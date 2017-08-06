@@ -1,5 +1,6 @@
 package iarks.org.bitbucket.gyromouse;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -22,7 +24,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 {
     Button buttonMouse,buttonScroll,buttonRight,buttonKeyboard;
     BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(1);
-    EditText keyboard_visibility;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -40,8 +41,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         buttonScroll = (Button)findViewById(R.id.buttonScroll);
         buttonRight = (Button)findViewById(R.id.buttonRight);
         buttonKeyboard = (Button)findViewById(R.id.buttonKeyboard);
-        keyboard_visibility=(EditText)findViewById(R.id.editText);
-        keyboard_visibility.setSelected(false);
+//        keyboard_visibility.setSelected(false);
 
         final Trackpad trackpad = new Trackpad(sharedQueue,getApplicationContext());
         final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue,getApplicationContext());
@@ -121,7 +121,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View v)
             {
-
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
             }
         });
 
