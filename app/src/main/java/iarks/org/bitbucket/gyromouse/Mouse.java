@@ -122,12 +122,12 @@ class Trackpad implements Runnable
                 // orientation in radians
                 z = (deltaOrientation[0]);
                 x = (deltaOrientation[1]);
-                y = (deltaOrientation[2]);
+//                y = (deltaOrientation[2]);
 
                 //orientation in degrees
                 z = (Math.toDegrees(z));
                 x = (Math.toDegrees(x));
-                y = (Math.toDegrees(y));
+//                y = (Math.toDegrees(y));
 
                 deltas = "{\"X\":" + "\"" + df.format(z) + "\"," + "\"Y\":\"" + df.format(x) + "\"}" + "\0";
 
@@ -231,7 +231,7 @@ class ScrollWheel implements Runnable
         Looper.loop();
     }
 
-    public void stopThread()
+    void stopThread()
     {
         //Unregister the listener
         if (mSensorManager != null) {

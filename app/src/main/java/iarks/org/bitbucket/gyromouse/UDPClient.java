@@ -18,18 +18,23 @@ class UDPClient implements Runnable {
     private byte[] data;
     private final BlockingQueue<String> sharedQueue;
 
-    UDPClient(int portNumber, String ip, BlockingQueue<String> bq) {
-        try {
+    UDPClient(int portNumber, String ip, BlockingQueue<String> bq)
+    {
+        try
+        {
             clientSocket = new DatagramSocket();
             IPAddress = InetAddress.getByName("192.168.1.40");
             port = 49443;
 
             Log.println(Log.INFO, "UDPClient", "HERE IN CONSTRUCTOR");
-        } catch (Exception e) {
-        } finally {
+        }
+        catch (Exception e)
+        {
+        }
+        finally
+        {
             sharedQueue = bq;
         }
-
     }
 
     void clearThread()
@@ -40,7 +45,7 @@ class UDPClient implements Runnable {
     @Override
     public void run()
     {
-        Log.e("UDPClient", "Thread start");
+//        Log.e("UDPClient", "Thread start");
         while (true)
         {
             if (!sharedQueue.isEmpty())
@@ -51,14 +56,14 @@ class UDPClient implements Runnable {
                 {
                     synchronized (sharedQueue)
                     {
-                        Log.println(Log.INFO, "UDPClient", "SENDING THE DATA. Run()");
-                        Log.println(Log.INFO, "UDPClient", sendPacket.getData().toString());
+//                        Log.println(Log.INFO, "UDPClient", "SENDING THE DATA. Run()");
+//                        Log.println(Log.INFO, "UDPClient", sendPacket.getData().toString());
                         clientSocket.send(sendPacket);
                         data=null;
-                        Log.println(Log.INFO, "UDPClient", "Data Sent");
+//                        Log.println(Log.INFO, "UDPClient", "Data Sent");
                     }
                 } catch (Exception e) {
-                    Log.e("UDPClient", "Run() Exception - " + e.getMessage());
+//                    Log.e("UDPClient", "Run() Exception - " + e.getMessage());
     //              Log.d("e.message = ", e.getMessage());
                 }
             }
