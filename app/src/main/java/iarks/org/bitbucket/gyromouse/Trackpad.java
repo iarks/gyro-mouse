@@ -1,9 +1,5 @@
 package iarks.org.bitbucket.gyromouse;
 
-/**
- * Created by Arkadeep on 03-Aug-17.
- */
-
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -20,11 +16,11 @@ import java.text.DecimalFormat;
 import java.util.concurrent.BlockingQueue;
 
 
-class Mouse implements Runnable
+class Trackpad implements Runnable
 {
 
 
-    private final BlockingQueue<String> blockingQueue;
+    private final BlockingQueue<String> sharedQueue;
 
     private Context mContext;
     private SensorManager mSensorManager = null;
@@ -49,9 +45,9 @@ class Mouse implements Runnable
 
     private DecimalFormat df = new DecimalFormat("0.00");
 
-    Mouse(BlockingQueue<String> bq,Context context)
+    Trackpad(BlockingQueue<String> bq, Context context)
     {
-        this.blockingQueue = bq;
+        this.sharedQueue = bq;
         this.mContext = context;
         try{
         clientSocket =new DatagramSocket();
@@ -73,9 +69,9 @@ class Mouse implements Runnable
         mHandlerThread.start();
         Handler handler = new Handler(mHandlerThread.getLooper());
 
-        synchronized (blockingQueue) {
+        synchronized (sharedQueue) {
             try {
-                blockingQueue.put("{\"X\":" + "\"" + "EOT" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                sharedQueue.put("{\"X\":" + "\"" + "EOT" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
                 deltas=null;
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -91,7 +87,7 @@ class Mouse implements Runnable
                 float directionX = 0.0f;
                 float directionY = 0.0f;
 
-                Log.e("Mouse", "THIS THREAD RIGHT HERE!");
+                Log.e("Trackpad", "THIS THREAD RIGHT HERE!");
 
                 float[] deltaOrientation = new float[9];
                 deltaOrientation[0] = 1;
@@ -168,9 +164,9 @@ class Mouse implements Runnable
 
                 data = deltas.getBytes();
 
-                synchronized (blockingQueue) {
+                synchronized (sharedQueue) {
                     try {
-                        blockingQueue.put(deltas);
+                        sharedQueue.put(deltas);
                         deltas=null;
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -190,14 +186,138 @@ class Mouse implements Runnable
     public void cleanThread()
     {
 
-//        synchronized (blockingQueue) {
+//        synchronized (sharedQueue) {
 //            try {
-//                blockingQueue.put("{\"X\":" + "\"" + "EOT" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+//                sharedQueue.put("{\"X\":" + "\"" + "EOT" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
 //                deltas=null;
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
 //            }
 //        }
+
+        //Unregister the listener
+        if (mSensorManager != null) {
+            mSensorManager.unregisterListener(mListener);
+        }
+
+        if (mHandlerThread.isAlive())
+            mHandlerThread.quitSafely();
+
+        deltas=null;
+        firstVal=true;
+    }
+
+}
+
+class ScrollWheel implements Runnable
+{
+
+
+    private final BlockingQueue<String> sharedQueue;
+    private Context mContext;
+    private SensorManager mSensorManager = null;
+    private Sensor mSensor;
+    private SensorEventListener mListener;
+    private HandlerThread mHandlerThread;
+    private String deltas=null;
+    private boolean firstVal=true;
+
+
+
+    private DatagramSocket clientSocket;
+    private InetAddress IPAddress;
+    private int port = 49443;
+    private byte[] data;
+
+    private final float NS2S = 1.0f / 1000000000.0f;
+    private final float[] deltaRotationVector = new float[4];
+    private float timestamp;
+    public static final float EPSILON = 0.000000001f;
+
+
+    private DecimalFormat df = new DecimalFormat("0.00");
+
+    ScrollWheel(BlockingQueue<String> bq,Context context)
+    {
+        this.sharedQueue = bq;
+        this.mContext = context;
+        try{
+            clientSocket =new DatagramSocket();
+            IPAddress = InetAddress.getByName("192.168.1.40");}
+        catch (Exception e)
+        {
+
+        }
+    }
+
+    @Override
+    public void run()
+    {
+        Log.e("Thread Name", Thread.currentThread().getName()+ "THIS THREAD RIGHT HERE!");
+        Looper.prepare();
+        mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+        mHandlerThread = new HandlerThread("AccelerometerLogListener");
+        mHandlerThread.start();
+        Handler handler = new Handler(mHandlerThread.getLooper());
+
+//        synchronized (sharedQueue) {
+//            try {
+//                sharedQueue.put("{\"X\":" + "\"" + "EOT" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+//                deltas=null;
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+        mListener = new SensorEventListener()
+        {
+            @Override
+            public void onSensorChanged(SensorEvent event)
+            {
+                Log.e("Mouse", "THIS THREAD RIGHT HERE!");
+
+                float[] deltaOrientation = new float[9];
+                deltaOrientation[0] = 1;
+                deltaOrientation[4] = 1;
+                deltaOrientation[8] = 1;
+                DecimalFormat df = new DecimalFormat("0.00");
+
+                double x, y, z;
+                final float dT = (event.timestamp - timestamp) * NS2S;
+
+                // Axis of the rotation sample, not normalized yet.
+                float axisX = event.values[0];
+                float axisY = event.values[1];
+                float axisZ = event.values[2];
+
+                y = axisY;
+
+                deltas = "{\"X\":" + "\"" + "S" + "\"," + "\"Y\":\"" + df.format(y) + "\"}" + "\0";
+
+//                data = deltas.getBytes();
+
+                synchronized (sharedQueue) {
+                    try {
+                        sharedQueue.put(deltas);
+                        deltas=null;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+            }
+        };
+        mSensorManager.registerListener(mListener,mSensor,SensorManager.SENSOR_DELAY_UI,handler);
+        Looper.loop();
+    }
+
+    public void cleanThread()
+    {
 
         //Unregister the listener
         if (mSensorManager != null) {

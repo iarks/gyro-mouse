@@ -38,7 +38,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         buttonScroll = (Button)findViewById(R.id.buttonScroll);
         buttonRight = (Button)findViewById(R.id.buttonRight);
 
-        final Mouse mouse = new Mouse(blockingQueue,getApplicationContext());
+        final Trackpad mouse = new Trackpad(blockingQueue,getApplicationContext());
+
+        final ScrollWheel scrollWheel = new ScrollWheel(blockingQueue,getApplicationContext());
 
         // Start UDP thread
 //        udp_thread.start();
@@ -74,11 +76,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             {
                 if(event.getAction() == MotionEvent.ACTION_DOWN)
                 {
-
+                    Thread th = new Thread(scrollWheel);
+                    th.start();
                 }
                 else if (event.getAction() == MotionEvent.ACTION_UP)
                 {
-
+                    udpClient.clearThread();
+                    scrollWheel.cleanThread();
                 }
                 return false;
             }
@@ -91,11 +95,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             {
                 if(event.getAction() == MotionEvent.ACTION_DOWN)
                 {
-
+                    try
+                    {
+                        blockingQueue.put("{\"X\":" + "\"" + "RD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                    }
+                    catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
                 else if (event.getAction() == MotionEvent.ACTION_UP)
                 {
-
+                    try
+                    {
+                        blockingQueue.put("{\"X\":" + "\"" + "RU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                    }
+                    catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
                 return false;
             }
