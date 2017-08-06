@@ -20,7 +20,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
     Button buttonMouse,buttonScroll,buttonRight;
-    BlockingQueue<String> blockingQueue = new LinkedBlockingDeque<>(1);
+    BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final UDPClient udpClient = new UDPClient(49443,"192.168.1.39",blockingQueue);
+        final UDPClient udpClient = new UDPClient(49443,"192.168.1.39", sharedQueue);
         final Thread udp_thread = new Thread(udpClient);
         udp_thread.start();
 
@@ -38,14 +38,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         buttonScroll = (Button)findViewById(R.id.buttonScroll);
         buttonRight = (Button)findViewById(R.id.buttonRight);
 
-        final Trackpad mouse = new Trackpad(blockingQueue,getApplicationContext());
+        final Trackpad trackpad = new Trackpad(sharedQueue,getApplicationContext());
+        final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue,getApplicationContext());
 
-        final ScrollWheel scrollWheel = new ScrollWheel(blockingQueue,getApplicationContext());
-
-        // Start UDP thread
-//        udp_thread.start();
-
-        // Add listeners for buttons
         buttonMouse.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
@@ -53,16 +48,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             {
                 if(event.getAction() == MotionEvent.ACTION_DOWN)
                 {
-
-                    Thread th = new Thread(mouse);
-                    th.start();
-//                    mThread = new HandlerThread("Gyro");
-//                    mHandlerThread.start();
+                    Thread trackpad_thread = new Thread(trackpad);
+                    trackpad_thread.start();
                 }
                 else if (event.getAction() == MotionEvent.ACTION_UP)
                 {
                     udpClient.clearThread();
-                    mouse.cleanThread();
+                    trackpad.stopThread();
                     Log.e("MainActivity","cleared");
                 }
                 return false;
@@ -76,13 +68,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             {
                 if(event.getAction() == MotionEvent.ACTION_DOWN)
                 {
-                    Thread th = new Thread(scrollWheel);
-                    th.start();
+                    Thread scrollWheel_thread = new Thread(scrollWheel);
+                    scrollWheel_thread.start();
                 }
                 else if (event.getAction() == MotionEvent.ACTION_UP)
                 {
                     udpClient.clearThread();
-                    scrollWheel.cleanThread();
+                    scrollWheel.stopThread();
                 }
                 return false;
             }
@@ -97,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 {
                     try
                     {
-                        blockingQueue.put("{\"X\":" + "\"" + "RD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        sharedQueue.put("{\"X\":" + "\"" + "RD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
                     }
                     catch (InterruptedException e)
                     {
@@ -108,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 {
                     try
                     {
-                        blockingQueue.put("{\"X\":" + "\"" + "RU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        sharedQueue.put("{\"X\":" + "\"" + "RU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
                     }
                     catch (InterruptedException e)
                     {
