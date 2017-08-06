@@ -13,14 +13,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.EditText;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
-    Button buttonMouse,buttonScroll,buttonRight;
+    Button buttonMouse,buttonScroll,buttonRight,buttonKeyboard;
     BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(1);
+    EditText keyboard_visibility;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -37,6 +39,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         buttonMouse = (Button)findViewById(R.id.buttonMouse);
         buttonScroll = (Button)findViewById(R.id.buttonScroll);
         buttonRight = (Button)findViewById(R.id.buttonRight);
+        buttonKeyboard = (Button)findViewById(R.id.buttonKeyboard);
+        keyboard_visibility=(EditText)findViewById(R.id.editText);
+        keyboard_visibility.setSelected(false);
 
         final Trackpad trackpad = new Trackpad(sharedQueue,getApplicationContext());
         final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue,getApplicationContext());
@@ -108,6 +113,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
                 return false;
+            }
+        });
+
+        buttonKeyboard.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+
             }
         });
 
