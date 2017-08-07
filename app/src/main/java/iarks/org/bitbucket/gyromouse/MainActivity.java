@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View v)
             {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
             }
         });
 
@@ -204,46 +204,55 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public boolean dispatchKeyEvent(KeyEvent event)
-    {
-        Toast.makeText(getApplicationContext(), "here_above all else", Toast.LENGTH_SHORT).show();
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        Toast.makeText(getApplicationContext(), "KEY EVENT DETECTED", Toast.LENGTH_SHORT).show();
         int i;
         int keyCode = event.getKeyCode();
         boolean z = event.getAction() == 1;
-        int unicodeChar=event.getUnicodeChar();
-        if (unicodeChar == 0)
+        int unicodeChar = event.getUnicodeChar();
+
+        if (event.getAction() == 1 || event.getAction() == 2)
         {
-            if (keyCode == 0)
+            if (unicodeChar == 0)
             {
-                char charAt = event.getCharacters().charAt(0);
-                if (charAt != '\u0000')
+                Toast.makeText(getApplicationContext(), "UNICODE CHARACTER IS 0 : " + event.getUnicodeChar(), Toast.LENGTH_SHORT).show();
+                // keycode for unknown key events
+                if (keyCode == 0)
                 {
-                    i = charAt;
-                    Toast.makeText(getApplicationContext(), Integer.toHexString(i)+"here", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "KEYCODE IS 0 - IT IS AN UNKNOWN KEY EVENT", Toast.LENGTH_SHORT).show();
+
+                    char charAt = event.getCharacters().charAt(0);
+                    if (charAt != '\u0000')
+                    {
+                        Toast.makeText(getApplicationContext(), "IT IS NOT A NULL CHARACTER", Toast.LENGTH_SHORT).show();
+                        i = charAt;
+
+                        Toast.makeText(getApplicationContext(), "THE ACTUAL CHARACTER" + event.getCharacters(), Toast.LENGTH_SHORT).show();
+
+                        Toast.makeText(getApplicationContext(), "i = " + Integer.toHexString(i), Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+
+
+                if (keyCode == 67) {
+                    Toast.makeText(getApplicationContext(), "BACKSPACE", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (keyCode != 66) {
+
+                    Toast.makeText(getApplicationContext(), "PROBABLY A CHARACTER", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), Integer.toHexString(unicodeChar) + "here" + keyCode, Toast.LENGTH_SHORT).show();
+                    return false;
+                } else {
+                    Toast.makeText(getApplicationContext(), "NOTHING MATCHES - PROBABLY ENTER", Toast.LENGTH_SHORT).show();
+                    return true;
                 }
             }
 
-            if (keyCode == 67)
-            {
-                Toast.makeText(getApplicationContext(), "here_in 67", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            else if (keyCode != 66)
-            {
-
-                Toast.makeText(getApplicationContext(), "here_in not 66", Toast.LENGTH_SHORT).show();
-                Toast.makeText(getApplicationContext(), Integer.toHexString(unicodeChar)+"here"+keyCode, Toast.LENGTH_SHORT).show();
-                return false;
-            }
-            else
-            {
-                Toast.makeText(getApplicationContext(), "here_else", Toast.LENGTH_SHORT).show();
-                return true;
-            }
+            i = unicodeChar;
+            Toast.makeText(getApplicationContext(), "UNICODE CHARACTER NOT 0 : " + Integer.toHexString(i), Toast.LENGTH_SHORT).show();
+            return super.dispatchKeyEvent(event);
         }
-        i=unicodeChar;
-        Toast.makeText(getApplicationContext(), Integer.toHexString(i)+"here"+i, Toast.LENGTH_SHORT).show();
-
-        return super.dispatchKeyEvent(event);
+        return false;
     }
 }
