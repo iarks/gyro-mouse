@@ -6,6 +6,8 @@ package iarks.org.bitbucket.gyromouse;
 
 
 import android.util.Log;
+
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -50,7 +52,11 @@ class UDPClient implements Runnable {
         {
             if (!sharedQueue.isEmpty())
             {
-                data = sharedQueue.remove().getBytes();
+                try {
+                    data = sharedQueue.remove().getBytes("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
                 DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, port);
                 try
                 {
