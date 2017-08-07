@@ -16,16 +16,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import static android.view.KeyEvent.KEYCODE_BACK;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
     Button buttonMouse,buttonScroll,buttonRight,buttonKeyboard;
-    BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(1);
+    BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(2);
 //    EditText edit;
 
 
@@ -206,64 +206,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean dispatchKeyEvent(KeyEvent event)
     {
-//        Toast.makeText(getApplicationContext(), "KEY EVENT DETECTED", Toast.LENGTH_SHORT).show();
-        int i;
-        int keyCode = event.getKeyCode();
-        int unicodeChar = event.getUnicodeChar();
-        if (event.getAction() == 1 || event.getAction() == 2)
+        if ((event.getAction() == 1 || event.getAction() == 2) && event.getKeyCode()!=KEYCODE_BACK)
         {
-            switch (keyCode)
-            {
-                case 67:
-                    try
-                    {
-                        sharedQueue.put("{\"X\":" + "\"" + "BS" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
-                    }
-                    catch (InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    return true;
-            }
-
-            if (unicodeChar == 0)
-            {
-                Toast.makeText(getApplicationContext(), "UNICODE CHARACTER IS 0 : " + event.getUnicodeChar(), Toast.LENGTH_SHORT).show();
-
-                // keycode for unknown key events
-                if (keyCode == 0)
-                {
-                    Toast.makeText(getApplicationContext(), "KEYCODE IS 0 - IT IS AN UNKNOWN KEY EVENT", Toast.LENGTH_SHORT).show();
-
-                    char charAt = event.getCharacters().charAt(0);
-                    if (charAt != '\u0000')
-                    {
-//                        String ch = event.getCharacters();
-//                        try
-//                        {
-//                            Toast.makeText(getApplicationContext(), "UNICODE CHARACTER NOT 0 : " + ch, Toast.LENGTH_SHORT).show();
-//                            sharedQueue.put("{\"X\":" + "\"" + "K" + "\"," + "\"Y\":\"" + ch + "\"}" + "\0");
-//                            return true;
-//                        }
-//                        catch (InterruptedException e)
-//                        {
-//                            e.printStackTrace();
-//                        }
-                    }
-                }
-            }
-
-            i = unicodeChar;
-            try
-            {
-                sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + i + "\"}" + "\0");
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-            return super.dispatchKeyEvent(event);
+            KeyboardEvents keyboardEvents = new KeyboardEvents(event, sharedQueue, getApplicationContext());
+            Thread th = new Thread(keyboardEvents);
+            th.start();
         }
-        return false;
+        return super.dispatchKeyEvent(event);
     }
 }
