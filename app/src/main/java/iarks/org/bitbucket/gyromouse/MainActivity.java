@@ -3,6 +3,7 @@ package iarks.org.bitbucket.gyromouse;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -24,6 +26,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 {
     Button buttonMouse,buttonScroll,buttonRight,buttonKeyboard;
     BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(1);
+//    EditText edit;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -41,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         buttonScroll = (Button)findViewById(R.id.buttonScroll);
         buttonRight = (Button)findViewById(R.id.buttonRight);
         buttonKeyboard = (Button)findViewById(R.id.buttonKeyboard);
+//        edit=(EditText)findViewById(R.id.edit);
 //        keyboard_visibility.setSelected(false);
 
         final Trackpad trackpad = new Trackpad(sharedQueue,getApplicationContext());
@@ -196,5 +201,49 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event)
+    {
+        Toast.makeText(getApplicationContext(), "here_above all else", Toast.LENGTH_SHORT).show();
+        int i;
+        int keyCode = event.getKeyCode();
+        boolean z = event.getAction() == 1;
+        int unicodeChar=event.getUnicodeChar();
+        if (unicodeChar == 0)
+        {
+            if (keyCode == 0)
+            {
+                char charAt = event.getCharacters().charAt(0);
+                if (charAt != '\u0000')
+                {
+                    i = charAt;
+                    Toast.makeText(getApplicationContext(), Integer.toHexString(i)+"here", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            if (keyCode == 67)
+            {
+                Toast.makeText(getApplicationContext(), "here_in 67", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            else if (keyCode != 66)
+            {
+
+                Toast.makeText(getApplicationContext(), "here_in not 66", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), Integer.toHexString(unicodeChar)+"here"+keyCode, Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            else
+            {
+                Toast.makeText(getApplicationContext(), "here_else", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        }
+        i=unicodeChar;
+        Toast.makeText(getApplicationContext(), Integer.toHexString(i)+"here"+i, Toast.LENGTH_SHORT).show();
+
+        return super.dispatchKeyEvent(event);
     }
 }
