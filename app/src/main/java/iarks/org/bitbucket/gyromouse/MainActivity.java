@@ -204,18 +204,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        Toast.makeText(getApplicationContext(), "KEY EVENT DETECTED", Toast.LENGTH_SHORT).show();
+    public boolean dispatchKeyEvent(KeyEvent event)
+    {
+//        Toast.makeText(getApplicationContext(), "KEY EVENT DETECTED", Toast.LENGTH_SHORT).show();
         int i;
         int keyCode = event.getKeyCode();
-        boolean z = event.getAction() == 1;
         int unicodeChar = event.getUnicodeChar();
-
         if (event.getAction() == 1 || event.getAction() == 2)
         {
+            switch (keyCode)
+            {
+                case 67:
+                    try
+                    {
+                        sharedQueue.put("{\"X\":" + "\"" + "BS" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                    }
+                    catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    return true;
+            }
+
             if (unicodeChar == 0)
             {
                 Toast.makeText(getApplicationContext(), "UNICODE CHARACTER IS 0 : " + event.getUnicodeChar(), Toast.LENGTH_SHORT).show();
+
                 // keycode for unknown key events
                 if (keyCode == 0)
                 {
@@ -224,33 +238,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     char charAt = event.getCharacters().charAt(0);
                     if (charAt != '\u0000')
                     {
-                        Toast.makeText(getApplicationContext(), "IT IS NOT A NULL CHARACTER", Toast.LENGTH_SHORT).show();
-                        i = charAt;
-
-                        Toast.makeText(getApplicationContext(), "THE ACTUAL CHARACTER" + event.getCharacters(), Toast.LENGTH_SHORT).show();
-
-                        Toast.makeText(getApplicationContext(), "i = " + Integer.toHexString(i), Toast.LENGTH_SHORT).show();
-
+//                        String ch = event.getCharacters();
+//                        try
+//                        {
+//                            Toast.makeText(getApplicationContext(), "UNICODE CHARACTER NOT 0 : " + ch, Toast.LENGTH_SHORT).show();
+//                            sharedQueue.put("{\"X\":" + "\"" + "K" + "\"," + "\"Y\":\"" + ch + "\"}" + "\0");
+//                            return true;
+//                        }
+//                        catch (InterruptedException e)
+//                        {
+//                            e.printStackTrace();
+//                        }
                     }
-                }
-
-
-                if (keyCode == 67) {
-                    Toast.makeText(getApplicationContext(), "BACKSPACE", Toast.LENGTH_SHORT).show();
-                    return true;
-                } else if (keyCode != 66) {
-
-                    Toast.makeText(getApplicationContext(), "PROBABLY A CHARACTER", Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getApplicationContext(), Integer.toHexString(unicodeChar) + "here" + keyCode, Toast.LENGTH_SHORT).show();
-                    return false;
-                } else {
-                    Toast.makeText(getApplicationContext(), "NOTHING MATCHES - PROBABLY ENTER", Toast.LENGTH_SHORT).show();
-                    return true;
                 }
             }
 
             i = unicodeChar;
-            Toast.makeText(getApplicationContext(), "UNICODE CHARACTER NOT 0 : " + Integer.toHexString(i), Toast.LENGTH_SHORT).show();
+            try
+            {
+                sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + i + "\"}" + "\0");
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
             return super.dispatchKeyEvent(event);
         }
         return false;
