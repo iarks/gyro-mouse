@@ -15,7 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
+import android.widget.ImageView;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -24,7 +24,7 @@ import static android.view.KeyEvent.KEYCODE_BACK;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
-    Button buttonMouse,buttonScroll,buttonRight,buttonKeyboard;
+    ImageView buttonMouse,buttonScroll,buttonRight,buttonKeyboard;
     BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(2);
 //    EditText edit;
 
@@ -41,10 +41,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         final Thread udp_thread = new Thread(udpClient);
         udp_thread.start();
 
-        buttonMouse = (Button)findViewById(R.id.buttonMouse);
-        buttonScroll = (Button)findViewById(R.id.buttonScroll);
-        buttonRight = (Button)findViewById(R.id.buttonRight);
-        buttonKeyboard = (Button)findViewById(R.id.buttonKeyboard);
+        buttonMouse = (ImageView) findViewById(R.id.buttonMouse);
+        buttonScroll = (ImageView) findViewById(R.id.buttonScroll);
+        buttonRight = (ImageView) findViewById(R.id.buttonRight);
+        buttonKeyboard = (ImageView) findViewById(R.id.buttonKeyboard);
 //        edit=(EditText)findViewById(R.id.edit);
 //        keyboard_visibility.setSelected(false);
 

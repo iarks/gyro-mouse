@@ -11,54 +11,61 @@
     tools:layout_editor_absoluteY="81dp"
     tools:layout_editor_absoluteX="0dp">
 
-    <Button
+    <ImageView
         android:id="@+id/buttonMouse"
-        android:layout_width="105dp"
-        android:layout_height="92dp"
-        android:text="Mouse"
-        tools:layout_constraintTop_creator="1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Move Pointer"
+        android:src="@drawable/typicons_e0921_64_buttons"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toTopOf="@+id/buttonScroll"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ImageView
+        android:id="@+id/buttonKeyboard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Keyboard"
+        android:contentDescription="Open Keyboard"
+        android:src="@drawable/materialsicons_key146"
         tools:layout_constraintRight_creator="1"
         tools:layout_constraintBottom_creator="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginBottom="114dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
-    <Button
-        android:id="@+id/buttonKeyboard"
-        android:layout_width="122dp"
-        android:layout_height="48dp"
-        android:text="Keyboard"
-        tools:layout_constraintTop_creator="1"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="105dp"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="@+id/buttonMouse"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginLeft="8dp" />
-
-    <Button
+    <ImageView
         android:id="@+id/buttonScroll"
-        android:layout_width="88dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Scroll"
-        app:layout_constraintLeft_toLeftOf="@+id/buttonMouse"
-        app:layout_constraintTop_toBottomOf="@+id/buttonMouse"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintTop_creator="1" />
-
-    <Button
-        android:id="@+id/buttonRight"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:text="Right"
-        android:layout_marginEnd="16dp"
-        tools:layout_constraintTop_creator="1"
+        android:src="@drawable/typicons_e01e0_64"
+        android:contentDescription="Scroll Wheel"
         tools:layout_constraintRight_creator="1"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/buttonMouse"/>
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toTopOf="@+id/buttonKeyboard"
+        app:layout_constraintRight_toRightOf="@+id/buttonKeyboard"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="82dp"
+        app:layout_constraintLeft_toLeftOf="@+id/buttonKeyboard" />
+
+    <ImageView
+        android:id="@+id/buttonRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Right"
+        android:contentDescription="Right Mouse Button"
+        android:src="@drawable/typicons_e01b0_64"
+        tools:layout_constraintTop_creator="1"
+        android:layout_marginTop="29dp"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintTop_toTopOf="@+id/buttonMouse"
+        app:layout_constraintLeft_toRightOf="@+id/buttonMouse" />
 
     <!--<EditText
         android:layout_width="wrap_content"

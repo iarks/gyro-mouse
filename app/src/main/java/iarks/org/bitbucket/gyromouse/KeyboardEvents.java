@@ -54,7 +54,7 @@ class KeyboardEvents implements Runnable
                     try
                     {
 //                        Toast.makeText(context, "UNICODE CHARACTER NOT 0 : " + ch, Toast.LENGTH_SHORT).show();
-                        sharedQueue.put("{\"X\":" + "\"" + "K" + "\"," + "\"Y\":\"" + ch + "\"}" + "\0");
+                        sharedQueue.put("{\"X\":" + "\"" + "K" + "\"," + "\"Y\":\"" + Integer.toHexString(charAt) + "\"}" + "\0");
                         return;
                     }
                     catch (InterruptedException e)
