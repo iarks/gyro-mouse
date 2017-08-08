@@ -16,10 +16,22 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <include layout="@layout/content_main"
+        android:id="@+id/include" />
+
+    <!--<android.support.v7.widget.AppCompatImageButton-->
+        <!--android:id="@+id/appCompatImageButton"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="top|right"-->
+        <!--android:layout_marginRight="16dp"-->
+        <!--android:background="?attr/selectableItemBackgroundBorderless"-->
+        <!--android:src="@drawable/materialicons_e1ba1_48" />-->
 
 </android.support.design.widget.CoordinatorLayout>

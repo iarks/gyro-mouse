@@ -1,6 +1,7 @@
 package iarks.org.bitbucket.gyromouse;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -208,7 +209,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_wifi)
+        {
+            startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
             return true;
         }
 
