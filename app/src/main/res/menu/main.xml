@@ -5,6 +5,6 @@
         android:id="@+id/action_wifi"
         android:orderInCategory="100"
         android:title="Wifi Settings"
-        android:icon="@drawable/materialicons_e1ba1_64"
+        android:icon="@drawable/ic_signal_wifi_4_bar_black_24dp"
         app:showAsAction="always" />
 </menu>
