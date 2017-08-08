@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 {
     Button buttonRight,buttonEscape,buttonLeft,buttonWindows;
     ImageButton buttonAR,buttonAL,buttonAU,buttonAD,buttonMouse,buttonKeyboard,buttonScroll;
-    BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(2);
+    BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
 //    EditText edit;
 
 
@@ -63,12 +63,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         buttonAU=(ImageButton)findViewById(R.id.buttonAUp);
         buttonAR=(ImageButton)findViewById(R.id.buttonARight);
         buttonAL=(ImageButton)findViewById(R.id.buttonALeft);
-
-
-
-//        edit=(EditText)findViewById(R.id.edit);
-//        keyboard_visibility.setSelected(false);
-
 
         final Trackpad trackpad = new Trackpad(sharedQueue,getApplicationContext());
         final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue,getApplicationContext());
@@ -199,19 +193,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         buttonMouse.setOnTouchListener(new View.OnTouchListener()
         {
+            long timeDown,timeUp;
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
                 if(event.getAction() == MotionEvent.ACTION_DOWN)
                 {
+                    timeDown=event.getDownTime();
                     Thread trackpad_thread = new Thread(trackpad);
                     trackpad_thread.start();
                 }
                 else if (event.getAction() == MotionEvent.ACTION_UP)
                 {
+                    timeUp=event.getEventTime();
                     udpClient.clearThread();
                     trackpad.stopThread();
                     Log.e("MainActivity","cleared");
+                    if(timeUp-timeDown<200)
+                    {
+                        try
+                        {
+                            sharedQueue.put("{\"X\":" + "\"" + "LD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "LU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        }
+                        catch (InterruptedException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
                 }
                 return false;
             }
@@ -341,9 +350,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
             }
         });
-
-
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
