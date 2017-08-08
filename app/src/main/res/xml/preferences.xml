@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sample="urn:oasis:names:tc:xliff:document:1.2">
+    <EditTextPreference android:title="Setup Server"
+        android:key="username"
+        android:summary="Provide IP address and Port number of host">
+    </EditTextPreference>
+    <CheckBoxPreference android:title="Application Updates"
+        android:defaultValue="false"
+        android:summary="This option if selected will allow the application to check for latest versions."
+        android:key="applicationUpdates" />
+    <ListPreference
+        android:title="Download Details"
+        android:summary="Select the kind of data that you would like to download"
+        android:key="downloadType"
+        android:defaultValue="1"
+        android:entries="@array/listArray"
+        android:entryValues="@array/listValues" />
+
+    <!--<com.pavelsikun.seekbarpreference.SeekBarPreference-->
+        <!--android:key="your_pref_key"-->
+        <!--android:title="SeekbarPreference 2"-->
+        <!--android:summary="Some summary"-->
+        <!--android:enabled="false"-->
+        <!--android:defaultValue="5000"-->
+
+        <!--sample:msbp_minValue="100"-->
+        <!--sample:msbp_maxValue="10000"-->
+        <!--sample:msbp_interval="200"-->
+        <!--sample:msbp_measurementUnit="%"-->
+        <!--sample:msbp_dialogEnabled="false"/>-->
+
+</PreferenceScreen>
