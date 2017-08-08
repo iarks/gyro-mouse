@@ -161,12 +161,15 @@ class Trackpad implements Runnable
         //Unregister the listener
         if (mSensorManager != null)
         {
+            Log.e("Trackpad", "Unregistering Listener");
             mSensorManager.unregisterListener(mListener);
         }
 
-        if (mHandlerThread.isAlive())
-            mHandlerThread.quitSafely();
-
+        if(mHandlerThread.isAlive())
+        {
+            Log.e("Trackpad", "Killing thread");
+            mHandlerThread.quit();
+        }
         deltas=null;
     }
 }
