@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        edit=(EditText)findViewById(R.id.edit);
 //        keyboard_visibility.setSelected(false);
 
+
         final Trackpad trackpad = new Trackpad(sharedQueue,getApplicationContext());
         final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue,getApplicationContext());
 
