@@ -27,16 +27,21 @@
 
     <Button
         android:id="@+id/buttonKeyboard"
-        android:layout_width="122dp"
+        android:layout_width="0dp"
         android:layout_height="48dp"
         android:text="Keyboard"
+        android:layout_marginStart="142dp"
+        android:layout_marginEnd="142dp"
         tools:layout_constraintTop_creator="1"
-        android:layout_marginStart="8dp"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonRight"
+        app:layout_constraintRight_toRightOf="parent"
         android:layout_marginTop="105dp"
         tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="@+id/buttonMouse"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginLeft="8dp" />
+        android:layout_marginBottom="105dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/buttonScroll"
@@ -44,10 +49,10 @@
         android:layout_height="48dp"
         android:layout_marginStart="8dp"
         android:text="Scroll"
-        app:layout_constraintLeft_toLeftOf="@+id/buttonMouse"
+        tools:layout_constraintTop_creator="1"
         app:layout_constraintTop_toBottomOf="@+id/buttonMouse"
         tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintTop_creator="1" />
+        app:layout_constraintLeft_toLeftOf="@+id/buttonMouse" />
 
     <Button
         android:id="@+id/buttonRight"
@@ -58,7 +63,37 @@
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintRight_creator="1"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/buttonMouse"/>
+        app:layout_constraintTop_toTopOf="@+id/buttonMouse" />
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/themify_e7330_64"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:id="@+id/buttonWin"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp" />
+
+    <Button
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/themify_e7330_64"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonWin"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/buttonWin"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintVertical_bias="0.0"
+        android:id="@+id/buttonEscape"
+        android:text="ESC"/>
 
     <!--<EditText
         android:layout_width="wrap_content"

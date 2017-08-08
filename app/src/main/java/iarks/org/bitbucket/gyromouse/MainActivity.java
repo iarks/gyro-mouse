@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -24,7 +25,8 @@ import static android.view.KeyEvent.KEYCODE_BACK;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
-    Button buttonMouse,buttonScroll,buttonRight,buttonKeyboard;
+    Button buttonMouse,buttonScroll,buttonRight,buttonKeyboard,buttonEscape;
+    ImageButton buttonWindows;
     BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(2);
 //    EditText edit;
 
@@ -45,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         buttonScroll = (Button)findViewById(R.id.buttonScroll);
         buttonRight = (Button)findViewById(R.id.buttonRight);
         buttonKeyboard = (Button)findViewById(R.id.buttonKeyboard);
+        buttonEscape = (Button)findViewById(R.id.buttonEscape);
+        buttonWindows = (ImageButton)findViewById(R.id.buttonWin);
 //        edit=(EditText)findViewById(R.id.edit);
 //        keyboard_visibility.setSelected(false);
 
@@ -119,6 +123,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
                 return false;
+            }
+        });
+
+        buttonEscape.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    sharedQueue.put("{\"X\":" + "\"" + "ESC" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                return;
+            }
+        });
+
+        buttonWindows.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    sharedQueue.put("{\"X\":" + "\"" + "WIN" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                return;
             }
         });
 
