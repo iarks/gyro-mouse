@@ -17,22 +17,22 @@
         android:inputType="numberDecimal">
     </EditTextPreference>
 
-    <com.yokkomi.commons.preference.seekbar.SeekBarPreference
-        android:defaultValue="25"
-        android:key="pointerSpeed"
-        android:summary="Set pointer speed"
-        android:title="Pointer Speed"
-        app:explain="Set the rate of pointer movement"
-        app:maxValue="100"
-        app:padding="3"/>
+    <!--<com.yokkomi.commons.preference.seekbar.SeekBarPreference-->
+        <!--android:defaultValue="25"-->
+        <!--android:key="pointerSpeed"-->
+        <!--android:summary="Set pointer speed"-->
+        <!--android:title="Pointer Speed"-->
+        <!--app:explain="Set the rate of pointer movement"-->
+        <!--app:maxValue="100"-->
+        <!--app:padding="3"/>-->
 
-    <com.yokkomi.commons.preference.seekbar.SeekBarPreference
-        android:defaultValue="0.2"
-        android:key="pointerThreshold"
-        android:summary="Set pointer responsiveness"
-        android:title="Pointer Speed"
-        app:explain="Set the sensitivity of pointer movement"
-        app:maxValue="2"
-        app:padding="3"/>
+    <!--<com.yokkomi.commons.preference.seekbar.SeekBarPreference-->
+        <!--android:defaultValue="0.2"-->
+        <!--android:key="pointerThreshold"-->
+        <!--android:summary="Set pointer responsiveness"-->
+        <!--android:title="Pointer Speed"-->
+        <!--app:explain="Set the sensitivity of pointer movement"-->
+        <!--app:maxValue="2"-->
+        <!--app:padding="3"/>-->
 
 </PreferenceScreen>

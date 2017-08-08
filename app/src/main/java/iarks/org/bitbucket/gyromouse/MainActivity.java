@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String ip = SP.getString("username", "192.168.1.40");
         String port = SP.getString("port","49443");
-        String pointerSpeed = SP.getString("downloadType","25");
-        String pointerThreshold = SP.getString("downloadType","0.2");
+//        String pointerSpeed = SP.getString("downloadType","25");
+//        String pointerThreshold = SP.getString("downloadType","0.2");
 
         final UDPClient udpClient = new UDPClient(Integer.parseInt(port),ip, sharedQueue);
         final Thread udp_thread = new Thread(udpClient);
