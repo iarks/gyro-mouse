@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -193,7 +194,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         buttonMouse.setOnTouchListener(new View.OnTouchListener()
         {
-            long timeDown,timeUp;
+            long timeDown,timeUp,dt1,dt2;
+            int downcount=0;
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
@@ -209,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     udpClient.clearThread();
                     trackpad.stopThread();
                     Log.e("MainActivity","cleared");
-                    if(timeUp-timeDown<200)
+                    if(timeUp-timeDown<500)
                     {
                         try
                         {
@@ -278,11 +280,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         buttonLeft.setOnTouchListener(new View.OnTouchListener()
         {
+            long downTime=0;
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
                 if(event.getAction() == MotionEvent.ACTION_DOWN)
                 {
+                    downTime=event.getDownTime();
                     try
                     {
                         sharedQueue.put("{\"X\":" + "\"" + "LD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
@@ -294,13 +298,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 else if (event.getAction() == MotionEvent.ACTION_UP)
                 {
-                    try
+                    if(event.getEventTime()-downTime<1000)
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "LU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        try
+                        {
+                            sharedQueue.put("{\"X\":" + "\"" + "LU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        }
+                        catch (InterruptedException e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
-                    catch (InterruptedException e)
+                    else
                     {
-                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this,"Left Mouse Button Pressed", Toast.LENGTH_SHORT).show();
                     }
                 }
                 return false;
@@ -319,7 +330,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 {
                     e.printStackTrace();
                 }
-                return;
             }
         });
 
@@ -336,7 +346,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 {
                     e.printStackTrace();
                 }
-                return;
             }
         });
 
@@ -441,6 +450,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return super.dispatchKeyEvent(event);
     }
+
+
 
 
 }
