@@ -25,8 +25,8 @@ class UDPClient implements Runnable {
         try
         {
             clientSocket = new DatagramSocket();
-            IPAddress = InetAddress.getByName("192.168.1.40");
-            port = 49443;
+            IPAddress = InetAddress.getByName(ip);
+            port = portNumber;
 
             Log.println(Log.INFO, "UDPClient", "HERE IN CONSTRUCTOR");
         }

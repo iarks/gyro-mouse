@@ -2,7 +2,9 @@ package iarks.org.bitbucket.gyromouse;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -40,7 +42,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final UDPClient udpClient = new UDPClient(49443,"192.168.1.39", sharedQueue);
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String ip = SP.getString("username", "192.168.1.40");
+        String port = SP.getString("port","49443");
+        String pointerSpeed = SP.getString("downloadType","25");
+        String pointerThreshold = SP.getString("downloadType","0.2");
+
+        final UDPClient udpClient = new UDPClient(Integer.parseInt(port),ip, sharedQueue);
         final Thread udp_thread = new Thread(udpClient);
         udp_thread.start();
 
@@ -50,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         buttonKeyboard = (Button)findViewById(R.id.buttonKeyboard);
         buttonEscape = (Button)findViewById(R.id.buttonEscape);
         buttonWindows = (ImageButton)findViewById(R.id.buttonWin);
+
 //        edit=(EditText)findViewById(R.id.edit);
 //        keyboard_visibility.setSelected(false);
 
@@ -169,6 +178,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
             }
         });
+
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
