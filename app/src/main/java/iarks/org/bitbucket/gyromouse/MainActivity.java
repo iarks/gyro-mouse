@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_settings)
         {
             // Handle the camera action
-            Intent i = new Intent(this, SettingsActivity.class);
+            Intent i = new Intent(this, PreferencesActivity.class);
             startActivity(i);
         }
 //          else if (id == R.id.nav_gallery) {

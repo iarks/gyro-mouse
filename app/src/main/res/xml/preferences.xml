@@ -1,33 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:sample="urn:oasis:names:tc:xliff:document:1.2">
-    <EditTextPreference android:title="Setup Server"
-        android:key="username"
-        android:summary="Provide IP address and Port number of host">
+    xmlns:sample="urn:oasis:names:tc:xliff:document:1.2"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <EditTextPreference android:title="Server IP"
+        android:key="ip"
+        android:summary="Provide address of host"
+        android:hint="xxx.xxx.xxx.xxx"
+        android:inputType="numberDecimal"
+        android:defaultValue="192.168.1.40">
     </EditTextPreference>
-    <CheckBoxPreference android:title="Application Updates"
-        android:defaultValue="false"
-        android:summary="This option if selected will allow the application to check for latest versions."
-        android:key="applicationUpdates" />
-    <ListPreference
-        android:title="Download Details"
-        android:summary="Select the kind of data that you would like to download"
-        android:key="downloadType"
-        android:defaultValue="1"
-        android:entries="@array/listArray"
-        android:entryValues="@array/listValues" />
 
-    <!--<com.pavelsikun.seekbarpreference.SeekBarPreference-->
-        <!--android:key="your_pref_key"-->
-        <!--android:title="SeekbarPreference 2"-->
-        <!--android:summary="Some summary"-->
-        <!--android:enabled="false"-->
-        <!--android:defaultValue="5000"-->
+    <EditTextPreference android:title="Server Socket"
+        android:key="port"
+        android:defaultValue="49443"
+        android:summary="Provide port number of host"
+        android:hint="49443"
+        android:inputType="numberDecimal">
+    </EditTextPreference>
 
-        <!--sample:msbp_minValue="100"-->
-        <!--sample:msbp_maxValue="10000"-->
-        <!--sample:msbp_interval="200"-->
-        <!--sample:msbp_measurementUnit="%"-->
-        <!--sample:msbp_dialogEnabled="false"/>-->
+    <com.yokkomi.commons.preference.seekbar.SeekBarPreference
+        android:defaultValue="25"
+        android:key="pointerSpeed"
+        android:summary="Set pointer speed"
+        android:title="Pointer Speed"
+        app:explain="Set the rate of pointer movement"
+        app:maxValue="100"
+        app:padding="3"/>
+
+    <com.yokkomi.commons.preference.seekbar.SeekBarPreference
+        android:defaultValue="0.2"
+        android:key="pointerThreshold"
+        android:summary="Set pointer responsiveness"
+        android:title="Pointer Speed"
+        app:explain="Set the sensitivity of pointer movement"
+        app:maxValue="2"
+        app:padding="3"/>
 
 </PreferenceScreen>
