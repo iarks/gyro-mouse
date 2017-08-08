@@ -1,5 +1,6 @@
 package iarks.org.bitbucket.gyromouse;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +21,7 @@ import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -28,8 +30,9 @@ import static android.view.KeyEvent.KEYCODE_BACK;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
-    Button buttonMouse,buttonScroll,buttonRight,buttonKeyboard,buttonEscape;
-    ImageButton buttonWindows;
+    Button buttonRight,buttonKeyboard,buttonEscape,buttonLeft,buttonWindows;
+    Button buttonScroll;
+    ImageButton buttonAR,buttonAL,buttonAU,buttonAD,buttonMouse;
     BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(2);
 //    EditText edit;
 
@@ -52,12 +55,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         final Thread udp_thread = new Thread(udpClient);
         udp_thread.start();
 
-        buttonMouse = (Button)findViewById(R.id.buttonMouse);
-        buttonScroll = (Button)findViewById(R.id.buttonScroll);
+        buttonMouse = (ImageButton)findViewById(R.id.buttonMouse);
+//        buttonScroll = (Button)findViewById(R.id.buttonScroll);
         buttonRight = (Button)findViewById(R.id.buttonRight);
-        buttonKeyboard = (Button)findViewById(R.id.buttonKeyboard);
+//        buttonKeyboard = (Button)findViewById(R.id.buttonKeyboard);
         buttonEscape = (Button)findViewById(R.id.buttonEscape);
-        buttonWindows = (ImageButton)findViewById(R.id.buttonWin);
+        buttonWindows = (Button)findViewById(R.id.buttonWin);
 
 //        edit=(EditText)findViewById(R.id.edit);
 //        keyboard_visibility.setSelected(false);
@@ -86,24 +89,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        buttonScroll.setOnTouchListener(new View.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
-                if(event.getAction() == MotionEvent.ACTION_DOWN)
-                {
-                    Thread scrollWheel_thread = new Thread(scrollWheel);
-                    scrollWheel_thread.start();
-                }
-                else if (event.getAction() == MotionEvent.ACTION_UP)
-                {
-                    udpClient.clearThread();
-                    scrollWheel.stopThread();
-                }
-                return false;
-            }
-        });
+//        buttonScroll.setOnTouchListener(new View.OnTouchListener()
+//        {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event)
+//            {
+//                if(event.getAction() == MotionEvent.ACTION_DOWN)
+//                {
+//                    Thread scrollWheel_thread = new Thread(scrollWheel);
+//                    scrollWheel_thread.start();
+//                }
+//                else if (event.getAction() == MotionEvent.ACTION_UP)
+//                {
+//                    udpClient.clearThread();
+//                    scrollWheel.stopThread();
+//                }
+//                return false;
+//            }
+//        });
 
         buttonRight.setOnTouchListener(new View.OnTouchListener()
         {
@@ -169,15 +172,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        buttonKeyboard.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
-            }
-        });
+
+//        buttonKeyboard.setOnClickListener(new View.OnClickListener()
+//        {
+//            @Override
+//            public void onClick(View v)
+//            {
+//                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
+//            }
+//        });
+
 
 
 
@@ -271,4 +276,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return super.dispatchKeyEvent(event);
     }
+
+
 }
