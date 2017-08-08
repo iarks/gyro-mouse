@@ -16,7 +16,7 @@
         android:orientation="horizontal">
 
         <android.support.v7.widget.AppCompatImageButton
-            android:id="@+id/up"
+            android:id="@+id/buttonAUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_keyboard_arrow_up_black_24dp" />
@@ -32,18 +32,17 @@
             android:layout_height="wrap_content"
             android:text="ESC"/>
         <android.support.v7.widget.AppCompatImageButton
-            android:id="@+id/right"
+            android:id="@+id/buttonARight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_keyboard_arrow_left_black_24dp"/>
         <android.support.v7.widget.AppCompatImageButton
-            android:id="@+id/down"
+            android:id="@+id/buttonADown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp"
-            />
+            app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp" />
         <android.support.v7.widget.AppCompatImageButton
-            android:id="@+id/left"
+            android:id="@+id/buttonALeft"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_keyboard_arrow_right_black_24dp"
@@ -59,23 +58,46 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <Button
+            android:id="@+id/buttonLeft"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="R"
-            android:id="@+id/buttonRight"
-            />
+            android:layout_height="48dp"
+            android:text="L"/>
+
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/buttonMouse"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_settings_overscan_black_24dp"
-            />
+            app:srcCompat="@drawable/ic_settings_overscan_black_24dp" />
+
         <Button
+            android:id="@+id/buttonRight"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="R" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/buttonKeyboard"
+            android:layout_width="48dp"
             android:layout_height="48dp"
-            android:text="L"
-            android:id="@+id/l"/>
+            app:srcCompat="@drawable/ic_keyboard_black_24dp" />
+
+        <android.support.v7.widget.AppCompatImageButton
+            android:id="@+id/buttonScroll"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:srcCompat="@drawable/ic_keyboard_black_24dp" />
+
+
     </LinearLayout>
 
 </LinearLayout>
