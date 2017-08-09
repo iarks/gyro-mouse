@@ -1,12 +1,8 @@
 package iarks.org.bitbucket.gyromouse;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 
 public class PreferencesActivity extends PreferenceActivity
 {
@@ -25,7 +21,7 @@ public class PreferencesActivity extends PreferenceActivity
         public void onCreate(final Bundle savedInstanceState)
         {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences);
+            addPreferencesFromResource(R.xml.activity_preferences);
         }
     }
 }
