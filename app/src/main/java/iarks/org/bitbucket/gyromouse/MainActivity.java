@@ -32,8 +32,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Button buttonRight,buttonEscape,buttonLeft,buttonWindows;
     ImageButton buttonAR,buttonAL,buttonAU,buttonAD,buttonMouse,buttonKeyboard,buttonScroll;
     BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
-//    EditText edit;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -46,24 +44,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String ip = SP.getString("username", "192.168.1.40");
         String port = SP.getString("port","49443");
-//        String pointerSpeed = SP.getString("downloadType","25");
-//        String pointerThreshold = SP.getString("downloadType","0.2");
 
         final UDPClient udpClient = new UDPClient(Integer.parseInt(port),ip, sharedQueue);
         final Thread udp_thread = new Thread(udpClient);
         udp_thread.start();
 
-        buttonMouse = (ImageButton)findViewById(R.id.buttonMouse);
-        buttonScroll = (ImageButton)findViewById(R.id.buttonScroll);
-        buttonRight = (Button)findViewById(R.id.buttonRight);
-        buttonKeyboard = (ImageButton)findViewById(R.id.buttonKeyboard);
-        buttonEscape = (Button)findViewById(R.id.buttonEscape);
-        buttonWindows = (Button)findViewById(R.id.buttonWin);
-        buttonLeft=(Button)findViewById(R.id.buttonLeft);
         buttonAD=(ImageButton)findViewById(R.id.buttonADown);
         buttonAU=(ImageButton)findViewById(R.id.buttonAUp);
         buttonAR=(ImageButton)findViewById(R.id.buttonARight);
         buttonAL=(ImageButton)findViewById(R.id.buttonALeft);
+        buttonMouse = (ImageButton)findViewById(R.id.buttonMouse);
+        buttonScroll = (ImageButton)findViewById(R.id.buttonScroll);
+        buttonRight = (Button)findViewById(R.id.buttonRight);
+        buttonKeyboard = (ImageButton)findViewById(R.id.buttonKeyboard);
+
+        buttonEscape = (Button)findViewById(R.id.buttonEscape);
+        buttonWindows = (Button)findViewById(R.id.buttonWin);
+        buttonLeft=(Button)findViewById(R.id.buttonLeft);
+
 
         final Trackpad trackpad = new Trackpad(sharedQueue,getApplicationContext());
         final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue,getApplicationContext());
@@ -194,8 +192,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         buttonMouse.setOnTouchListener(new View.OnTouchListener()
         {
-            long timeDown,timeUp,dt1,dt2;
-            int downcount=0;
+            long timeDown,timeUp;
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
@@ -444,14 +441,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     {
         if ((event.getAction() == 1 || event.getAction() == 2) && event.getKeyCode()!=KEYCODE_BACK)
         {
-            KeyboardEvents keyboardEvents = new KeyboardEvents(event, sharedQueue, getApplicationContext());
+            KeyboardEvents keyboardEvents = new KeyboardEvents(event, sharedQueue);
             Thread th = new Thread(keyboardEvents);
             th.start();
         }
         return super.dispatchKeyEvent(event);
     }
-
-
-
-
 }

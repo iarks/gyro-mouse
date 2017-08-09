@@ -10,19 +10,16 @@ import java.util.concurrent.BlockingQueue;
 class KeyboardEvents implements Runnable
 {
     private KeyEvent event;
-    private Context context;
     private BlockingQueue<String> sharedQueue;
-    KeyboardEvents(KeyEvent event, BlockingQueue<String> sharedQueue, Context context)
+    KeyboardEvents(KeyEvent event, BlockingQueue<String> sharedQueue)
     {
         this.event=event;
-        this.context=context;
         this.sharedQueue=sharedQueue;
     }
 
     @Override
     public void run()
     {
-//        Toast.makeText(context, "KEY EVENT DETECTED", Toast.LENGTH_SHORT).show();
         int i;
         int keyCode = event.getKeyCode();
         int unicodeChar = event.getUnicodeChar();
