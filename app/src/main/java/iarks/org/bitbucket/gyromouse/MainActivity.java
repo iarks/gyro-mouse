@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String ip = SP.getString("username", "192.168.1.40");
+        String ip = SP.getString("ip", "192.168.1.40");
         String port = SP.getString("port","49443");
 
         final UDPClient udpClient = new UDPClient(Integer.parseInt(port),ip, sharedQueue);
