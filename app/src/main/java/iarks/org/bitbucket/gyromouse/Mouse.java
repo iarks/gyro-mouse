@@ -193,7 +193,7 @@ class ScrollWheel implements Runnable
     @Override
     public void run()
     {
-        Log.e("Thread Name", Thread.currentThread().getName()+ "THIS THREAD RIGHT HERE!");
+//        Log.e("Thread Name", Thread.currentThread().getName()+ "THIS THREAD RIGHT HERE!");
         Looper.prepare();
         mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);

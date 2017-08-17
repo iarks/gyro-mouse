@@ -1,10 +1,6 @@
 package iarks.org.bitbucket.gyromouse;
 
-import android.content.Context;
 import android.view.KeyEvent;
-import android.widget.Toast;
-
-import java.io.UnsupportedEncodingException;
 import java.util.concurrent.BlockingQueue;
 
 class KeyboardEvents implements Runnable
