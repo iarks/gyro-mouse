@@ -25,13 +25,4 @@
     <include layout="@layout/content_main"
         android:id="@+id/include" />
 
-    <!--<android.support.v7.widget.AppCompatImageButton-->
-        <!--android:id="@+id/appCompatImageButton"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="top|right"-->
-        <!--android:layout_marginRight="16dp"-->
-        <!--android:background="?attr/selectableItemBackgroundBorderless"-->
-        <!--android:src="@drawable/materialicons_e1ba1_48" />-->
-
 </android.support.design.widget.CoordinatorLayout>
