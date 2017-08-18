@@ -3,4 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="yatse_primaryDark">#0b1113</color>
+    <color name="yatse_primary">#18252a</color>
+    <color name="yatse_accent">#00cbc4</color>
+    <color name="background_material_light">#263238</color>
+    <color name="yatse_background">#0b171b</color>
 </resources>
