@@ -9,4 +9,5 @@
     <color name="yatse_accent">#00cbc4</color>
     <color name="background_material_light">#263238</color>
     <color name="yatse_background">#0b171b</color>
+    <color name="yatse_button">#18252A</color>
 </resources>

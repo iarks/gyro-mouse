@@ -9,6 +9,6 @@
         <item name="android:colorBackground">@color/yatse_background</item>
         <item name="android:textColorSecondary">@color/yatse_background_material_light</item>
 
-        <item name="colorButtonNormal">#18252A</item>
+        <item name="colorButtonNormal">@color/yatse_button</item>
     </style>
 </resources>
