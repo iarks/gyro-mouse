@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity
         buttonMouse = (ImageButton)findViewById(R.id.buttonMouse);
         buttonScroll = (ImageButton)findViewById(R.id.buttonScroll);
         buttonRight = (Button)findViewById(R.id.buttonRight);
-        buttonKeyboard = (ImageButton)findViewById(R.id.buttonKeyboard);
+        //buttonKeyboard = (ImageButton)findViewById(R.id.buttonKeyboard);
 
         buttonEscape = (Button)findViewById(R.id.buttonEscape);
         buttonWindows = (Button)findViewById(R.id.buttonWin);
@@ -343,15 +343,15 @@ public class MainActivity extends AppCompatActivity
         });
 
 
-        buttonKeyboard.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
-            }
-        });
+//        buttonKeyboard.setOnClickListener(new View.OnClickListener()
+//        {
+//            @Override
+//            public void onClick(View v)
+//            {
+//                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
+//            }
+//        });
     }
 
     @Override
@@ -373,6 +373,12 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_wifi)
         {
             startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
+            return true;
+        }
+        else if(id == R.id.action_keyboard)
+        {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
             return true;
         }
         else if(id == R.id.action_settings)

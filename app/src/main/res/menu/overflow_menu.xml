@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_keyboard"
+        android:orderInCategory="100"
+        android:title="@string/open_keyboard"
+        android:icon="@drawable/ic_keyboard_black_24dp"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_wifi"
         android:orderInCategory="100"
         android:title="@string/wifi_settings"
