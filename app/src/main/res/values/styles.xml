@@ -8,6 +8,9 @@
         <item name="colorAccent">@color/yatse_accent</item>
         <item name="android:colorBackground">@color/yatse_background</item>
         <item name="android:textColorSecondary">@color/yatse_background_material_light</item>
+        <item name="colorButtonNormal">#18252A</item>
+
+
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -24,5 +27,6 @@
         <!-- To change the background of options menu-->
         <item name="android:itemBackground">@color/yatse_primaryDark</item>
     </style>
+
 
 </resources>

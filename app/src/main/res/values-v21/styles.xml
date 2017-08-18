@@ -8,5 +8,7 @@
         <item name="colorAccent">@color/yatse_accent</item>
         <item name="android:colorBackground">@color/yatse_background</item>
         <item name="android:textColorSecondary">@color/yatse_background_material_light</item>
+
+        <item name="colorButtonNormal">#18252A</item>
     </style>
 </resources>
