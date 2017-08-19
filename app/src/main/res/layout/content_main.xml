@@ -19,7 +19,7 @@
             android:id="@+id/buttonAUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/fab_margin"
+            android:padding="20dp"
             app:srcCompat="@drawable/ic_keyboard_arrow_up_black_24dp" />
 
     </LinearLayout>
@@ -40,19 +40,19 @@
             android:id="@+id/buttonARight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/fab_margin"
+            android:padding="20dp"
             app:srcCompat="@drawable/ic_keyboard_arrow_left_black_24dp"/>
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/buttonADown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/fab_margin"
+            android:padding="20dp"
             app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp" />
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/buttonALeft"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/fab_margin"
+            android:padding="20dp"
             app:srcCompat="@drawable/ic_keyboard_arrow_right_black_24dp"
             />
         <Button
@@ -79,7 +79,7 @@
             android:id="@+id/buttonMouse"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/fab_margin"
+            android:padding="20dp"
             app:srcCompat="@drawable/ic_settings_overscan_black_24dp" />
 
         <Button
@@ -99,7 +99,7 @@
             android:id="@+id/buttonScroll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/fab_margin"
+            android:padding="20dp"
             app:srcCompat="@drawable/ic_swap_vert_black_24dp" />
 
     </LinearLayout>
