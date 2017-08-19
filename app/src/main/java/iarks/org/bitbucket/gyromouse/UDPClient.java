@@ -4,7 +4,6 @@ package iarks.org.bitbucket.gyromouse;
  * Created by Arkadeep on 03-Aug-17.
  */
 
-
 import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
@@ -13,7 +12,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.concurrent.BlockingQueue;
 
-class UDPClient implements Runnable {
+class UDPClient implements Runnable
+{
     private DatagramSocket clientSocket;
     private InetAddress IPAddress;
     private int port;
@@ -47,12 +47,12 @@ class UDPClient implements Runnable {
     @Override
     public void run()
     {
-//        Log.e("UDPClient", "Thread start");
         while (true)
         {
             if (!sharedQueue.isEmpty())
             {
-                try {
+                try
+                {
                     data = sharedQueue.remove().getBytes("UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -62,15 +62,13 @@ class UDPClient implements Runnable {
                 {
                     synchronized (sharedQueue)
                     {
-//                        Log.println(Log.INFO, "UDPClient", "SENDING THE DATA. Run()");
-//                        Log.println(Log.INFO, "UDPClient", sendPacket.getData().toString());
                         clientSocket.send(sendPacket);
                         data=null;
-//                        Log.println(Log.INFO, "UDPClient", "Data Sent");
                     }
-                } catch (Exception e) {
-//                    Log.e("UDPClient", "Run() Exception - " + e.getMessage());
-    //              Log.d("e.message = ", e.getMessage());
+                }
+                catch (Exception e)
+                {
+
                 }
             }
         }

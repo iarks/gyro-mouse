@@ -26,7 +26,7 @@ import static android.view.KeyEvent.KEYCODE_BACK;
 public class MainActivity extends AppCompatActivity
 {
     Button buttonRight,buttonEscape,buttonLeft,buttonWindows;
-    ImageButton buttonAR,buttonAL,buttonAU,buttonAD,buttonMouse,buttonKeyboard,buttonScroll;
+    ImageButton buttonAR,buttonAL,buttonAU,buttonAD,buttonMouse,buttonScroll;
     BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
 
     @Override
@@ -342,16 +342,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
-//        buttonKeyboard.setOnClickListener(new View.OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View v)
-//            {
-//                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
-//            }
-//        });
     }
 
     @Override
