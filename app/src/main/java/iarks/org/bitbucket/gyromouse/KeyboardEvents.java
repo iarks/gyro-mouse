@@ -26,7 +26,10 @@ class KeyboardEvents implements Runnable
             case 67:
                 try
                 {
-                    sharedQueue.put("{\"X\":" + "\"" + "BS" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                    synchronized (sharedQueue) {
+                        sharedQueue.put("{\"X\":" + "\"" + "BS" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        sharedQueue.notifyAll();
+                    }
                 }
                 catch (InterruptedException e)
                 {
@@ -49,7 +52,10 @@ class KeyboardEvents implements Runnable
                     try
                     {
 //                        Toast.makeText(context, "UNICODE CHARACTER NOT 0 : " + ch, Toast.LENGTH_SHORT).show();
-                        sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + (int)charAt + "\"}" + "\0");
+                        synchronized (sharedQueue) {
+                            sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + (int)charAt + "\"}" + "\0");
+                            sharedQueue.notifyAll();
+                        }
                         return;
                     }
                     catch (InterruptedException e)
@@ -63,7 +69,10 @@ class KeyboardEvents implements Runnable
         i = unicodeChar;
         try
         {
-            sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + i + "\"}" + "\0");
+            synchronized (sharedQueue) {
+                sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + i + "\"}" + "\0");
+                sharedQueue.notifyAll();
+            }
         }
         catch (InterruptedException e)
         {

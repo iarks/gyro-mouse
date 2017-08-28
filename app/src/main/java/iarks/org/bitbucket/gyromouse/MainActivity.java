@@ -71,7 +71,10 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "AD" + "\"," + "\"Y\":\"" + 1 + "\"}" + "\0");
+                        synchronized (sharedQueue) {
+                            sharedQueue.put("{\"X\":" + "\"" + "AD" + "\"," + "\"Y\":\"" + 1 + "\"}" + "\0");
+                            sharedQueue.notifyAll();
+                        }
                     }
                     catch (InterruptedException e)
                     {
@@ -82,7 +85,10 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "AD" + "\"," + "\"Y\":\"" + 0 + "\"}" + "\0");
+                        synchronized (sharedQueue) {
+                            sharedQueue.put("{\"X\":" + "\"" + "AD" + "\"," + "\"Y\":\"" + 0 + "\"}" + "\0");
+                            sharedQueue.notifyAll();
+                        }
                     }
                     catch (InterruptedException e)
                     {
@@ -102,7 +108,10 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "AR" + "\"," + "\"Y\":\"" + 1 + "\"}" + "\0");
+                        synchronized (sharedQueue) {
+                            sharedQueue.put("{\"X\":" + "\"" + "AR" + "\"," + "\"Y\":\"" + 1 + "\"}" + "\0");
+                            sharedQueue.notifyAll();
+                        }
                     }
                     catch (InterruptedException e)
                     {
@@ -113,7 +122,10 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "AR" + "\"," + "\"Y\":\"" + 0 + "\"}" + "\0");
+                        synchronized (sharedQueue) {
+                            sharedQueue.put("{\"X\":" + "\"" + "AR" + "\"," + "\"Y\":\"" + 0 + "\"}" + "\0");
+                            sharedQueue.notifyAll();
+                        }
                     }
                     catch (InterruptedException e)
                     {
@@ -133,7 +145,11 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "AL" + "\"," + "\"Y\":\"" + 1 + "\"}" + "\0");
+                        synchronized (sharedQueue) {
+                            sharedQueue.put("{\"X\":" + "\"" + "AL" + "\"," + "\"Y\":\"" + 1 + "\"}" + "\0");
+                            sharedQueue.notifyAll();
+                        }
+
                     }
                     catch (InterruptedException e)
                     {
@@ -144,7 +160,10 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "AL" + "\"," + "\"Y\":\"" + 0 + "\"}" + "\0");
+                        synchronized (sharedQueue) {
+                            sharedQueue.put("{\"X\":" + "\"" + "AL" + "\"," + "\"Y\":\"" + 0 + "\"}" + "\0");
+                            sharedQueue.notifyAll();
+                        }
                     }
                     catch (InterruptedException e)
                     {
@@ -164,7 +183,10 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "AU" + "\"," + "\"Y\":\"" + 1 + "\"}" + "\0");
+                        synchronized (sharedQueue) {
+                            sharedQueue.put("{\"X\":" + "\"" + "AU" + "\"," + "\"Y\":\"" + 1 + "\"}" + "\0");
+                            sharedQueue.notifyAll();
+                        }
                     }
                     catch (InterruptedException e)
                     {
@@ -175,7 +197,10 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "AU" + "\"," + "\"Y\":\"" + 0 + "\"}" + "\0");
+                        synchronized (sharedQueue) {
+                            sharedQueue.put("{\"X\":" + "\"" + "AU" + "\"," + "\"Y\":\"" + 0 + "\"}" + "\0");
+                            sharedQueue.notifyAll();
+                        }
                     }
                     catch (InterruptedException e)
                     {
@@ -208,8 +233,12 @@ public class MainActivity extends AppCompatActivity
                     {
                         try
                         {
-                            sharedQueue.put("{\"X\":" + "\"" + "LD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
-                            sharedQueue.put("{\"X\":" + "\"" + "LU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                            synchronized (sharedQueue)
+                            {
+                                sharedQueue.put("{\"X\":" + "\"" + "LD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                                sharedQueue.put("{\"X\":" + "\"" + "LU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                                sharedQueue.notifyAll();
+                            }
                         }
                         catch (InterruptedException e)
                         {
@@ -249,7 +278,10 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "RD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        synchronized (sharedQueue) {
+                            sharedQueue.put("{\"X\":" + "\"" + "RD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                            sharedQueue.notifyAll();
+                        }
                     }
                     catch (InterruptedException e)
                     {
@@ -260,7 +292,10 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "RU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        synchronized (sharedQueue) {
+                            sharedQueue.put("{\"X\":" + "\"" + "RU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                            sharedQueue.notifyAll();
+                        }
                     }
                     catch (InterruptedException e)
                     {
@@ -282,7 +317,10 @@ public class MainActivity extends AppCompatActivity
                     downTime=event.getDownTime();
                     try
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "LD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        synchronized (sharedQueue) {
+                            sharedQueue.put("{\"X\":" + "\"" + "LD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                            sharedQueue.notifyAll();
+                        }
                     }
                     catch (InterruptedException e)
                     {
@@ -295,7 +333,10 @@ public class MainActivity extends AppCompatActivity
                     {
                         try
                         {
-                            sharedQueue.put("{\"X\":" + "\"" + "LU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                            synchronized (sharedQueue) {
+                                sharedQueue.put("{\"X\":" + "\"" + "LU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                                sharedQueue.notifyAll();
+                            }
                         }
                         catch (InterruptedException e)
                         {
@@ -317,7 +358,10 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    sharedQueue.put("{\"X\":" + "\"" + "ESC" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                    synchronized (sharedQueue) {
+                        sharedQueue.put("{\"X\":" + "\"" + "ESC" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        sharedQueue.notifyAll();
+                    }
                 }
                 catch (InterruptedException e)
                 {
@@ -333,7 +377,10 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    sharedQueue.put("{\"X\":" + "\"" + "WIN" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                    synchronized (sharedQueue) {
+                        sharedQueue.put("{\"X\":" + "\"" + "WIN" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        sharedQueue.notifyAll();
+                    }
                 }
                 catch (InterruptedException e)
                 {

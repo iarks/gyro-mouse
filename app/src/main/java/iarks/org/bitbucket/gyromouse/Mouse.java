@@ -215,12 +215,20 @@ class ScrollWheel implements Runnable
 
                 deltas = "{\"X\":" + "\"" + "S" + "\"," + "\"Y\":\"" + df.format(axisY) + "\"}" + "\0";
 
-                synchronized (sharedQueue) {
-                    try {
+                synchronized (sharedQueue)
+                {
+                    try
+                    {
                         sharedQueue.put(deltas);
                         deltas=null;
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
+                    }
+                    finally
+                    {
+                        sharedQueue.notifyAll();
                     }
                 }
             }
