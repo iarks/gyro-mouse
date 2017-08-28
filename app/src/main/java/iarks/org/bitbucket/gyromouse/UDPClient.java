@@ -1,9 +1,5 @@
 package iarks.org.bitbucket.gyromouse;
 
-/**
- * Created by Arkadeep on 03-Aug-17.
- */
-
 import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
@@ -49,26 +45,38 @@ class UDPClient implements Runnable
     {
         while (true)
         {
-            if (!sharedQueue.isEmpty())
+            Log.e("UDPClient","inWhile");
+            synchronized (sharedQueue)
             {
-                try
+                if (!sharedQueue.isEmpty())
                 {
-                    data = sharedQueue.remove().getBytes("UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-                DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, port);
-                try
-                {
-                    synchronized (sharedQueue)
+                    try
+                    {
+                        data = sharedQueue.remove().getBytes("UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, port);
+                    try
                     {
                         clientSocket.send(sendPacket);
                         data=null;
                     }
-                }
-                catch (Exception e)
-                {
+                    catch (Exception e)
+                    {
 
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        sharedQueue.wait();
+                    }
+                    catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

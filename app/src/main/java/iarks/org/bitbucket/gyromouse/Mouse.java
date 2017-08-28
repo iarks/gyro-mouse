@@ -142,6 +142,7 @@ class Trackpad implements Runnable
                     {
                         e.printStackTrace();
                     }
+                    sharedQueue.notifyAll();
                 }
             }
 
