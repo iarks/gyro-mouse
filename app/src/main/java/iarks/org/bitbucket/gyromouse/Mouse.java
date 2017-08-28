@@ -15,6 +15,8 @@ import java.util.concurrent.BlockingQueue;
 
 class Trackpad implements Runnable
 {
+    private static final String TAG = MainActivity.class.getName();
+
     private Context context;
     private SensorManager mSensorManager = null;
     private Sensor sensor;
@@ -173,6 +175,7 @@ class Trackpad implements Runnable
 
 class ScrollWheel implements Runnable
 {
+    private static final String TAG = MainActivity.class.getName();
 
     private final BlockingQueue<String> sharedQueue;
     private Context mContext;

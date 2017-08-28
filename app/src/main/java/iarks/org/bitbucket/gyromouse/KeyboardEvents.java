@@ -5,6 +5,8 @@ import java.util.concurrent.BlockingQueue;
 
 class KeyboardEvents implements Runnable
 {
+    private static final String TAG = MainActivity.class.getName();
+
     private KeyEvent event;
     private BlockingQueue<String> sharedQueue;
     KeyboardEvents(KeyEvent event, BlockingQueue<String> sharedQueue)

@@ -10,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 
 class UDPClient implements Runnable
 {
+    private static final String TAG = MainActivity.class.getName();
     private DatagramSocket clientSocket;
     private InetAddress IPAddress;
     private int port;
@@ -45,7 +46,7 @@ class UDPClient implements Runnable
     {
         while (true)
         {
-            Log.e("UDPClient","inWhile");
+            Log.e(TAG,"inWhile");
             synchronized (sharedQueue)
             {
                 if (!sharedQueue.isEmpty())

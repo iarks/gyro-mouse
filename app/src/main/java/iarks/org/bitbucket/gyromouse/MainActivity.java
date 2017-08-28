@@ -24,6 +24,8 @@ import static android.view.KeyEvent.KEYCODE_BACK;
 
 public class MainActivity extends AppCompatActivity
 {
+    private static final String TAG = MainActivity.class.getName();
+
     Button buttonRight,buttonEscape,buttonLeft,buttonWindows;
     ImageButton buttonAR,buttonAL,buttonAU,buttonAD,buttonMouse,buttonScroll;
     BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
