@@ -17,7 +17,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -52,7 +51,6 @@ public class MainActivity extends AppCompatActivity
         buttonMouse = (ImageButton)findViewById(R.id.buttonMouse);
         buttonScroll = (ImageButton)findViewById(R.id.buttonScroll);
         buttonRight = (Button)findViewById(R.id.buttonRight);
-        //buttonKeyboard = (ImageButton)findViewById(R.id.buttonKeyboard);
 
         buttonEscape = (Button)findViewById(R.id.buttonEscape);
         buttonWindows = (Button)findViewById(R.id.buttonWin);
@@ -353,7 +351,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.

@@ -54,10 +54,6 @@ class KeyboardEvents implements Runnable
                     {
                         e.printStackTrace();
                     }
-//                    catch(UnsupportedEncodingException u)
-//                    {
-//                        u.printStackTrace();
-//                    }
                 }
             }
         }
