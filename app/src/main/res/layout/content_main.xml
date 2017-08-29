@@ -35,7 +35,8 @@
             android:layout_width="70dp"
             android:padding="@dimen/fab_margin"
             android:layout_height="wrap_content"
-            android:text="@string/escape"/>
+            android:text="@string/escape"
+            android:textColor="@color/yatse_accent"/>
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/buttonARight"
             android:layout_width="wrap_content"
@@ -60,7 +61,8 @@
             android:layout_width="70dp"
             android:layout_height="wrap_content"
             android:padding="@dimen/fab_margin"
-            android:text="@string/windows" />
+            android:text="@string/windows"
+            android:textColor="@color/yatse_accent"/>
     </LinearLayout>
 
     <LinearLayout
@@ -73,7 +75,8 @@
             android:id="@+id/buttonLeft"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/leftMouse"/>
+            android:text="@string/leftMouse"
+            android:textColor="@color/yatse_accent"/>
 
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/buttonMouse"
@@ -86,7 +89,8 @@
             android:id="@+id/buttonRight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/rightMouse" />
+            android:text="@string/rightMouse"
+            android:textColor="@color/yatse_accent"/>
 
     </LinearLayout>
 
