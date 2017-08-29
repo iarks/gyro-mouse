@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="20dp"
-            app:srcCompat="@drawable/ic_keyboard_arrow_up_black_24dp" />
+            app:srcCompat="@drawable/ic_keyboard_arrow_up_24dp" />
 
     </LinearLayout>
 
@@ -42,19 +42,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="20dp"
-            app:srcCompat="@drawable/ic_keyboard_arrow_left_black_24dp"/>
+            app:srcCompat="@drawable/ic_keyboard_arrow_left_24dp"/>
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/buttonADown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="20dp"
-            app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp" />
+            app:srcCompat="@drawable/ic_keyboard_arrow_down_24dp" />
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/buttonALeft"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="20dp"
-            app:srcCompat="@drawable/ic_keyboard_arrow_right_black_24dp"
+            app:srcCompat="@drawable/ic_keyboard_arrow_right_24dp"
             />
         <Button
             android:id="@+id/buttonWin"
@@ -83,7 +83,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="20dp"
-            app:srcCompat="@drawable/ic_settings_overscan_black_24dp" />
+            app:srcCompat="@drawable/ic_settings_overscan_24dp" />
 
         <Button
             android:id="@+id/buttonRight"
@@ -104,7 +104,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="20dp"
-            app:srcCompat="@drawable/ic_swap_vert_black_24dp" />
+            app:srcCompat="@drawable/ic_swap_vert_24dp" />
 
     </LinearLayout>
 
