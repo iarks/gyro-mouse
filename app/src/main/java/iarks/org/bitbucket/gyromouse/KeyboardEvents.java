@@ -48,7 +48,7 @@ class KeyboardEvents implements Runnable
                 char charAt = event.getCharacters().charAt(0);
                 if (charAt != '\u0000')
                 {
-                    String ch = event.getCharacters();
+//                    String ch = event.getCharacters();
                     try
                     {
 //                        Toast.makeText(context, "UNICODE CHARACTER NOT 0 : " + ch, Toast.LENGTH_SHORT).show();
