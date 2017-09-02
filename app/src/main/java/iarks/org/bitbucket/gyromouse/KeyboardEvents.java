@@ -1,7 +1,10 @@
 package iarks.org.bitbucket.gyromouse;
 
+import android.util.Log;
 import android.view.KeyEvent;
 import java.util.concurrent.BlockingQueue;
+
+import static android.R.attr.tag;
 
 class KeyboardEvents implements Runnable
 {
@@ -26,7 +29,8 @@ class KeyboardEvents implements Runnable
             case 67:
                 try
                 {
-                    synchronized (sharedQueue) {
+                    synchronized (sharedQueue)
+                    {
                         sharedQueue.put("{\"X\":" + "\"" + "BS" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
                         sharedQueue.notifyAll();
                     }
@@ -48,12 +52,12 @@ class KeyboardEvents implements Runnable
                 char charAt = event.getCharacters().charAt(0);
                 if (charAt != '\u0000')
                 {
-//                    String ch = event.getCharacters();
+                    String ch = event.getCharacters();
                     try
                     {
 //                        Toast.makeText(context, "UNICODE CHARACTER NOT 0 : " + ch, Toast.LENGTH_SHORT).show();
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + (int)charAt + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + charAt + "\"}" + "\0");
                             sharedQueue.notifyAll();
                         }
                         return;
@@ -70,7 +74,10 @@ class KeyboardEvents implements Runnable
         try
         {
             synchronized (sharedQueue) {
-                sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + i + "\"}" + "\0");
+                sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + (char)i + "\"}" + "\0");
+//                Log.d(TAG,event.getCharacters().charAt(0)+"");
+                Log.d(TAG,(char)i+"");
+//                sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + event.getCharacters().charAt(0) + "\"}" + "\0");
                 sharedQueue.notifyAll();
             }
         }
