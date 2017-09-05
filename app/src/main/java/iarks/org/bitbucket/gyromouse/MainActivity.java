@@ -389,6 +389,18 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        //-----------------------------------------------
+        try
+        {
+            synchronized (sharedQueue) {
+                sharedQueue.put("DICK MOVE");
+                sharedQueue.notifyAll();
+            }
+        }catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+        //----------------------------------------------------
     }
 
     @Override
