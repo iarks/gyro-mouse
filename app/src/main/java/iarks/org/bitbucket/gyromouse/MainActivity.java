@@ -19,14 +19,20 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+import java.net.Socket;
 import java.util.Enumeration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 
@@ -463,25 +469,22 @@ public class MainActivity extends AppCompatActivity
                     datagramSocket = new DatagramSocket();
                     datagramSocket.setBroadcast(true);
 
-                    try
-                    {
-                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), 9050);
-                        datagramSocket.send(sendPacket);
-                        Log.i("",getClass().getName() + ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
-                        Log.i("",">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
-//                        Toast.makeText(MainActivity.this, ">>> Request packet sent to: 255.255.255.255 (DEFAULT)", Toast.LENGTH_SHORT).show();
-                    }
-                    catch (Exception e)
-                    {
-                        //Toast.makeText(MainActivity.this, "ERR", Toast.LENGTH_SHORT).show();
-                        e.printStackTrace();
-                    }
+//                    try
+//                    {
+//                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), 9050);
+//                        datagramSocket.send(sendPacket);
+//                        Log.e(getClass().getName(), ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
+//                    }
+//                    catch (Exception e)
+//                    {
+//                        e.printStackTrace();
+//                    }
 
                     // Broadcast the message over all the network interfaces
                     Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
                     while (interfaces.hasMoreElements())
                     {
-
+                        Log.e(getClass().getName(), ">>> In While, looping network interfaces");
                         NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
                         if (networkInterface.isLoopback() || !networkInterface.isUp())
                         {
@@ -504,16 +507,14 @@ public class MainActivity extends AppCompatActivity
                             }
                             catch (Exception e)
                             {
-
+                                e.printStackTrace();
                             }
 
-                          Log.i("",getClass().getName() + ">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
-                            Log.i("",">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
-//                            Toast.makeText(MainActivity.this, ">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName(), Toast.LENGTH_SHORT).show();
+                          Log.e(getClass().getName(),">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
                         }
                     }
 
-                    Log.i("",">>> Done looping over all network interfaces. Now waiting for a reply!");
+                    Log.e(getClass().getName(),">>> Done looping over all network interfaces. Now waiting for a reply!");
 
                     //Wait for a response
                     byte[] recvBuf = new byte[15000];
@@ -521,13 +522,12 @@ public class MainActivity extends AppCompatActivity
                     datagramSocket.receive(receivePacket);
 
                     //We have a response
-                    Log.i("",getClass().getName() + ">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
-                    Log.i("",">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
+                    Log.e(getClass().getName(),">>> Broadcast response from server at: " + receivePacket.getAddress().getHostAddress());
 
-                    //Check if the message is correct
-                    String message = new String(receivePacket.getData()).trim();
-                    Log.i("",message);
+                    // TODO: 9/6/2017 Check if the message is correct
+
                     datagramSocket.close();
+                    connectTCP(receivePacket.getAddress().getHostAddress());
                 }
                 catch (Exception e)
                 {
@@ -560,6 +560,35 @@ public class MainActivity extends AppCompatActivity
         protected void onProgressUpdate(Void... values)
         {
 
+        }
+
+        void connectTCP(String ip)
+        {
+            try
+            {
+                Socket skt = new Socket(ip, 13000);
+
+                BufferedReader socketReader = null;
+                BufferedWriter socketWriter = null;
+                socketReader = new BufferedReader(new InputStreamReader(
+                        skt.getInputStream()));
+                socketWriter = new BufferedWriter(new OutputStreamWriter(
+                        skt.getOutputStream()));
+
+                String inMsg = null;
+                while ((inMsg = socketReader.readLine()) != null) {
+                    Log.e(getClass().getName(),"Received from  client: " + inMsg);
+                    Log.e(getClass().getName(),"Im here!!");
+                    String outMsg = inMsg;
+                    socketWriter.write(outMsg);
+                    socketWriter.write("\n");
+                    socketWriter.flush();
+                }
+            }
+            catch(Exception e)
+            {
+                Log.e("","Whoops! It didn't work!\n");
+            }
         }
 
     }
