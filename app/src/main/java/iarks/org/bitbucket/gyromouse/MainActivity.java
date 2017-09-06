@@ -3,6 +3,7 @@ package iarks.org.bitbucket.gyromouse;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -17,6 +18,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -389,18 +397,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        //-----------------------------------------------
-        try
-        {
-            synchronized (sharedQueue) {
-                sharedQueue.put("DICK MOVE");
-                sharedQueue.notifyAll();
-            }
-        }catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-        //----------------------------------------------------
+        new serverFind().execute();
     }
 
     @Override
@@ -449,5 +446,121 @@ public class MainActivity extends AppCompatActivity
             th.start();
         }
         return super.dispatchKeyEvent(event);
+    }
+
+    private class serverFind extends AsyncTask<String, Void, String>
+    {
+        @Override
+        protected String doInBackground(String... params)
+        {
+            try
+            {
+                byte[] sendData = "CANCONNECT".getBytes("UTF-8");
+                DatagramSocket datagramSocket;
+
+                try
+                {
+                    datagramSocket = new DatagramSocket();
+                    datagramSocket.setBroadcast(true);
+
+                    try
+                    {
+                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), 9050);
+                        datagramSocket.send(sendPacket);
+                        Log.i("",getClass().getName() + ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
+                        Log.i("",">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
+//                        Toast.makeText(MainActivity.this, ">>> Request packet sent to: 255.255.255.255 (DEFAULT)", Toast.LENGTH_SHORT).show();
+                    }
+                    catch (Exception e)
+                    {
+                        //Toast.makeText(MainActivity.this, "ERR", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+
+                    // Broadcast the message over all the network interfaces
+                    Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
+                    while (interfaces.hasMoreElements())
+                    {
+
+                        NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
+                        if (networkInterface.isLoopback() || !networkInterface.isUp())
+                        {
+                            continue; // Don't want to broadcast to the loopback interface
+                        }
+
+                        for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses())
+                        {
+                            InetAddress broadcast = interfaceAddress.getBroadcast();
+                            if (broadcast == null)
+                            {
+                                continue;
+                            }
+
+                            // Send the broadcast package!
+                            try
+                            {
+                                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, 9050);
+                                datagramSocket.send(sendPacket);
+                            }
+                            catch (Exception e)
+                            {
+
+                            }
+
+                          Log.i("",getClass().getName() + ">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
+                            Log.i("",">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
+//                            Toast.makeText(MainActivity.this, ">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    Log.i("",">>> Done looping over all network interfaces. Now waiting for a reply!");
+
+                    //Wait for a response
+                    byte[] recvBuf = new byte[15000];
+                    DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
+                    datagramSocket.receive(receivePacket);
+
+                    //We have a response
+                    Log.i("",getClass().getName() + ">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
+                    Log.i("",">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
+
+                    //Check if the message is correct
+                    String message = new String(receivePacket.getData()).trim();
+                    Log.i("",message);
+                    datagramSocket.close();
+                }
+                catch (Exception e)
+                {
+                    Log.i("","ERROR");
+                    Log.e("ERROR", "HERE");
+                }
+
+
+
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values)
+        {
+
+        }
+
     }
 }
