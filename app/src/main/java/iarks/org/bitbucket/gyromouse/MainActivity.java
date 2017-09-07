@@ -19,16 +19,11 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-import java.net.Socket;
 import java.util.Enumeration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -43,6 +38,8 @@ public class MainActivity extends AppCompatActivity
     Button buttonRight,buttonEscape,buttonLeft,buttonWindows;
     ImageButton buttonAR,buttonAL,buttonAU,buttonAD,buttonMouse,buttonScroll;
     BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
+
+    Thread tcpClientThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -403,7 +400,8 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        new serverFind().execute();
+        Thread tcpClientThread = new Thread(new ServerHandler());
+        tcpClientThread.start();
     }
 
     @Override
@@ -454,18 +452,17 @@ public class MainActivity extends AppCompatActivity
         return super.dispatchKeyEvent(event);
     }
 
+
+
     private class serverFind extends AsyncTask<String, Void, String>
     {
         @Override
-        protected String doInBackground(String... params)
-        {
-            try
-            {
-                byte[] sendData = "CANCONNECT".getBytes("UTF-8");
+        protected String doInBackground(String... params) {
+            try {
+                byte[] sendData = "{\"X\":\"CANHAVEIP?\",\"Y\":\"0\"}".getBytes("UTF-8");
                 DatagramSocket datagramSocket;
 
-                try
-                {
+                try {
                     datagramSocket = new DatagramSocket();
                     datagramSocket.setBroadcast(true);
 
@@ -482,39 +479,32 @@ public class MainActivity extends AppCompatActivity
 
                     // Broadcast the message over all the network interfaces
                     Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
-                    while (interfaces.hasMoreElements())
-                    {
+                    while (interfaces.hasMoreElements()) {
                         Log.e(getClass().getName(), ">>> In While, looping network interfaces");
                         NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
-                        if (networkInterface.isLoopback() || !networkInterface.isUp())
-                        {
+                        if (networkInterface.isLoopback() || !networkInterface.isUp()) {
                             continue; // Don't want to broadcast to the loopback interface
                         }
 
-                        for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses())
-                        {
+                        for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
                             InetAddress broadcast = interfaceAddress.getBroadcast();
-                            if (broadcast == null)
-                            {
+                            if (broadcast == null) {
                                 continue;
                             }
 
                             // Send the broadcast package!
-                            try
-                            {
+                            try {
                                 DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, 9050);
                                 datagramSocket.send(sendPacket);
-                            }
-                            catch (Exception e)
-                            {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
 
-                          Log.e(getClass().getName(),">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
+                            Log.e(getClass().getName(), ">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
                         }
                     }
 
-                    Log.e(getClass().getName(),">>> Done looping over all network interfaces. Now waiting for a reply!");
+                    Log.e(getClass().getName(), ">>> Done looping over all network interfaces. Now waiting for a reply!");
 
                     //Wait for a response
                     byte[] recvBuf = new byte[15000];
@@ -522,74 +512,37 @@ public class MainActivity extends AppCompatActivity
                     datagramSocket.receive(receivePacket);
 
                     //We have a response
-                    Log.e(getClass().getName(),">>> Broadcast response from server at: " + receivePacket.getAddress().getHostAddress());
+                    Log.e(getClass().getName(), ">>> Broadcast response from server at: " + receivePacket.getAddress().getHostAddress());
 
                     // TODO: 9/6/2017 Check if the message is correct
 
                     datagramSocket.close();
-                    connectTCP(receivePacket.getAddress().getHostAddress());
-                }
-                catch (Exception e)
-                {
-                    Log.i("","ERROR");
+                } catch (Exception e) {
+                    Log.i("", "ERROR");
                     Log.e("ERROR", "HERE");
                 }
 
 
-
-            }catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return null;
         }
 
         @Override
-        protected void onPostExecute(String result)
-        {
+        protected void onPostExecute(String result) {
 
         }
 
         @Override
-        protected void onPreExecute()
-        {
+        protected void onPreExecute() {
 
         }
 
         @Override
-        protected void onProgressUpdate(Void... values)
-        {
+        protected void onProgressUpdate(Void... values) {
 
         }
-
-        void connectTCP(String ip)
-        {
-            try
-            {
-                Socket skt = new Socket(ip, 13000);
-
-                BufferedReader socketReader = null;
-                BufferedWriter socketWriter = null;
-                socketReader = new BufferedReader(new InputStreamReader(
-                        skt.getInputStream()));
-                socketWriter = new BufferedWriter(new OutputStreamWriter(
-                        skt.getOutputStream()));
-
-                String inMsg = null;
-                while ((inMsg = socketReader.readLine()) != null) {
-                    Log.e(getClass().getName(),"Received from  client: " + inMsg);
-                    Log.e(getClass().getName(),"Im here!!");
-                    String outMsg = inMsg;
-                    socketWriter.write(outMsg);
-                    socketWriter.write("\n");
-                    socketWriter.flush();
-                }
-            }
-            catch(Exception e)
-            {
-                Log.e("","Whoops! It didn't work!\n");
-            }
-        }
-
     }
+
 }

@@ -1,26 +1,17 @@
 package iarks.org.bitbucket.gyromouse;
 
-public class Server
+import java.net.Socket;
+
+/**
+ * Created by Arkadeep on 9/6/2017.
+ */
+
+public final class Server
 {
-    private String ipAddress,name,portAddress;
-
-    public Server(String ipAddress, String name, String portAddress)
+    public static String ServerIP,udpPort,tcpPort,ServerName,sessionKey;
+    public static Socket tcpSocket;
+    private Server()
     {
-        this.ipAddress = ipAddress;
-        this.name = name;
-        this.portAddress = portAddress;
-    }
 
-    public String getIpAddress()
-    {
-        return ipAddress;
-    }
-
-    public String getServerName() {
-        return name;
-    }
-
-    public String getPortAddress() {
-        return portAddress;
     }
 }
