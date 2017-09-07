@@ -32,6 +32,7 @@ dependencies {
     }
     dependencies {
         compile 'com.yokkomi:seekbar-preference:1.0'
+        compile 'com.shamanland:xdroid-toaster:0.0.10'
     }
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'

@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity
 
     Thread tcpClientThread;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity
         final Trackpad trackpad = new Trackpad(sharedQueue,getApplicationContext());
         final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue,getApplicationContext());
 
+
         buttonAD.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "AD" + "\"," + "\"Y\":\"" + 1 + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "AD" + "\"," + "\"Y\":\"" + 1 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                             sharedQueue.notifyAll();
                         }
                     }
@@ -97,7 +99,7 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "AD" + "\"," + "\"Y\":\"" + 0 + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "AD" + "\"," + "\"Y\":\"" + 0 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                             sharedQueue.notifyAll();
                         }
                     }
@@ -120,7 +122,7 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "AR" + "\"," + "\"Y\":\"" + 1 + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "AR" + "\"," + "\"Y\":\"" + 1 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                             sharedQueue.notifyAll();
                         }
                     }
@@ -134,7 +136,7 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "AR" + "\"," + "\"Y\":\"" + 0 + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "AR" + "\"," + "\"Y\":\"" + 0 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                             sharedQueue.notifyAll();
                         }
                     }
@@ -157,7 +159,7 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "AL" + "\"," + "\"Y\":\"" + 1 + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "AL" + "\"," + "\"Y\":\"" + 1 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                             sharedQueue.notifyAll();
                         }
 
@@ -172,7 +174,7 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "AL" + "\"," + "\"Y\":\"" + 0 + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "AL" + "\"," + "\"Y\":\"" + 0 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                             sharedQueue.notifyAll();
                         }
                     }
@@ -195,7 +197,7 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "AU" + "\"," + "\"Y\":\"" + 1 + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "AU" + "\"," + "\"Y\":\"" + 1 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                             sharedQueue.notifyAll();
                         }
                     }
@@ -209,7 +211,7 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "AU" + "\"," + "\"Y\":\"" + 0 + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "AU" + "\"," + "\"Y\":\"" + 0 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                             sharedQueue.notifyAll();
                         }
                     }
@@ -246,8 +248,8 @@ public class MainActivity extends AppCompatActivity
                         {
                             synchronized (sharedQueue)
                             {
-                                sharedQueue.put("{\"X\":" + "\"" + "LD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
-                                sharedQueue.put("{\"X\":" + "\"" + "LU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                                sharedQueue.put("{\"X\":" + "\"" + "LD" + "\"," + "\"Y\":\"" + 0.00 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
+                                sharedQueue.put("{\"X\":" + "\"" + "LU" + "\"," + "\"Y\":\"" + 0.00 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                                 sharedQueue.notifyAll();
                             }
                         }
@@ -290,7 +292,7 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "RD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "RD" + "\"," + "\"Y\":\"" + 0.00 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                             sharedQueue.notifyAll();
                         }
                     }
@@ -304,7 +306,7 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "RU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "RU" + "\"," + "\"Y\":\"" + 0.00 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                             sharedQueue.notifyAll();
                         }
                     }
@@ -329,7 +331,7 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "LD" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                            sharedQueue.put("{\"X\":" + "\"" + "LD" + "\"," + "\"Y\":\"" + 0.00 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                             sharedQueue.notifyAll();
                         }
                     }
@@ -345,7 +347,7 @@ public class MainActivity extends AppCompatActivity
                         try
                         {
                             synchronized (sharedQueue) {
-                                sharedQueue.put("{\"X\":" + "\"" + "LU" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                                sharedQueue.put("{\"X\":" + "\"" + "LU" + "\"," + "\"Y\":\"" + 0.00 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                                 sharedQueue.notifyAll();
                             }
                         }
@@ -370,7 +372,7 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     synchronized (sharedQueue) {
-                        sharedQueue.put("{\"X\":" + "\"" + "ESC" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        sharedQueue.put("{\"X\":" + "\"" + "ESC" + "\"," + "\"Y\":\"" + 0.00 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                         sharedQueue.notifyAll();
                     }
                 }
@@ -389,7 +391,7 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     synchronized (sharedQueue) {
-                        sharedQueue.put("{\"X\":" + "\"" + "WIN" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        sharedQueue.put("{\"X\":" + "\"" + "WIN" + "\"," + "\"Y\":\"" + 0.00 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
                         sharedQueue.notifyAll();
                     }
                 }
@@ -400,6 +402,10 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        //UI initialised - now look for servers
+        new ServerFind().execute();
+
+        // also start the tcp thread and connect to already present servers
         Thread tcpClientThread = new Thread(new ServerHandler());
         tcpClientThread.start();
     }
@@ -454,70 +460,83 @@ public class MainActivity extends AppCompatActivity
 
 
 
-    private class serverFind extends AsyncTask<String, Void, String>
+    private class ServerFind extends AsyncTask<String, Void, String>
     {
         @Override
-        protected String doInBackground(String... params) {
-            try {
+        protected String doInBackground(String... params)
+        {
+            try
+            {
                 byte[] sendData = "{\"X\":\"CANHAVEIP?\",\"Y\":\"0\"}".getBytes("UTF-8");
-                DatagramSocket datagramSocket;
+                DatagramSocket datagramSocket=null;
 
-                try {
-                    datagramSocket = new DatagramSocket();
-                    datagramSocket.setBroadcast(true);
+                try
+                {
+                    for(int i=1;i<=10;i++)
+                    {
+                        datagramSocket = new DatagramSocket();
+                        datagramSocket.setBroadcast(true);
 
-//                    try
-//                    {
-//                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), 9050);
-//                        datagramSocket.send(sendPacket);
-//                        Log.e(getClass().getName(), ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
-//                    }
-//                    catch (Exception e)
-//                    {
-//                        e.printStackTrace();
-//                    }
+                        //                    try
+                        //                    {
+                        //                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), 9050);
+                        //                        datagramSocket.send(sendPacket);
+                        //                        Log.e(getClass().getName(), ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
+                        //                    }
+                        //                    catch (Exception e)
+                        //                    {
+                        //                        e.printStackTrace();
+                        //                    }
 
-                    // Broadcast the message over all the network interfaces
-                    Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
-                    while (interfaces.hasMoreElements()) {
-                        Log.e(getClass().getName(), ">>> In While, looping network interfaces");
-                        NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
-                        if (networkInterface.isLoopback() || !networkInterface.isUp()) {
-                            continue; // Don't want to broadcast to the loopback interface
-                        }
-
-                        for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
-                            InetAddress broadcast = interfaceAddress.getBroadcast();
-                            if (broadcast == null) {
-                                continue;
+                        // Broadcast the message over all the network interfaces
+                        Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
+                        while (interfaces.hasMoreElements())
+                        {
+                            Log.e(getClass().getName(), ">>> In While, looping network interfaces");
+                            NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
+                            if (networkInterface.isLoopback() || !networkInterface.isUp())
+                            {
+                                continue; // Don't want to broadcast to the loopback interface
                             }
 
-                            // Send the broadcast package!
-                            try {
-                                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, 9050);
-                                datagramSocket.send(sendPacket);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses())
+                            {
+                                InetAddress broadcast = interfaceAddress.getBroadcast();
+                                if (broadcast == null)
+                                {
+                                    continue;
+                                }
 
-                            Log.e(getClass().getName(), ">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
+                                // Send the broadcast package!
+                                try
+                                {
+                                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, 9050);
+                                    datagramSocket.send(sendPacket);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+
+                                Log.e(getClass().getName(), ">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
+                            }
                         }
+
+                        Log.e(getClass().getName(), ">>> Done looping over all network interfaces. Now waiting for a reply!");
+
+                        //Wait for a response
+                        byte[] recvBuf = new byte[15000];
+                        DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length, 2000);
+                        datagramSocket.receive(receivePacket);
+
+                        //We have a response
+                        Log.e(getClass().getName(), ">>> Broadcast response from server at: " + receivePacket.getAddress().getHostAddress());
                     }
 
-                    Log.e(getClass().getName(), ">>> Done looping over all network interfaces. Now waiting for a reply!");
-
-                    //Wait for a response
-                    byte[] recvBuf = new byte[15000];
-                    DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
-                    datagramSocket.receive(receivePacket);
-
-                    //We have a response
-                    Log.e(getClass().getName(), ">>> Broadcast response from server at: " + receivePacket.getAddress().getHostAddress());
-
-                    // TODO: 9/6/2017 Check if the message is correct
-
                     datagramSocket.close();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     Log.i("", "ERROR");
                     Log.e("ERROR", "HERE");
                 }
@@ -542,6 +561,16 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onProgressUpdate(Void... values) {
 
+        }
+
+        public void showToast(final String toast)
+        {
+            runOnUiThread(new Runnable() {
+                public void run()
+                {
+                    Toast.makeText(MainActivity.this, toast, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 

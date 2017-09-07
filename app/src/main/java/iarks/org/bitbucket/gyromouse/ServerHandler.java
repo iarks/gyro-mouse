@@ -1,11 +1,16 @@
 package iarks.org.bitbucket.gyromouse;
 
+import android.app.Activity;
 import android.util.Log;
+import android.widget.Toast;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+
+import xdroid.toaster.Toaster;
 
 public class ServerHandler implements Runnable
 {
@@ -14,7 +19,8 @@ public class ServerHandler implements Runnable
     {
         if (!connectTCP("192.168.1.40"))
         {
-            // TODO: 9/7/2017 show appropriate message to user
+            Toaster.toastLong("Cannot find any server.\nTry connecting manually");
+            // TODO: 9/7/2017 consider adding a popup to take to connections page
             return;
         }
         while (true)

@@ -55,7 +55,7 @@ class ScrollWheel implements Runnable
                 float axisY = event.values[1];
 //                float axisZ = event.values[2];
 
-                deltas = "{\"X\":" + "\"" + "S" + "\"," + "\"Y\":\"" + df.format(axisY) + "\"}" + "\0";
+                deltas = "{\"X\":" + "\"" + "S" + "\"," + "\"Y\":\"" + df.format(axisY) + "\","+ "\"Z\":"+ "\"" + Server.sessionKey + "\"" + "}\0";
 
                 synchronized (sharedQueue)
                 {
