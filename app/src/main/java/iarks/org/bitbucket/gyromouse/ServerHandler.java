@@ -1,6 +1,5 @@
 package iarks.org.bitbucket.gyromouse;
 import android.util.Log;
-import android.view.accessibility.AccessibilityManager;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -23,48 +22,64 @@ import xdroid.toaster.Toaster;
 class ServerHandler implements Runnable
 {
     private DatabaseHandler dbHandler;
-    private int connected=0;
-    private static List<String> list = new ArrayList<>();
+    private boolean connected=false;
+    private static List<Server> list = new ArrayList<>();
     private UDPClient udpClient;
-
-    String discoveredServer=null;
 
     ServerHandler(DatabaseHandler dbHandler, UDPClient udpClient)
     {
         this.dbHandler = dbHandler;
-        this.udpClient=udpClient;
+        this.udpClient = udpClient;
     }
 
     @Override
     public void run()
     {
-//        int x = dbHandler.getServerCount();
-        int x=0;
-        if(x>0)
-        {
-            List<Server> serverList = dbHandler.getAllServers();
+        // ist priority - connect to already present servers
+        // check number of preexisting servers
+        int count = dbHandler.getServerCount();
 
+        Toaster.toast("DATABASE COUNT"+count);
+
+        // if server count is more than 0, then preexisting servers are present - try to connect to those
+        if(count>0)
+        {
+            // get a list of all the servers in the database
+            List<Server> serverList = dbHandler.getAllDBServers();
+
+            // iterate through list and try to connect to each server
             for (Server object: serverList)
             {
-                boolean check = connectTCP(object.getServerIP());
+                // connect to that servers IP - connect TCP returns true if connection is established otherwise returns false
+                boolean check = connectTCP(object);
+                //check if connection is established
                 if(check)
                 {
-                    connected=1;
+                    //if connection established- set a flag and break - no need to iterate any more
+                    connected=true;
                     break;
                 }
             }
         }
-        else if(x==0 || connected == 0)
+        else if(count==0 || !connected)// if server count is 0 or all previous servers fail to connect come here
         {
             Toaster.toast("No Predefined Server available");
             Toaster.toast("Searching for servers on local network");
+
+            // do a broadcasting server search - this fills the global list with any servers on the network
             searchServer();
+
             if (list.size() > 0)
             {
+                // means we have servers on the network
                 Toaster.toast("We have responses");
+
+                //connect to the first server on this list
+                // TODO: 9/8/2017 or ask the used to manually select
+                // TODO: 9/8/2017 maybe add these servers to database?
                 connectTCP(list.remove(0));
             }
-            else
+            else// if no servers are available on the internet as well, just give up. ask user to connect manually or search again
             {
                 Toaster.toast("NO SERVERS AVAILABLE. CONNECT MANUALLY");
                 return;
@@ -74,7 +89,8 @@ class ServerHandler implements Runnable
 
         while (true)
         {
-            try {
+            try
+            {
                 DataOutputStream outToServer = new DataOutputStream(CurrentServer.tcpSocket.getOutputStream());
                 DataInputStream inFromServer = new DataInputStream(CurrentServer.tcpSocket.getInputStream());
 
@@ -83,18 +99,20 @@ class ServerHandler implements Runnable
                 int i;
 
 
-                while ((i = inFromServer.read(receivedBytes, 0, receivedBytes.length)) != 0) {
+                while ((i = inFromServer.read(receivedBytes, 0, receivedBytes.length)) != 0)
+                {
                     // Translate data bytes to a ASCII string.
                     receivedString = new String(receivedBytes);
                     receivedString = receivedString.trim();
-                    Log.e("Received from client>> ", receivedString.trim());
+                    Log.i(getClass().getName(),"Received from server>> "+ receivedString.trim());
                     break;
                 }
 
                 if (receivedString.equals("UDERE?"))
                 {
-                    Log.e(getClass().getName(), "SERVER IS PINGING");
+                    Log.i(getClass().getName(), "SERVER IS PINGING");
                     outToServer.write("YES".getBytes(), 0, "YES".getBytes().length);
+                    outToServer.flush();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -103,54 +121,54 @@ class ServerHandler implements Runnable
 
     }
 
-    private boolean connectTCP(String ip)
+    private boolean connectTCP(Server server)
     {
         try
         {
-            // this connects client to server
+            // create a new socket for a new client
             Socket clientSocket = new Socket();
-            clientSocket.connect(new InetSocketAddress(ip, 13000), 2000);
 
+            //connect this socket to the servers - details are provided
+            clientSocket.connect(new InetSocketAddress(server.getServerIP(), 13000), 2000);
+
+            // initiate OP stream and ask for connection
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
             outToServer.write("CANCONNECT?".getBytes(), 0, "CANCONNECT?".getBytes().length);
 
+            // initiate IP stream
             DataInputStream inFromServer = new DataInputStream(clientSocket.getInputStream());
 
+            // prepare to read
             String receivedString = null;
             byte[] receivedBytes = new byte[256];
             int i;
 
+            // read from server
             while ((i = inFromServer.read(receivedBytes, 0, receivedBytes.length)) != 0)
             {
                 // Translate data bytes to a ASCII string.
                 receivedString = new String(receivedBytes);
                 receivedString = receivedString.trim();
-                Log.e("Received from client>> ", receivedString.trim());
+                Log.i(getClass().getName(), "Received from server>> "+receivedString.trim());
                 break;
             }
 
             if (receivedString.equals("BUSY"))
             {
-                Log.e(getClass().getName(), "Server busy at the moment cannot connect now");
+                // if server returns busy it may be connected to another client
+                Log.i(getClass().getName(), "Server busy at the moment cannot connect now");
                 return false;
             }
-            CurrentServer.serverIP = ip;
+            CurrentServer.serverIP = server.getServerIP();
 
             CurrentServer.sessionKey = receivedString;
 
             CurrentServer.tcpSocket = clientSocket;
 
-            CurrentServer.inetAddress = InetAddress.getByName(ip);
+            CurrentServer.inetAddress = InetAddress.getByName(server.getServerIP());
 
             udpClient.udpSetup();
 
-            // TODO: 9/8/2017 solve this thing below
-            //CurrentServer.serverName = getServerName();
-
-
-            //udp and tcp port numbers are defined in shared preferences
-
-            // TODO: 9/7/2017 Server.name = get the server name
             return true;
         }
         catch (IOException e)
@@ -160,22 +178,6 @@ class ServerHandler implements Runnable
         }
         return false;
     }
-    // TODO: 9/8/2017 solve this
-
-//    String getServerName()
-//    {
-//        try
-//        {
-//            DatagramSocket dskt = new DatagramSocket();
-//            byte[] data =  "GIMMENAME?".getBytes();
-//            DatagramPacket sendPacket = new DatagramPacket(data , data.length, CurrentServer.inetAddress, //get port from shared prefs);
-//            ;
-//        }catch (SocketException e)
-//        {
-//            e.printStackTrace();
-//        }
-//
-//    }
 
     private void searchServer()
     {
@@ -201,12 +203,15 @@ class ServerHandler implements Runnable
         {
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), Integer.parseInt(CurrentServer.udpPort));
             datagramSocket.send(sendPacket);
-            Log.e(getClass().getName() , ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
-        } catch (Exception e) {
+            Log.i(getClass().getName() , ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
+        }
+        catch(Exception e)
+        {
 
         }
 
-        try {
+        try
+        {
             Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
@@ -225,27 +230,32 @@ class ServerHandler implements Runnable
                     } catch (Exception e) {
 
                     }
-                    Log.e(getClass().getName() ,">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
+                    Log.i(getClass().getName() ,">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
                 }
             }
-            Log.e(getClass().getName() , ">>> Done looping over all network interfaces. Now waiting for a reply!");
+            Log.i(getClass().getName() , ">>> Done looping over all network interfaces. Now waiting for a reply!");
 
-            while (true) {
+            while (true)
+            {
                 // Wait for a response
                 byte[] recvBuf = new byte[15000];
                 DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
                 datagramSocket.receive(receivePacket);
 
                 // We have a response
-                Log.e(getClass().getName() , ">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
-
+                Log.i(getClass().getName() , ">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
+                Toaster.toast("These available");
                 // check if message is correct - no need
-                Toaster.toast(receivePacket.getAddress().getHostAddress());
-                list.add(receivePacket.getAddress().getHostAddress());
+                Toaster.toast(receivePacket.getAddress().getHostAddress()+"-"+new String(receivePacket.getData()));
+
+                String name = new String(receivePacket.getData());
+                list.add(new Server(99, name,receivePacket.getAddress().getHostAddress()));
+
+                Toaster.toast(receivePacket.getAddress().getHostAddress()+"-"+new String(receivePacket.getData()));
             }
         } catch (SocketTimeoutException e)
         {
-            Log.e(getClass().getName() , ">>> SOCKET TIMED OUT");
+            Log.i(getClass().getName() , ">>> SOCKET TIMED OUT");
             Toaster.toast("SOCKET TIMED OUT");
         } catch (IOException e) {
             //no hosts discovered

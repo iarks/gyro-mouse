@@ -31,7 +31,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
     private static final String TAG = MainActivity.class.getName();
 
     Button buttonRight, buttonEscape, buttonLeft, buttonWindows;
@@ -40,25 +41,38 @@ public class MainActivity extends AppCompatActivity {
     DatabaseHandler dbHandler;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
+
+        // inflate layout file
         setContentView(R.layout.activity_main);
+
+        // add toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //initiate database handler
+        dbHandler = new DatabaseHandler(this);
+
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         //CurrentServer.serverIP = SP.getString("ip", "192.168.1.40");
         CurrentServer.tcpPort = SP.getString("tcpPort", "13000");
         CurrentServer.udpPort = SP.getString("udpPort", "9050");
 
+        // create the udp thread
         final UDPClient udpClient = new UDPClient(sharedQueue);
         final Thread udp_thread = new Thread(udpClient);
         udp_thread.start();
 
-        // also start the tcp thread and try to connect to already present servers
-        dbHandler = new DatabaseHandler(this);
+        // also start the tcp handler thread
+        ServerHandler serverHandler = new ServerHandler(dbHandler,udpClient);
+        Thread tcpClientThread = new Thread(serverHandler);
+        tcpClientThread.start();
 
 
+        // associate ui elements to variables/ objects
         buttonAD = (ImageButton) findViewById(R.id.buttonADown);
         buttonAU = (ImageButton) findViewById(R.id.buttonAUp);
         buttonAR = (ImageButton) findViewById(R.id.buttonARight);
@@ -66,20 +80,17 @@ public class MainActivity extends AppCompatActivity {
         buttonMouse = (ImageButton) findViewById(R.id.buttonMouse);
         buttonScroll = (ImageButton) findViewById(R.id.buttonScroll);
         buttonRight = (Button) findViewById(R.id.buttonRight);
-
         buttonEscape = (Button) findViewById(R.id.buttonEscape);
         buttonWindows = (Button) findViewById(R.id.buttonWin);
         buttonLeft = (Button) findViewById(R.id.buttonLeft);
 
-
+        // create trackpad objects
         final Trackpad trackpad = new Trackpad(sharedQueue, getApplicationContext());
+
+        // create scrollwheel objects
         final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue, getApplicationContext());
 
-        ServerHandler serverHandler = new ServerHandler(dbHandler,udpClient);
-        Thread tcpClientThread = new Thread(serverHandler);
-        tcpClientThread.start();
-
-
+        // add click listeners to buttons
         buttonAD.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -199,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
                     timeUp = event.getEventTime();
                     udpClient.clearThread();
                     trackpad.stopThread();
-                    Log.e("MainActivity", "cleared");
+                    Log.i(getClass().getName(), "cleared");
                     if (timeUp - timeDown < 500) {
                         try {
                             synchronized (sharedQueue) {
@@ -317,16 +328,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        // end of onCreate
     }
 
+    // create overflow menu to toolbar
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.overflow_menu, menu);
         return true;
     }
 
+    // add click listenrs to toolbar elements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -349,6 +363,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // click listener for keyboard events
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if ((event.getAction() == 1 || event.getAction() == 2) && event.getKeyCode() != KEYCODE_BACK) {
