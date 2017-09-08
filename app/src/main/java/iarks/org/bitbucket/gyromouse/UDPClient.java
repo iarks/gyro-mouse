@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.BlockingQueue;
 
 class UDPClient implements Runnable
@@ -17,13 +18,13 @@ class UDPClient implements Runnable
     private byte[] data;
     private final BlockingQueue<String> sharedQueue;
 
-    UDPClient(int portNumber, String ip, BlockingQueue<String> bq)
+    UDPClient(BlockingQueue<String> bq)
     {
         try
         {
             clientSocket = new DatagramSocket();
-            IPAddress = InetAddress.getByName(ip);
-            port = portNumber;
+//          IPAddress = InetAddress.getByName(ip);
+//            port = portNumber;
 
             Log.println(Log.INFO, "UDPClient", "HERE IN CONSTRUCTOR");
         }
@@ -33,6 +34,18 @@ class UDPClient implements Runnable
         finally
         {
             sharedQueue = bq;
+        }
+    }
+
+    void udpSetup()
+    {
+        try
+        {
+            IPAddress = InetAddress.getByName(CurrentServer.serverIP);
+            port = Integer.parseInt(CurrentServer.udpPort);
+        }catch (UnknownHostException e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -46,7 +59,7 @@ class UDPClient implements Runnable
     {
         while (true)
         {
-            Log.e(TAG,"inWhile");
+            //Log.e(TAG,"inWhile");
             synchronized (sharedQueue)
             {
                 if (!sharedQueue.isEmpty())

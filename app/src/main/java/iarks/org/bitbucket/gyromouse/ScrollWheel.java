@@ -12,9 +12,6 @@ import android.os.Looper;
 import java.text.DecimalFormat;
 import java.util.concurrent.BlockingQueue;
 
-/**
- * Created by Arkadeep on 8/30/2017.
- */
 class ScrollWheel implements Runnable
 {
     private static final String TAG = MainActivity.class.getName();
@@ -55,7 +52,7 @@ class ScrollWheel implements Runnable
                 float axisY = event.values[1];
 //                float axisZ = event.values[2];
 
-                deltas = "{\"X\":" + "\"" + "S" + "\"," + "\"Y\":\"" + df.format(axisY) + "\","+ "\"Z\":"+ "\"" + Server.sessionKey + "\"" + "}\0";
+                deltas = ("S;"+df.format(axisY)+";"+CurrentServer.sessionKey);
 
                 synchronized (sharedQueue)
                 {

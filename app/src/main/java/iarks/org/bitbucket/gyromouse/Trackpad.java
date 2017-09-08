@@ -55,7 +55,7 @@ class Trackpad implements Runnable
         {
             try
             {
-                sharedQueue.put("{\"X\":" + "\"" + "EOT" + "\"," + "\"Y\":\"" + 0.00 + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0");
+                sharedQueue.put("EOT;x;"+CurrentServer.sessionKey);
                 deltas=null;
             }
             catch (InterruptedException e)
@@ -130,7 +130,7 @@ class Trackpad implements Runnable
                 x = (Math.toDegrees(x));
 //                y = (Math.toDegrees(y));
 
-                deltas = "{\"X\":" + "\"" + df.format(z) + "\"," + "\"Y\":\"" + df.format(x) + "\","+ "\"Z\":"+ "\""+Server.sessionKey+"\""+"}\0";
+                deltas = df.format(z) + ";" + df.format(x) + ";" + CurrentServer.sessionKey;
 
                 synchronized (sharedQueue)
                 {
