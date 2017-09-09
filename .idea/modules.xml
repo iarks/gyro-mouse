@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GyroMouse.iml" filepath="$PROJECT_DIR$/GyroMouse.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gyro-mouse.iml" filepath="$PROJECT_DIR$/gyro-mouse.iml" />
     </modules>
   </component>
 </project>

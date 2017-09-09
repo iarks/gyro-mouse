@@ -19,15 +19,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
+
+import xdroid.toaster.Toaster;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 
@@ -39,6 +37,8 @@ public class MainActivity extends AppCompatActivity
     ImageButton buttonAR, buttonAL, buttonAU, buttonAD, buttonMouse, buttonScroll;
     BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
     DatabaseHandler dbHandler;
+    List<Server> discoveredServer = new ArrayList<>();
+    List<Server> preServers = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -67,9 +67,9 @@ public class MainActivity extends AppCompatActivity
         udp_thread.start();
 
         // also start the tcp handler thread
-        ServerHandler serverHandler = new ServerHandler(dbHandler,udpClient);
-        Thread tcpClientThread = new Thread(serverHandler);
-        tcpClientThread.start();
+//        ServerHandler serverHandler = new ServerHandler();
+//        Thread tcpClientThread = new Thread(serverHandler);
+//        tcpClientThread.start();
 
 
         // associate ui elements to variables/ objects
@@ -328,6 +328,9 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        SearchServers ss = new SearchServers();
+        ss.setUDP(udpClient);
+        ss.execute("");
         // end of onCreate
     }
 
@@ -372,6 +375,96 @@ public class MainActivity extends AppCompatActivity
             th.start();
         }
         return super.dispatchKeyEvent(event);
+    }
+
+    class SearchServers extends AsyncTask<String, Void, String>
+    {
+        boolean connected=false;
+        UDPClient udpClient;
+        void setUDP(UDPClient udpClientObject)
+        {
+            udpClient=udpClientObject;
+        }
+
+        @Override
+        protected String doInBackground(String... params)
+        {
+            // ist priority - connect to already present servers
+            // check number of preexisting servers
+            int count = dbHandler.getServerCount();
+
+            Toaster.toast("DATABASE COUNT "+count);
+
+            // if server count is more than 0, then preexisting servers are present - try to connect to those
+            if(count>0)
+            {
+                // get a list of all the servers in the database
+                preServers = dbHandler.getAllDBServers();
+
+                // iterate through list and try to connect to each server
+                for (Server server: preServers)
+                {
+                    // connect to that servers IP - connect TCP returns true if connection is established otherwise returns false
+                    boolean check = TCPConnector.connectTCP(server, udpClient);
+                    //check if connection is established
+                    if(check)
+                    {
+                        //if connection established- set a flag and break - no need to iterate any more
+                        connected=true;
+                        break;
+                    }
+                }
+            }
+
+            if(!connected||count==0)// if server count is 0 or all previous servers fail to connect come here
+            {
+                Toaster.toast("No Predefined Server available");
+                Toaster.toast("Searching for servers on local network");
+
+                // do a broadcasting server search - this fills the global list with any servers on the network
+                discoveredServer = TCPConnector.searchServer();
+
+                if (discoveredServer.size() > 0) {
+                    // means we have servers on the network
+                    Toaster.toast("We have responses");
+
+                    //connect to the first server on this list
+                    // TODO: 9/8/2017 or ask the used to manually select
+                    for (Server servers : discoveredServer) {
+                        Toaster.toast("checking if available");
+                        boolean check = dbHandler.checkAvailable(servers.getServerID());
+                        Toaster.toast("check = " + check);
+                        if (!check) {
+                            //so this server is not present
+                            //add new server to database
+                            dbHandler.addServerToDB(servers);
+                        }
+                    }
+
+                    TCPConnector.connectTCP(discoveredServer.remove(0), udpClient);
+                } else// if no servers are available on the network as well, just give up. ask user to connect manually or search again
+                {
+                    Toaster.toast("NO SERVERS AVAILABLE. CONNECT MANUALLY");
+                    return "f";
+                }
+            }
+            return "s";
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            //fancy
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            //fancy
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values){}
     }
 
 }
