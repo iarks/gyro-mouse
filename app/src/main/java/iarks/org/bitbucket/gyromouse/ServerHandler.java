@@ -23,7 +23,8 @@ class ServerHandler implements Runnable
 {
     private DatabaseHandler dbHandler;
     private boolean connected=false;
-    private static List<Server> list = new ArrayList<>();
+    private List<Server> list = new ArrayList<>();
+    List<Server> serverList;
     private UDPClient udpClient;
 
     ServerHandler(DatabaseHandler dbHandler, UDPClient udpClient)
@@ -39,13 +40,13 @@ class ServerHandler implements Runnable
         // check number of preexisting servers
         int count = dbHandler.getServerCount();
 
-        Toaster.toast("DATABASE COUNT"+count);
+        Toaster.toast("DATABASE COUNT "+count);
 
         // if server count is more than 0, then preexisting servers are present - try to connect to those
         if(count>0)
         {
             // get a list of all the servers in the database
-            List<Server> serverList = dbHandler.getAllDBServers();
+            serverList = dbHandler.getAllDBServers();
 
             // iterate through list and try to connect to each server
             for (Server object: serverList)
@@ -61,7 +62,8 @@ class ServerHandler implements Runnable
                 }
             }
         }
-        else if(count==0 || !connected)// if server count is 0 or all previous servers fail to connect come here
+
+        if(count==0 || !connected)// if server count is 0 or all previous servers fail to connect come here
         {
             Toaster.toast("No Predefined Server available");
             Toaster.toast("Searching for servers on local network");
@@ -76,10 +78,22 @@ class ServerHandler implements Runnable
 
                 //connect to the first server on this list
                 // TODO: 9/8/2017 or ask the used to manually select
-                // TODO: 9/8/2017 maybe add these servers to database?
+                for (Server servers: list)
+                {
+                    Toaster.toast("checking if available");
+                    boolean check = dbHandler.checkAvailable(servers.getServerID());
+                    Toaster.toast("check = "+ check);
+                    if(!check)
+                    {
+                        //so this server is not present
+                        //add new server to database
+                        dbHandler.addServerToDB(servers);
+                    }
+                }
+
                 connectTCP(list.remove(0));
             }
-            else// if no servers are available on the internet as well, just give up. ask user to connect manually or search again
+            else// if no servers are available on the network as well, just give up. ask user to connect manually or search again
             {
                 Toaster.toast("NO SERVERS AVAILABLE. CONNECT MANUALLY");
                 return;
@@ -114,6 +128,13 @@ class ServerHandler implements Runnable
                     outToServer.write("YES".getBytes(), 0, "YES".getBytes().length);
                     outToServer.flush();
                 }
+                else if (receivedString.equals(""))
+                {
+                    Log.i(getClass().getName(), "SERVER IS DEAD?");
+                    // TODO: 9/8/2017 goback to the start
+                    Toaster.toast("SERVER IS PROBABLY DEAD");
+                    return;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -125,11 +146,17 @@ class ServerHandler implements Runnable
     {
         try
         {
-            // create a new socket for a new client
-            Socket clientSocket = new Socket();
+            Socket clientSocket;
+            try {
+                // create a new socket for a new client
+                clientSocket = new Socket();
 
-            //connect this socket to the servers - details are provided
-            clientSocket.connect(new InetSocketAddress(server.getServerIP(), 13000), 2000);
+                //connect this socket to the servers - details are provided
+                clientSocket.connect(new InetSocketAddress(server.getServerIP(), 13000), 2000);
+            }catch (Exception e)
+            {
+                return false;
+            }
 
             // initiate OP stream and ask for connection
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
@@ -173,16 +200,19 @@ class ServerHandler implements Runnable
         }
         catch (IOException e)
         {
+
+            Log.e(getClass().getName(), "Whoops! It didn't work!\n");
             e.printStackTrace();
-            Log.e("", "Whoops! It didn't work!\n");
+            Log.e(getClass().getName(),"CAUSE " +e.getCause().toString());
+            Log.e(getClass().getName(),"MESSAGE " +e.getMessage());
+            return false;
         }
-        return false;
+
     }
 
     private void searchServer()
     {
         list.clear();
-        String toConnect = null;
         Toaster.toast("In search server");
         byte[] sendData = "CANHAVEIP?;x;GMO".getBytes();
         DatagramSocket datagramSocket = null;
@@ -248,9 +278,9 @@ class ServerHandler implements Runnable
                 // check if message is correct - no need
                 Toaster.toast(receivePacket.getAddress().getHostAddress()+"-"+new String(receivePacket.getData()));
 
-                String name = new String(receivePacket.getData());
-                list.add(new Server(99, name,receivePacket.getAddress().getHostAddress()));
-
+                String name = new String(receivePacket.getData()).trim();
+                String id = "_"+name+"_"+receivePacket.getAddress().getHostAddress();
+                list.add(new Server(id, name, receivePacket.getAddress().getHostAddress()));
                 Toaster.toast(receivePacket.getAddress().getHostAddress()+"-"+new String(receivePacket.getData()));
             }
         } catch (SocketTimeoutException e)

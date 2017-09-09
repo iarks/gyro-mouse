@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +18,10 @@ class DatabaseHandler extends SQLiteOpenHelper
     private static final int DATABASE_VERSION = 1;
 
     // Database Name
-    private static final String DATABASE_NAME = "serverManager";
+    private static final String DATABASE_NAME = "ServerManager";
 
     // Contacts table name
-    private static final String TABLE_SERVERS = "servers";
+    private static final String TABLE_SERVERS = "Servers";
 
     // Contacts Table Columns names
     private static final String KEY_ID = "id";
@@ -36,7 +38,7 @@ class DatabaseHandler extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db)
     {
         String CREATE_SERVERS_TABLE = "CREATE TABLE " + TABLE_SERVERS + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT,"
+                + KEY_ID + " TEXT PRIMARY KEY," + KEY_NAME + " TEXT,"
                 + KEY_IP + " TEXT" + ")";
         db.execSQL(CREATE_SERVERS_TABLE);
     }
@@ -54,15 +56,25 @@ class DatabaseHandler extends SQLiteOpenHelper
 
     public void addServerToDB(Server server)
     {
-        SQLiteDatabase db = this.getWritableDatabase();
+        Log.i(getClass().getName(),"database server add");
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(KEY_NAME, server.getServerName()); // Contact Name
-        values.put(KEY_IP, server.getServerIP()); // Contact Phone Number
+            ContentValues values = new ContentValues();
+            values.put(KEY_ID, server.getServerID());
+            values.put(KEY_NAME, server.getServerName());
+            values.put(KEY_IP, server.getServerIP());
 
-        // Inserting Row
-        db.insert(TABLE_SERVERS, null, values);
-        db.close(); // Closing database connection
+            // Inserting Row
+            db.insert(TABLE_SERVERS, null, values);
+            db.close(); // Closing database connection}
+        }catch (Exception e)
+        {
+            Log.e(getClass().getName(),"e.getMessage()"+e.getMessage());
+            Log.e(getClass().getName(),"e.getCause()"+e.getCause());
+            e.printStackTrace();
+        }
+        Log.i(getClass().getName(),"That went well?");
     }
 
     public Server getServerFromDB(int id)
@@ -74,9 +86,9 @@ class DatabaseHandler extends SQLiteOpenHelper
         if (cursor != null)
             cursor.moveToFirst();
 
-        // TODO: 9/8/2017 check this part
-        Server server = new Server(Integer.parseInt(cursor.getString(0)),  cursor.getString(1), cursor.getString(2));
+       Server server = new Server(cursor.getString(0),  cursor.getString(1), cursor.getString(2));
         // return contact
+        cursor.close();
         return server;
     }
 
@@ -96,7 +108,7 @@ class DatabaseHandler extends SQLiteOpenHelper
             do
             {
                 Server server = new Server();
-                server.setServerID(Integer.parseInt(cursor.getString(0)));
+                server.setServerID(cursor.getString(0));
                 server.setServerName(cursor.getString(1));
                 server.setServerIP(cursor.getString(2));
                 // Adding contact to list
@@ -106,6 +118,7 @@ class DatabaseHandler extends SQLiteOpenHelper
         }
 
         db.close();
+
         // return contact list
         return serverList;
     }
@@ -141,28 +154,28 @@ class DatabaseHandler extends SQLiteOpenHelper
         db.close();
     }
 
-//    public int checkPresent(String k)
-//    {
-//        String selectQuery = "SELECT  * FROM " + TABLE_SAVED;
-//
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        Cursor cursor = db.rawQuery(selectQuery, null);
-//
-//        // looping through all rows and adding to list
-//        if (cursor.moveToFirst())
-//        {
-//            do
-//            {
-//                String x =cursor.getString(0);
-//                if (x.equals(k))
-//                {
-//                    db.close();
-//                    return 1;
-//                }
-//            } while (cursor.moveToNext());
-//        }
-//        db.close();
-//        return 0;
-//    }
+    public boolean checkAvailable(String key_id)
+    {
+        String selectQuery = "SELECT  * FROM " + TABLE_SERVERS;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst())
+        {
+            do
+            {
+                String x =cursor.getString(0);
+                if (x.equals(key_id))
+                {
+                    db.close();
+                    return true;
+                }
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return false;
+    }
 
 }

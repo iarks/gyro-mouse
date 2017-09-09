@@ -6,27 +6,27 @@ package iarks.org.bitbucket.gyromouse;
 
 class Server
 {
-    private String serverIP, serverName;
-    private int serverID;
+    private String serverIP, serverName, serverID;
 
     Server()
     {
 
     }
 
-    Server(int serverID, String serverName, String serverIP)
+    Server(String serverID, String serverName, String serverIP)
     {
         this.serverID=serverID;
         this.serverIP=serverIP;
         this.serverName=serverName;
     }
 
-    void setServerID(int serverID)
+    void setServerID(String serverID)
     {
         this.serverID = serverID;
     }
 
-    void setServerIP(String serverIP) {
+    void setServerIP(String serverIP)
+    {
         this.serverIP = serverIP;
     }
 
@@ -45,7 +45,7 @@ class Server
         return serverName;
     }
 
-    int getServerID()
+    String getServerID()
     {
         return serverID;
     }
