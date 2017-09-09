@@ -2,10 +2,6 @@ package iarks.org.bitbucket.gyromouse;
 import java.net.InetAddress;
 import java.net.Socket;
 
-/**
- * Created by Arkadeep on 9/7/2017.
- */
-
 class CurrentServer
 {
     static String sessionKey, serverIP, serverName, tcpPort,udpPort;
@@ -13,9 +9,6 @@ class CurrentServer
 
     static InetAddress inetAddress;
 
+    private CurrentServer(){};
 
-    private CurrentServer()
-    {
-
-    }
 }

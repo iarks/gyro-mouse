@@ -76,6 +76,8 @@ class TCPConnector
 
             CurrentServer.inetAddress = InetAddress.getByName(server.getServerIP());
 
+            CurrentServer.serverName = server.getServerName();
+
             udpClient.udpSetup();
 
             return true;
@@ -94,7 +96,7 @@ class TCPConnector
 
     static ArrayList<Server> searchServer()
     {
-        ArrayList<Server> list = new ArrayList<Server>();
+        ArrayList<Server> list = new ArrayList<>();
         list.clear();
 
         Toaster.toast("In search server");

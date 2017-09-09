@@ -77,7 +77,7 @@ class ScrollWheel implements Runnable
 
             }
         };
-        mSensorManager.registerListener(mListener,mSensor,SensorManager.SENSOR_DELAY_UI,handler);
+        mSensorManager.registerListener(mListener,mSensor,SensorManager.SENSOR_DELAY_GAME,handler);
         Looper.loop();
     }
 

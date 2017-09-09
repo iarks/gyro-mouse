@@ -4,7 +4,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.os.Bundle;
 
-public class PreferencesActivity extends PreferenceActivity
+class PreferencesActivity extends PreferenceActivity
 {
 
     @Override

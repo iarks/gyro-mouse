@@ -154,7 +154,7 @@ class Trackpad implements Runnable
 
             }
         };
-        mSensorManager.registerListener(mListener, sensor,SensorManager.SENSOR_DELAY_FASTEST,handler);
+        mSensorManager.registerListener(mListener, sensor,SensorManager.SENSOR_DELAY_GAME,handler);
         Looper.loop();
     }
 
