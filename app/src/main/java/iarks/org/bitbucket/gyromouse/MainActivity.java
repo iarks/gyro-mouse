@@ -23,7 +23,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
+
+import net.steamcrafted.loadtoast.LoadToast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +34,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 
+import io.github.yavski.fabspeeddial.FabSpeedDial;
+import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
 import xdroid.toaster.Toaster;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
@@ -45,6 +50,7 @@ public class MainActivity extends AppCompatActivity
     DatabaseHandler dbHandler;
     List<Server> discoveredServer = new ArrayList<>();
     List<Server> preServers = new ArrayList<>();
+    FabSpeedDial fabSpeedDial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -338,6 +344,30 @@ public class MainActivity extends AppCompatActivity
         ss.setUDP(udpClient);
         ss.execute("");
         // end of onCreate
+
+        fabSpeedDial = (FabSpeedDial) findViewById(R.id.ff);
+        fabSpeedDial.setMenuListener(new SimpleMenuListenerAdapter()
+        {
+            @Override
+            public boolean onMenuItemSelected(MenuItem menuItem)
+            {
+                int id = menuItem.getItemId();
+
+                //noinspection SimplifiableIfStatement
+                if (id == R.id.action_scanNetwork)
+                {
+                    new ScanNetwork().execute("");
+                    return true;
+                }
+                else if (id == R.id.action_dbServers)
+                {
+                    Intent myIntent = new Intent(MainActivity.this, ServerListActivity.class);
+                    MainActivity.this.startActivity(myIntent);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     // create overflow menu to toolbar
@@ -387,6 +417,7 @@ public class MainActivity extends AppCompatActivity
     {
         boolean connected=false;
         UDPClient udpClient;
+        LoadToast lt = new LoadToast(MainActivity.this);
         void setUDP(UDPClient udpClientObject)
         {
             udpClient=udpClientObject;
@@ -460,15 +491,72 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(String result)
         {
-
-
-            //fancy
+            if(result.equals("f"))
+                lt.error();
+            else
+                lt.success();
         }
 
         @Override
         protected void onPreExecute()
         {
-            //fancy
+            lt.setText("Searching for servers");
+            lt.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values){}
+    }
+
+    class ScanNetwork extends AsyncTask<String,Void,String>
+    {
+        LoadToast lt = new LoadToast(MainActivity.this);
+        @Override
+        protected String doInBackground(String... params) {
+            Toaster.toast("Searching for servers on local network");
+
+            // do a broadcasting server search - this fills the global list with any servers on the network
+            discoveredServer = TCPConnector.searchServer();
+
+            if (discoveredServer.size() > 0) {
+                // means we have servers on the network
+                Toaster.toast("We have responses");
+
+                //connect to the first server on this list
+                // TODO: 9/8/2017 or ask the used to manually select
+                for (Server servers : discoveredServer) {
+                    Toaster.toast("checking if available");
+                    boolean check = dbHandler.checkAvailable(servers.getServerID());
+                    Toaster.toast("check = " + check);
+                    if (!check) {
+                        //so this server is not present
+                        //add new server to database
+                        dbHandler.addServerToDB(servers);
+                    }
+                }
+            } else// if no servers are available on the network as well, just give up. ask user to connect manually or search again
+            {
+                Toaster.toast("NO SERVERS AVAILABLE. CONNECT MANUALLY");
+                return "f";
+            }
+            return "s";
+        }
+
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            if(result.equals("f"))
+                lt.error();
+            else
+                lt.success();
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            lt.setText("Searching for servers");
+            lt.show();
         }
 
         @Override
