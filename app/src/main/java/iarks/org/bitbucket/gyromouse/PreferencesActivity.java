@@ -3,14 +3,17 @@ package iarks.org.bitbucket.gyromouse;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.os.Bundle;
+import android.widget.ListView;
 
-class PreferencesActivity extends PreferenceActivity
+public class PreferencesActivity extends PreferenceActivity
 {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
+
 
     }
 

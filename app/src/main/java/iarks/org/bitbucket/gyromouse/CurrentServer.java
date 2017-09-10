@@ -4,7 +4,7 @@ import java.net.Socket;
 
 class CurrentServer
 {
-    static String sessionKey, serverIP, serverName, tcpPort,udpPort;
+    static String sessionKey, serverIP = "unavailable", serverName = "unavailable", tcpPort,udpPort;
     static Socket tcpSocket;
 
     static InetAddress inetAddress;

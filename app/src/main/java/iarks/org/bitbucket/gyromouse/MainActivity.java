@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -26,6 +27,10 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
+import com.github.johnpersano.supertoasts.library.utils.PaletteUtils;
+
 import net.steamcrafted.loadtoast.LoadToast;
 
 import java.util.ArrayList;
@@ -34,6 +39,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 
+import es.dmoral.toasty.Toasty;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
 import xdroid.toaster.Toaster;
@@ -66,7 +72,7 @@ public class MainActivity extends AppCompatActivity
 
         //initiate database handler
         dbHandler = new DatabaseHandler(this);
-
+        Globals.databaseHandler = dbHandler;
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         //CurrentServer.serverIP = SP.getString("ip", "192.168.1.40");
@@ -430,7 +436,7 @@ public class MainActivity extends AppCompatActivity
             // check number of preexisting servers
             int count = dbHandler.getServerCount();
 
-            Toaster.toast("DATABASE COUNT "+count);
+            //Toaster.toast("DATABASE COUNT "+count);
 
             // if server count is more than 0, then preexisting servers are present - try to connect to those
             if(count>0)
@@ -455,22 +461,24 @@ public class MainActivity extends AppCompatActivity
 
             if(!connected||count==0)// if server count is 0 or all previous servers fail to connect come here
             {
-                Toaster.toast("No Predefined Server available");
-                Toaster.toast("Searching for servers on local network");
+                //Toaster.toast("No Predefined Server available");
+                //Toaster.toast("Searching for servers on local network");
 
                 // do a broadcasting server search - this fills the global list with any servers on the network
                 discoveredServer = TCPConnector.searchServer();
 
-                if (discoveredServer.size() > 0) {
+                if (discoveredServer.size() > 0)
+                {
                     // means we have servers on the network
-                    Toaster.toast("We have responses");
+                    //Toaster.toast("We have responses");
 
                     //connect to the first server on this list
                     // TODO: 9/8/2017 or ask the used to manually select
-                    for (Server servers : discoveredServer) {
-                        Toaster.toast("checking if available");
+                    for (Server servers : discoveredServer)
+                    {
+                        //Toaster.toast("checking if available");
                         boolean check = dbHandler.checkAvailable(servers.getServerID());
-                        Toaster.toast("check = " + check);
+                        //Toaster.toast("check = " + check);
                         if (!check) {
                             //so this server is not present
                             //add new server to database
@@ -481,7 +489,7 @@ public class MainActivity extends AppCompatActivity
                     TCPConnector.connectTCP(discoveredServer.remove(0), udpClient);
                 } else// if no servers are available on the network as well, just give up. ask user to connect manually or search again
                 {
-                    Toaster.toast("NO SERVERS AVAILABLE. CONNECT MANUALLY");
+                    //Toaster.toast("NO SERVERS AVAILABLE. CONNECT MANUALLY");
                     return "f";
                 }
             }
@@ -492,9 +500,15 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(String result)
         {
             if(result.equals("f"))
+            {
                 lt.error();
-            else
+                Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
+            }
+            else {
                 lt.success();
+                Toasty.success(MainActivity.this, "connected to " + CurrentServer.serverName + " at "+ CurrentServer.serverIP, Toast.LENGTH_SHORT, true).show();
+            }
+
         }
 
         @Override
@@ -513,22 +527,23 @@ public class MainActivity extends AppCompatActivity
         LoadToast lt = new LoadToast(MainActivity.this);
         @Override
         protected String doInBackground(String... params) {
-            Toaster.toast("Searching for servers on local network");
+            //Toaster.toast("Searching for servers on local network");
 
             // do a broadcasting server search - this fills the global list with any servers on the network
             discoveredServer = TCPConnector.searchServer();
 
             if (discoveredServer.size() > 0) {
                 // means we have servers on the network
-                Toaster.toast("We have responses");
+                //Toaster.toast("We have responses");
 
                 //connect to the first server on this list
                 // TODO: 9/8/2017 or ask the used to manually select
                 for (Server servers : discoveredServer) {
-                    Toaster.toast("checking if available");
+                    //Toaster.toast("checking if available");
                     boolean check = dbHandler.checkAvailable(servers.getServerID());
-                    Toaster.toast("check = " + check);
-                    if (!check) {
+                    //Toaster.toast("check = " + check);
+                    if (!check)
+                    {
                         //so this server is not present
                         //add new server to database
                         dbHandler.addServerToDB(servers);
@@ -536,7 +551,7 @@ public class MainActivity extends AppCompatActivity
                 }
             } else// if no servers are available on the network as well, just give up. ask user to connect manually or search again
             {
-                Toaster.toast("NO SERVERS AVAILABLE. CONNECT MANUALLY");
+                //Toaster.toast("NO SERVERS AVAILABLE. CONNECT MANUALLY");
                 return "f";
             }
             return "s";
@@ -547,7 +562,10 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(String result)
         {
             if(result.equals("f"))
+            {
                 lt.error();
+                Toasty.error(MainActivity.this, "Could Not find any servers on local network", Toast.LENGTH_SHORT, true).show();
+            }
             else
                 lt.success();
         }
