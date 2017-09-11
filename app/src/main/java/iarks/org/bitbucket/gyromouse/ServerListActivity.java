@@ -4,14 +4,15 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,9 +47,42 @@ public class ServerListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view)
             {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                //// TODO: 9/10/2017 add a dialog box to add new servers
+                LayoutInflater li = LayoutInflater.from(ServerListActivity.this);
+                View promptsView = li.inflate(R.layout.add_servers_manual, null);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        ServerListActivity.this);
+
+                // set prompts.xml to alertdialog builder
+                alertDialogBuilder.setView(promptsView);
+
+                final EditText userInput_name = (EditText) promptsView.findViewById(R.id.input_name);
+                final EditText userInput_ip = (EditText) promptsView.findViewById(R.id.input_ip);
+
+                // set dialog message
+                alertDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("Add",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        Server server = new Server("_"+userInput_name.getText().toString()+"_"+userInput_ip.getText().toString(),userInput_name.getText().toString(),userInput_ip.getText().toString());
+                                        Globals.databaseHandler.addServerToDB(server);
+                                        new LoadDBServers().execute("");
+                                    }
+                                })
+                        .setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                // create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                // show it
+                alertDialog.show();
+
             }
         });
 
@@ -90,7 +124,7 @@ public class ServerListActivity extends AppCompatActivity {
             else
             {
                 lt.success();
-                ServerAdapter ca = new ServerAdapter(dbList);
+                final ServerAdapter ca = new ServerAdapter(dbList);
                 rv.setAdapter(ca);
 
                 LinearLayoutManager llm = new LinearLayoutManager(ServerListActivity.this);
@@ -114,7 +148,7 @@ public class ServerListActivity extends AppCompatActivity {
                                 tcpConnector.execute("");
                             }
 
-                            public void onLongClickItem(View v, int position)
+                            public void onLongClickItem(View v, final int position)
                             {
                                 final View vv=v;
                                 AlertDialog.Builder builder;
@@ -129,9 +163,12 @@ public class ServerListActivity extends AppCompatActivity {
                                                 TextView ip = (TextView)vv.findViewById(R.id.ip);
                                                 String del = "_"+name.getText()+"_"+ip.getText();
                                                 Globals.databaseHandler.deleteServer(del);
+                                                dbList.remove(position);
+                                                rv.removeViewAt(position);
+                                                ca.notifyItemRemoved(position);
+                                                ca.notifyItemRangeChanged(position,dbList.size());
+                                                ca.notifyDataSetChanged();
 
-                                                Toaster.toast("On Click Item interface");
-                                                System.out.println("On Click Item interface");
                                             }
                                         })
                                         .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
