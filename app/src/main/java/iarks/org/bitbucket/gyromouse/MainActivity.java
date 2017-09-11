@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity
     ImageButton buttonAR, buttonAL, buttonAU, buttonAD, buttonMouse, buttonScroll;
     BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
     DatabaseHandler dbHandler;
-    List<Server> discoveredServer = new ArrayList<>();
+    ArrayList<Server> discoveredServer = new ArrayList<>();
     List<Server> preServers = new ArrayList<>();
     FabSpeedDial fabSpeedDial;
     CyclicBarrier latch;
@@ -460,9 +460,11 @@ public class MainActivity extends AppCompatActivity
             {
                 discoveredServer = iarks.org.bitbucket.gyromouse.ScanNetwork.searchServer();
 
-                if (discoveredServer.size() == 1) {
+                if (discoveredServer.size() == 1)
+                {
                     //auto connect if only one server is available
-                    for (Server servers : discoveredServer) {
+                    for (Server servers : discoveredServer)
+                    {
                         boolean check = dbHandler.checkAvailable(servers.getServerID());
                         if (!check) {
                             // add them to database
@@ -475,20 +477,21 @@ public class MainActivity extends AppCompatActivity
                     } else
                         return "f";
                 }
-//                else if (discoveredServer.size() > 1)
-//                {
-//                    // show if more than 1 servers are available
-//                    for (Server servers : discoveredServer)
-//                    {
-//                        boolean check = dbHandler.checkAvailable(servers.getServerID());
-//                        if (!check)
-//                        {
-//                            dbHandler.addServerToDB(servers);
-//                        }
-//                    }
-//                    // TODO: 9/11/2017 show dialog
-//                    return "dialog";
-//                }
+
+                else if (discoveredServer.size() > 1)
+                {
+                    // show if more than 1 servers are available
+                    for (Server servers : discoveredServer)
+                    {
+                        boolean check = dbHandler.checkAvailable(servers.getServerID());
+                        if (!check)
+                        {
+                            dbHandler.addServerToDB(servers);
+                        }
+                    }
+                    // TODO: 9/11/2017 show dialog
+                    return "dialog";
+                }
                 else {
                     return "f";
                 }
@@ -504,34 +507,22 @@ public class MainActivity extends AppCompatActivity
                 lt.error();
                 Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
             }
-//            else if(result.equals("dialog"))
-//            {
-//                ArrayAdapterItem adapter = new ArrayAdapterItem(MainActivity.this, R.layout.list_view_layout, discoveredServer);
-//
-//
-//
-//                listViewItems.setAdapter(adapter);
-//
-//                AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-//                LayoutInflater inflater = getLayoutInflater();
-//                View convertView = (View) inflater.inflate(R.layout.dialog_list, null);
-//
-//                alertDialog.setView(convertView);
-//
-//                alertDialog.setTitle("List");
-//
-//                ListView lv = (ListView) convertView.findViewById(R.id.lv);
-//
-//                ArrayAdapterItem adapter = new ArrayAdapterItem(MainActivity.this,R.layout.list_view_layout, discoveredServer);
-//
-//                lv.setAdapter(adapter);
-//
-//                alertDialog.show();
-//
-//
-//
-//            }
-            else {
+            else if(result.equals("dialog"))
+            {
+                lt.success();
+                AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                LayoutInflater inflater = getLayoutInflater();
+                View convertView = (View) inflater.inflate(R.layout.dialog_list, null);
+                alertDialog.setView(convertView);
+                alertDialog.setTitle("Serveral servers found over network");
+                ListView lv = (ListView) convertView.findViewById(R.id.lv);
+
+                lv.setAdapter(adapter);
+                alertDialog.show();
+            }
+            else
+            {
                 lt.success();
                 Toasty.success(MainActivity.this, "connected to " + CurrentServer.serverName + " at "+ CurrentServer.serverIP, Toast.LENGTH_SHORT, true).show();
             }
@@ -590,7 +581,20 @@ public class MainActivity extends AppCompatActivity
             }
             else
             {
-                // TODO: 9/11/2017 show discovered servers in a dialog box
+                lt.success();
+
+                AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                LayoutInflater inflater = getLayoutInflater();
+                View convertView = (View) inflater.inflate(R.layout.dialog_list, null);
+                alertDialog.setView(convertView);
+                alertDialog.setTitle("List");
+                ListView lv = (ListView) convertView.findViewById(R.id.lv);
+
+                lv.setAdapter(adapter);
+                alertDialog.show();
+
+
             }
         }
 

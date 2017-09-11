@@ -1,5 +1,6 @@
 package iarks.org.bitbucket.gyromouse;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -144,8 +145,7 @@ public class ServerListActivity extends AppCompatActivity {
                                 Log.i(getClass().getName(),ip.getText().toString());
                                 Server server = new Server(key,name.getText().toString(),ip.getText().toString());
 
-                                TCPConnector tcpConnector = new TCPConnector(server,ServerListActivity.this);
-                                tcpConnector.execute("");
+                                new Conn(server).execute("");
                             }
 
                             public void onLongClickItem(View v, final int position)
@@ -197,6 +197,51 @@ public class ServerListActivity extends AppCompatActivity {
 
         @Override
         protected void onProgressUpdate(Void... values){}
+    }
+
+    class Conn extends AsyncTask<String, Void, String> {
+        boolean connected = false;
+
+        LoadToast lt =new LoadToast(ServerListActivity.this);
+
+        Server server;
+
+        Conn(Server serverp) {
+            server = serverp;
+        }
+
+
+        @Override
+        protected String doInBackground(String... params)
+        {
+            if (TCPConnector.connectTCP(server))
+                return "s";
+            return "f";
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            if (result.equals("f")) {
+                lt.error();
+                Toasty.error(ServerListActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
+            } else {
+                lt.success();
+                Toasty.success(ServerListActivity.this, "connected to " + CurrentServer.serverName + " at " + CurrentServer.serverIP, Toast.LENGTH_SHORT, true).show();
+            }
+
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            lt.setText("Searching for servers");
+            lt.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+        }
     }
 
 }
