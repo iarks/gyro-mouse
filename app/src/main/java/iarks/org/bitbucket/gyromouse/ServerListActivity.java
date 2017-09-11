@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -89,7 +90,6 @@ public class ServerListActivity extends AppCompatActivity {
             else
             {
                 lt.success();
-                // TODO: 9/10/2017 load data from list to list view
                 ServerAdapter ca = new ServerAdapter(dbList);
                 rv.setAdapter(ca);
 
@@ -105,8 +105,13 @@ public class ServerListActivity extends AppCompatActivity {
                                 TextView name = (TextView)v.findViewById(R.id.name);
                                 TextView ip = (TextView)v.findViewById(R.id.ip);
                                 String key = "_"+name.getText()+"_"+ip.getText();
+                                Log.i(getClass().getName(),key);
+                                Log.i(getClass().getName(),name.getText().toString());
+                                Log.i(getClass().getName(),ip.getText().toString());
                                 Server server = new Server(key,name.getText().toString(),ip.getText().toString());
-                                TCPConnector.connectTCP(server);
+
+                                TCPConnector tcpConnector = new TCPConnector(server,ServerListActivity.this);
+                                tcpConnector.execute("");
                             }
 
                             public void onLongClickItem(View v, int position)
@@ -120,7 +125,6 @@ public class ServerListActivity extends AppCompatActivity {
                                         {
                                             public void onClick(DialogInterface dialog, int which)
                                             {
-                                                // TODO: 9/10/2017 delete server
                                                 TextView name = (TextView)vv.findViewById(R.id.name);
                                                 TextView ip = (TextView)vv.findViewById(R.id.ip);
                                                 String del = "_"+name.getText()+"_"+ip.getText();

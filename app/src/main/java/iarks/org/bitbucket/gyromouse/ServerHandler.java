@@ -1,26 +1,47 @@
 package iarks.org.bitbucket.gyromouse;
+import android.provider.Settings;
 import android.util.Log;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.concurrent.BrokenBarrierException;
+
 import xdroid.toaster.Toaster;
 
 class ServerHandler implements Runnable
 {
+    int resetLatch=0;
+    int firstTime;
 
-    ServerHandler()
-    {
 
-    }
 
     @Override
     public void run()
     {
+        firstTime=1;
         while (true)
         {
+            if(resetLatch == 1 || firstTime==1)
+            {
+                try
+                {
+                    resetLatch=0;
+                    Globals.cdLatch.await();
+                }catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }catch (BrokenBarrierException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+
+
             try
             {
+                firstTime=0;
                 DataOutputStream outToServer = new DataOutputStream(CurrentServer.tcpSocket.getOutputStream());
                 DataInputStream inFromServer = new DataInputStream(CurrentServer.tcpSocket.getInputStream());
 
@@ -47,11 +68,12 @@ class ServerHandler implements Runnable
                 else if (receivedString.equals(""))
                 {
                     Log.i(getClass().getName(), "SERVER IS DEAD?");
-                    // TODO: 9/8/2017 goback to the start
                     Toaster.toast("SERVER IS PROBABLY DEAD");
-                    return;
+                    resetLatch=1;
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 e.printStackTrace();
             }
         }

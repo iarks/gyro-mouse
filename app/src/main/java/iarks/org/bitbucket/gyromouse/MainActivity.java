@@ -29,6 +29,8 @@ import net.steamcrafted.loadtoast.LoadToast;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingDeque;
 
 
@@ -49,11 +51,15 @@ public class MainActivity extends AppCompatActivity
     List<Server> discoveredServer = new ArrayList<>();
     List<Server> preServers = new ArrayList<>();
     FabSpeedDial fabSpeedDial;
+    CyclicBarrier latch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        latch = new CyclicBarrier(2);
+        Globals.cdLatch=latch;
 
         // inflate layout file
         setContentView(R.layout.activity_main);
@@ -78,9 +84,9 @@ public class MainActivity extends AppCompatActivity
         udp_thread.start();
 
         // also start the tcp handler thread
-//        ServerHandler serverHandler = new ServerHandler();
-//        Thread tcpClientThread = new Thread(serverHandler);
-//        tcpClientThread.start();
+        ServerHandler serverHandler = new ServerHandler();
+        Thread tcpClientThread = new Thread(serverHandler);
+        tcpClientThread.start();
 
 
         // associate ui elements to variables/ objects
@@ -100,6 +106,8 @@ public class MainActivity extends AppCompatActivity
 
         // create scrollwheel objects
         final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue, getApplicationContext());
+
+
 
         // add click listeners to buttons
         buttonAD.setOnTouchListener(new View.OnTouchListener() {

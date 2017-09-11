@@ -1,7 +1,11 @@
 package iarks.org.bitbucket.gyromouse;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
+
+import net.steamcrafted.loadtoast.LoadToast;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,11 +21,61 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.concurrent.BrokenBarrierException;
 
+import es.dmoral.toasty.Toasty;
 import xdroid.toaster.Toaster;
 
-class TCPConnector
+class TCPConnector extends AsyncTask<String, Void, String>
 {
+    boolean connected=false;
+
+    LoadToast lt;
+
+    Server server;
+    Context context;
+
+    TCPConnector(Server server, Context context)
+    {
+        this.server = server;
+        this.context = context;
+        lt = new LoadToast(context);
+    }
+
+
+    @Override
+    protected String doInBackground(String... params)
+    {
+        if(connectTCP(server))
+            return "s";
+        return "f";
+    }
+
+    @Override
+    protected void onPostExecute(String result)
+    {
+        if(result.equals("f"))
+        {
+            lt.error();
+            Toasty.error(context, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
+        }
+        else {
+            lt.success();
+            Toasty.success(context, "connected to " + CurrentServer.serverName + " at "+ CurrentServer.serverIP, Toast.LENGTH_SHORT, true).show();
+        }
+
+    }
+
+    @Override
+    protected void onPreExecute()
+    {
+        lt.setText("Searching for servers");
+        lt.show();
+    }
+
+    @Override
+    protected void onProgressUpdate(Void... values){}
+
 
     static boolean connectTCP(Server server)
     {
@@ -80,6 +134,14 @@ class TCPConnector
             CurrentServer.serverName = server.getServerName();
 
             Globals.udpClient.udpSetup();
+
+            try {
+                Globals.cdLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (BrokenBarrierException e) {
+                e.printStackTrace();
+            }
 
             return true;
         }
