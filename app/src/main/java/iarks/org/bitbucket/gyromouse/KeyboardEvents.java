@@ -31,7 +31,7 @@ class KeyboardEvents implements Runnable
                 {
                     synchronized (sharedQueue)
                     {
-                        sharedQueue.put("{\"X\":" + "\"" + "BS" + "\"," + "\"Y\":\"" + 0.00 + "\"}" + "\0");
+                        sharedQueue.put("BS;"+"xx;" + CurrentServer.sessionKey);
                         sharedQueue.notifyAll();
                     }
                 }
@@ -57,7 +57,7 @@ class KeyboardEvents implements Runnable
                     {
 //                        Toast.makeText(context, "UNICODE CHARACTER NOT 0 : " + ch, Toast.LENGTH_SHORT).show();
                         synchronized (sharedQueue) {
-                            sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + charAt + "\"}" + "\0");
+                            sharedQueue.put("U;" + charAt+ ";" + CurrentServer.sessionKey);
                             sharedQueue.notifyAll();
                         }
                         return;
@@ -74,7 +74,7 @@ class KeyboardEvents implements Runnable
         try
         {
             synchronized (sharedQueue) {
-                sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + (char)i + "\"}" + "\0");
+                sharedQueue.put("U;" + (char)i + ";" + CurrentServer.sessionKey);
 //                Log.d(TAG,event.getCharacters().charAt(0)+"");
                 Log.d(TAG,(char)i+"");
 //                sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + event.getCharacters().charAt(0) + "\"}" + "\0");
