@@ -7,4 +7,5 @@ package iarks.org.bitbucket.gyromouse;
 public class Globals
 {
     static DatabaseHandler databaseHandler;
+    static UDPClient udpClient;
 }

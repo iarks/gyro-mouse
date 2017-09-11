@@ -1,5 +1,6 @@
 package iarks.org.bitbucket.gyromouse;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.DataInputStream;
@@ -21,9 +22,9 @@ import xdroid.toaster.Toaster;
 
 class TCPConnector
 {
-    static boolean connectTCP(Server server, UDPClient udpClientRef)
+
+    static boolean connectTCP(Server server)
     {
-        UDPClient udpClient = udpClientRef;
         try
         {
             Socket clientSocket;
@@ -78,7 +79,7 @@ class TCPConnector
 
             CurrentServer.serverName = server.getServerName();
 
-            udpClient.udpSetup();
+            Globals.udpClient.udpSetup();
 
             return true;
         }
@@ -92,100 +93,5 @@ class TCPConnector
             return false;
         }
 
-    }
-
-    static ArrayList<Server> searchServer()
-    {
-        ArrayList<Server> list = new ArrayList<>();
-        list.clear();
-
-        Toaster.toast("In search server");
-        byte[] sendData = "CANHAVEIP?;x;GMO".getBytes();
-        DatagramSocket datagramSocket = null;
-
-        try
-        {
-            datagramSocket = new DatagramSocket();
-            datagramSocket.setSoTimeout(10000);
-            datagramSocket.setBroadcast(true);
-        }
-        catch (SocketException e)
-        {
-            Toaster.toast("SOCKET EXCEPTION");
-            e.printStackTrace();
-        }
-
-        try
-        {
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), Integer.parseInt(CurrentServer.udpPort));
-            datagramSocket.send(sendPacket);
-            Log.i("TCPConnector" , ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
-        }
-        catch(Exception e)
-        {
-
-        }
-
-        try
-        {
-            Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
-            while (interfaces.hasMoreElements()) {
-                NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
-                if (networkInterface.isLoopback() || !networkInterface.isUp()) {
-                    continue; // Don't want to broadcast to the loopback // interface
-                }
-                for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
-                    InetAddress broadcast = interfaceAddress.getBroadcast();
-                    if (broadcast == null) {
-                        continue;
-                    }
-                    // Send the broadcast package!
-                    try {
-                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, 8888);
-                        datagramSocket.send(sendPacket);
-                    } catch (Exception e) {
-
-                    }
-                    Log.i("TCPConnector" ,">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
-                }
-            }
-            Log.i("TCPConnector" , ">>> Done looping over all network interfaces. Now waiting for a reply!");
-
-            while (true)
-            {
-                // Wait for a response
-                byte[] recvBuf = new byte[15000];
-                DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
-                datagramSocket.receive(receivePacket);
-
-                // We have a response
-                Log.i("TCPConnector" , ">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
-                Toaster.toast("These available");
-                // check if message is correct - no need
-                Toaster.toast(receivePacket.getAddress().getHostAddress()+"-"+new String(receivePacket.getData()));
-
-                String name = new String(receivePacket.getData()).trim();
-                String id = "_"+name+"_"+receivePacket.getAddress().getHostAddress();
-
-                list.add(new Server(id, name, receivePacket.getAddress().getHostAddress()));
-
-                Toaster.toast(receivePacket.getAddress().getHostAddress()+"-"+new String(receivePacket.getData()));
-            }
-        }
-        catch (SocketTimeoutException e)
-        {
-            Log.i("TCPConnector" , ">>> SOCKET TIMED OUT");
-            Toaster.toast("SOCKET TIMED OUT");
-        }
-        catch (IOException e)
-        {
-            //no hosts discovered
-        }
-        finally
-        {
-            if (datagramSocket != null)
-                datagramSocket.close();
-            return list;
-        }
     }
 }

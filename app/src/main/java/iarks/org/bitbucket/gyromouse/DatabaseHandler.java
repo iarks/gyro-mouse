@@ -150,7 +150,14 @@ class DatabaseHandler extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_SERVERS, KEY_ID + " = ?",
-                new String[] { String.valueOf(server.getServerID()) });
+                new String[] { server.getServerID()});
+        db.close();
+    }
+
+    public void deleteServer(String id)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_SERVERS, KEY_ID + " = ?", new String[] {id});
         db.close();
     }
 

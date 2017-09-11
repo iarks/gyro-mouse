@@ -1,7 +1,5 @@
 package iarks.org.bitbucket.gyromouse;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,10 +7,8 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.support.v7.app.AppCompatActivity;
@@ -20,11 +16,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import com.github.johnpersano.supertoasts.library.Style;
@@ -42,7 +35,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import es.dmoral.toasty.Toasty;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
-import xdroid.toaster.Toaster;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 
@@ -81,6 +73,7 @@ public class MainActivity extends AppCompatActivity
 
         // create the udp thread
         final UDPClient udpClient = new UDPClient(sharedQueue);
+        Globals.udpClient = udpClient;
         final Thread udp_thread = new Thread(udpClient);
         udp_thread.start();
 
@@ -346,8 +339,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        SearchServers ss = new SearchServers();
-        ss.setUDP(udpClient);
+        ConnectToServers ss = new ConnectToServers();
         ss.execute("");
         // end of onCreate
 
@@ -419,77 +411,68 @@ public class MainActivity extends AppCompatActivity
         return super.dispatchKeyEvent(event);
     }
 
-    class SearchServers extends AsyncTask<String, Void, String>
+
+
+
+
+    private class ConnectToServers extends AsyncTask<String, Void, String>
     {
         boolean connected=false;
-        UDPClient udpClient;
         LoadToast lt = new LoadToast(MainActivity.this);
-        void setUDP(UDPClient udpClientObject)
-        {
-            udpClient=udpClientObject;
-        }
 
         @Override
         protected String doInBackground(String... params)
         {
-            // ist priority - connect to already present servers
-            // check number of preexisting servers
+
             int count = dbHandler.getServerCount();
 
-            //Toaster.toast("DATABASE COUNT "+count);
-
-            // if server count is more than 0, then preexisting servers are present - try to connect to those
             if(count>0)
             {
-                // get a list of all the servers in the database
                 preServers = dbHandler.getAllDBServers();
 
-                // iterate through list and try to connect to each server
                 for (Server server: preServers)
                 {
-                    // connect to that servers IP - connect TCP returns true if connection is established otherwise returns false
-                    boolean check = TCPConnector.connectTCP(server, udpClient);
-                    //check if connection is established
-                    if(check)
+
+                    if(TCPConnector.connectTCP(server))
                     {
-                        //if connection established- set a flag and break - no need to iterate any more
                         connected=true;
                         break;
                     }
                 }
             }
 
-            if(!connected||count==0)// if server count is 0 or all previous servers fail to connect come here
+            if(!connected||count==0)
             {
-                //Toaster.toast("No Predefined Server available");
-                //Toaster.toast("Searching for servers on local network");
+                discoveredServer = iarks.org.bitbucket.gyromouse.ScanNetwork.searchServer();
 
-                // do a broadcasting server search - this fills the global list with any servers on the network
-                discoveredServer = TCPConnector.searchServer();
-
-                if (discoveredServer.size() > 0)
+                if (discoveredServer.size() == 1)
                 {
-                    // means we have servers on the network
-                    //Toaster.toast("We have responses");
-
-                    //connect to the first server on this list
-                    // TODO: 9/8/2017 or ask the used to manually select
+                    //auto connect if only one server is available
                     for (Server servers : discoveredServer)
                     {
-                        //Toaster.toast("checking if available");
                         boolean check = dbHandler.checkAvailable(servers.getServerID());
-                        //Toaster.toast("check = " + check);
-                        if (!check) {
-                            //so this server is not present
-                            //add new server to database
+                        if (!check)
+                        {
                             dbHandler.addServerToDB(servers);
                         }
                     }
-
-                    TCPConnector.connectTCP(discoveredServer.remove(0), udpClient);
-                } else// if no servers are available on the network as well, just give up. ask user to connect manually or search again
+                    TCPConnector.connectTCP(discoveredServer.remove(0));
+                }
+                if (discoveredServer.size() > 1)
                 {
-                    //Toaster.toast("NO SERVERS AVAILABLE. CONNECT MANUALLY");
+                    // show if more than 1 servers are available
+                    for (Server servers : discoveredServer)
+                    {
+                        boolean check = dbHandler.checkAvailable(servers.getServerID());
+                        if (!check)
+                        {
+                            dbHandler.addServerToDB(servers);
+                        }
+                    }
+                    // TODO: 9/8/2017 or ask the used to manually select
+                }
+                else
+                {
                     return "f";
                 }
             }
@@ -522,52 +505,46 @@ public class MainActivity extends AppCompatActivity
         protected void onProgressUpdate(Void... values){}
     }
 
+
     class ScanNetwork extends AsyncTask<String,Void,String>
     {
         LoadToast lt = new LoadToast(MainActivity.this);
         @Override
-        protected String doInBackground(String... params) {
-            //Toaster.toast("Searching for servers on local network");
+        protected String doInBackground(String... params)
+        {
 
-            // do a broadcasting server search - this fills the global list with any servers on the network
-            discoveredServer = TCPConnector.searchServer();
+            discoveredServer = iarks.org.bitbucket.gyromouse.ScanNetwork.searchServer();
 
-            if (discoveredServer.size() > 0) {
-                // means we have servers on the network
-                //Toaster.toast("We have responses");
-
-                //connect to the first server on this list
-                // TODO: 9/8/2017 or ask the used to manually select
-                for (Server servers : discoveredServer) {
-                    //Toaster.toast("checking if available");
+            if (discoveredServer.size() > 0)
+            {
+                for (Server servers : discoveredServer)
+                {
                     boolean check = dbHandler.checkAvailable(servers.getServerID());
-                    //Toaster.toast("check = " + check);
                     if (!check)
                     {
-                        //so this server is not present
-                        //add new server to database
                         dbHandler.addServerToDB(servers);
                     }
                 }
-            } else// if no servers are available on the network as well, just give up. ask user to connect manually or search again
-            {
-                //Toaster.toast("NO SERVERS AVAILABLE. CONNECT MANUALLY");
-                return "f";
+                return "1";
             }
-            return "s";
+            else
+            {
+                return "0";
+            }
         }
 
 
         @Override
         protected void onPostExecute(String result)
         {
-            if(result.equals("f"))
+            if(result.equals("0"))
             {
                 lt.error();
                 Toasty.error(MainActivity.this, "Could Not find any servers on local network", Toast.LENGTH_SHORT, true).show();
             }
-            else
+            else {
                 lt.success();
+            }
         }
 
         @Override
