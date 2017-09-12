@@ -491,6 +491,18 @@ public class MainActivity extends AppCompatActivity {
 
                 lv.setAdapter(adapter);
 
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View v, int position, long id)
+                    {
+                        TextView ip = (TextView) v.findViewById(R.id.ip);
+                        TextView name = (TextView) v.findViewById(R.id.name);
+                        Server server = new Server("_" + name + "_" + ip, name.getText().toString(), ip.getText().toString());
+                        Conn conn = new Conn(server);
+                        conn.execute("");
+                    }
+                });
+
                 alertDialog.show();
             } else {
                 lt.success();
@@ -552,6 +564,7 @@ public class MainActivity extends AppCompatActivity {
                 ListView lv = (ListView) convertView.findViewById(R.id.lv);
 
                 lv.setAdapter(adapter);
+
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View v, int position, long id)
@@ -559,7 +572,7 @@ public class MainActivity extends AppCompatActivity {
                         TextView ip = (TextView) v.findViewById(R.id.ip);
                         TextView name = (TextView) v.findViewById(R.id.name);
                         Server server = new Server("_" + name + "_" + ip, name.getText().toString(), ip.getText().toString());
-                        Conn conn = new Conn(server,alertDialog);
+                        Conn conn = new Conn(server);
                         conn.execute("");
                     }
                 });
@@ -586,10 +599,10 @@ public class MainActivity extends AppCompatActivity {
         Server server;
         AlertDialog.Builder dialog;
 
-        Conn(Server serverp, AlertDialog.Builder diag)
+        Conn(Server serverp)
         {
             server = serverp;
-            dialog = diag;
+
         }
 
 
