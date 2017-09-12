@@ -30,6 +30,7 @@ public class ServerListActivity extends AppCompatActivity {
     List<Server> dbList;
     TextView currentServerName;
     TextView currentServerIP;
+    final ServerAdapter ca = new ServerAdapter();
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -68,7 +69,9 @@ public class ServerListActivity extends AppCompatActivity {
                                     public void onClick(DialogInterface dialog,int id) {
                                         Server server = new Server("_"+userInput_name.getText().toString()+"_"+userInput_ip.getText().toString(),userInput_name.getText().toString(),userInput_ip.getText().toString());
                                         Globals.databaseHandler.addServerToDB(server);
-                                        new LoadDBServers().execute("");
+                                        //new LoadDBServers().execute("");
+                                        dbList.add(server);
+                                        ca.notifyDataSetChanged();
                                     }
                                 })
                         .setNegativeButton("Cancel",
@@ -125,7 +128,8 @@ public class ServerListActivity extends AppCompatActivity {
             else
             {
                 lt.success();
-                final ServerAdapter ca = new ServerAdapter(dbList);
+//                final ServerAdapter ca = new ServerAdapter(dbList);
+                ca.setUpServerAdapter(dbList);
                 rv.setAdapter(ca);
 
                 LinearLayoutManager llm = new LinearLayoutManager(ServerListActivity.this);

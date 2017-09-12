@@ -33,6 +33,14 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.MyViewHold
     {
         this.serverList = serverList;
     }
+    public ServerAdapter()
+    {
+
+    }
+    void setUpServerAdapter(List<Server> serverList)
+    {
+        this.serverList = serverList;
+    }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position)
