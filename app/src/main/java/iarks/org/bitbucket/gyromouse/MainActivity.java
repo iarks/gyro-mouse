@@ -20,10 +20,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.johnpersano.supertoasts.library.Style;
@@ -47,8 +49,7 @@ import xdroid.toaster.Toaster;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 
-public class MainActivity extends AppCompatActivity
-{
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
 
     Button buttonRight, buttonEscape, buttonLeft, buttonWindows;
@@ -61,12 +62,11 @@ public class MainActivity extends AppCompatActivity
     CyclicBarrier latch;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         latch = new CyclicBarrier(2);
-        Globals.cdLatch=latch;
+        Globals.cdLatch = latch;
 
         // inflate layout file
         setContentView(R.layout.activity_main);
@@ -113,7 +113,6 @@ public class MainActivity extends AppCompatActivity
 
         // create scrollwheel objects
         final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue, getApplicationContext());
-
 
 
         // add click listeners to buttons
@@ -227,8 +226,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN)
-                {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     timeDown = event.getDownTime();
                     Thread trackpad_thread = new Thread(trackpad);
                     trackpad_thread.start();
@@ -359,21 +357,16 @@ public class MainActivity extends AppCompatActivity
         // end of onCreate
 
         fabSpeedDial = (FabSpeedDial) findViewById(R.id.ff);
-        fabSpeedDial.setMenuListener(new SimpleMenuListenerAdapter()
-        {
+        fabSpeedDial.setMenuListener(new SimpleMenuListenerAdapter() {
             @Override
-            public boolean onMenuItemSelected(MenuItem menuItem)
-            {
+            public boolean onMenuItemSelected(MenuItem menuItem) {
                 int id = menuItem.getItemId();
 
                 //noinspection SimplifiableIfStatement
-                if (id == R.id.action_scanNetwork)
-                {
+                if (id == R.id.action_scanNetwork) {
                     new ScanNetwork().execute("");
                     return true;
-                }
-                else if (id == R.id.action_dbServers)
-                {
+                } else if (id == R.id.action_dbServers) {
                     Intent myIntent = new Intent(MainActivity.this, ServerListActivity.class);
                     MainActivity.this.startActivity(myIntent);
                     return true;
@@ -385,8 +378,7 @@ public class MainActivity extends AppCompatActivity
 
     // create overflow menu to toolbar
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.overflow_menu, menu);
         return true;
@@ -427,44 +419,33 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
-
-
-    private class ConnectToServers extends AsyncTask<String, Void, String>
-    {
-        boolean connected=false;
+    private class ConnectToServers extends AsyncTask<String, Void, String> {
+        boolean connected = false;
         LoadToast lt = new LoadToast(MainActivity.this);
 
         @Override
-        protected String doInBackground(String... params)
-        {
+        protected String doInBackground(String... params) {
 
             int count = dbHandler.getServerCount();
 
-            if (count > 0)
-            {
+            if (count > 0) {
                 preServers = dbHandler.getAllDBServers();
 
-                for (Server server : preServers)
-                {
+                for (Server server : preServers) {
 
-                    if (TCPConnector.connectTCP(server))
-                    {
+                    if (TCPConnector.connectTCP(server)) {
                         connected = true;
                         return "s";
                     }
                 }
             }
 
-            if (!connected || count == 0)
-            {
+            if (!connected || count == 0) {
                 discoveredServer = iarks.org.bitbucket.gyromouse.ScanNetwork.searchServer();
 
-                if (discoveredServer.size() == 1)
-                {
+                if (discoveredServer.size() == 1) {
                     //auto connect if only one server is available
-                    for (Server servers : discoveredServer)
-                    {
+                    for (Server servers : discoveredServer) {
                         boolean check = dbHandler.checkAvailable(servers.getServerID());
                         if (!check) {
                             // add them to database
@@ -476,23 +457,17 @@ public class MainActivity extends AppCompatActivity
                         return "s";
                     } else
                         return "f";
-                }
-
-                else if (discoveredServer.size() > 1)
-                {
+                } else if (discoveredServer.size() > 1) {
                     // show if more than 1 servers are available
-                    for (Server servers : discoveredServer)
-                    {
+                    for (Server servers : discoveredServer) {
                         boolean check = dbHandler.checkAvailable(servers.getServerID());
-                        if (!check)
-                        {
+                        if (!check) {
                             dbHandler.addServerToDB(servers);
                         }
                     }
                     // TODO: 9/11/2017 show dialog
                     return "dialog";
-                }
-                else {
+                } else {
                     return "f";
                 }
             }
@@ -500,15 +475,11 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onPostExecute(String result)
-        {
-            if(result.equals("f"))
-            {
+        protected void onPostExecute(String result) {
+            if (result.equals("f")) {
                 lt.error();
                 Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
-            }
-            else if(result.equals("dialog"))
-            {
+            } else if (result.equals("dialog")) {
                 lt.success();
                 AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
@@ -519,72 +490,61 @@ public class MainActivity extends AppCompatActivity
                 ListView lv = (ListView) convertView.findViewById(R.id.lv);
 
                 lv.setAdapter(adapter);
+
                 alertDialog.show();
-            }
-            else
-            {
+            } else {
                 lt.success();
-                Toasty.success(MainActivity.this, "connected to " + CurrentServer.serverName + " at "+ CurrentServer.serverIP, Toast.LENGTH_SHORT, true).show();
+                Toasty.success(MainActivity.this, "connected to " + CurrentServer.serverName + " at " + CurrentServer.serverIP, Toast.LENGTH_SHORT, true).show();
             }
 
 
         }
 
         @Override
-        protected void onPreExecute()
-        {
+        protected void onPreExecute() {
             lt.setText("Searching for servers");
             lt.show();
         }
 
         @Override
-        protected void onProgressUpdate(Void... values){}
+        protected void onProgressUpdate(Void... values) {
+        }
     }
 
 
-    class ScanNetwork extends AsyncTask<String,Void,String>
-    {
+    class ScanNetwork extends AsyncTask<String, Void, String> {
         LoadToast lt = new LoadToast(MainActivity.this);
+
         @Override
-        protected String doInBackground(String... params)
-        {
+        protected String doInBackground(String... params) {
 
             discoveredServer = iarks.org.bitbucket.gyromouse.ScanNetwork.searchServer();
 
-            if (discoveredServer.size() > 0)
-            {
-                for (Server servers : discoveredServer)
-                {
+            if (discoveredServer.size() > 0) {
+                for (Server servers : discoveredServer) {
                     boolean check = dbHandler.checkAvailable(servers.getServerID());
-                    if (!check)
-                    {
+                    if (!check) {
                         // add newly found servers to database
                         dbHandler.addServerToDB(servers);
                     }
                 }
                 return "1";
-            }
-            else
-            {
+            } else {
                 return "0";
             }
         }
 
 
         @Override
-        protected void onPostExecute(String result)
-        {
-            if(result.equals("0"))
-            {
+        protected void onPostExecute(String result) {
+            if (result.equals("0")) {
                 lt.error();
                 Toasty.error(MainActivity.this, "Could Not find any servers on local network", Toast.LENGTH_SHORT, true).show();
-            }
-            else
-            {
+            } else {
                 lt.success();
 
                 AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
                 LayoutInflater inflater = getLayoutInflater();
                 View convertView = (View) inflater.inflate(R.layout.dialog_list, null);
                 alertDialog.setView(convertView);
@@ -592,10 +552,66 @@ public class MainActivity extends AppCompatActivity
                 ListView lv = (ListView) convertView.findViewById(R.id.lv);
 
                 lv.setAdapter(adapter);
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View v, int position, long id)
+                    {
+                        TextView ip = (TextView) v.findViewById(R.id.ip);
+                        TextView name = (TextView) v.findViewById(R.id.name);
+                        Server server = new Server("_" + name + "_" + ip, name.getText().toString(), ip.getText().toString());
+                        Conn conn = new Conn(server,alertDialog);
+                        conn.execute("");
+                    }
+                });
                 alertDialog.show();
-
-
             }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            lt.setText("Searching for servers");
+            lt.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+        }
+    }
+
+    class Conn extends AsyncTask<String, Void, String> {
+        boolean connected = false;
+
+        LoadToast lt =new LoadToast(MainActivity.this);
+
+        Server server;
+        AlertDialog.Builder dialog;
+
+        Conn(Server serverp, AlertDialog.Builder diag)
+        {
+            server = serverp;
+            dialog = diag;
+        }
+
+
+        @Override
+        protected String doInBackground(String... params)
+        {
+            if (TCPConnector.connectTCP(server))
+                return "s";
+            return "f";
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            if (result.equals("f")) {
+                lt.error();
+                Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
+            } else {
+                lt.success();
+                Toasty.success(MainActivity.this, "connected to " + CurrentServer.serverName + " at " + CurrentServer.serverIP, Toast.LENGTH_SHORT, true).show();
+            }
+
         }
 
         @Override
@@ -606,7 +622,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onProgressUpdate(Void... values){}
+        protected void onProgressUpdate(Void... values) {
+        }
     }
 
 }
