@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public class RecyclerViewServerAdapter extends RecyclerView.Adapter<RecyclerViewServerAdapter.MyViewHolder>
+class RecyclerViewServerAdapter extends RecyclerView.Adapter<RecyclerViewServerAdapter.MyViewHolder>
 {
 
     private List<Server> serverList;
@@ -16,12 +16,12 @@ public class RecyclerViewServerAdapter extends RecyclerView.Adapter<RecyclerView
     /**
      * View holder class
      * */
-    public class MyViewHolder extends RecyclerView.ViewHolder
+    class MyViewHolder extends RecyclerView.ViewHolder
     {
-        public TextView serverName;
+        TextView serverName;
         public TextView serverIP;
 
-        public MyViewHolder(View view)
+        MyViewHolder(View view)
         {
             super(view);
             serverName = (TextView) view.findViewById(R.id.name);
@@ -33,7 +33,7 @@ public class RecyclerViewServerAdapter extends RecyclerView.Adapter<RecyclerView
     {
         this.serverList = serverList;
     }
-    public RecyclerViewServerAdapter()
+    RecyclerViewServerAdapter()
     {
 
     }

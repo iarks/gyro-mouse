@@ -13,7 +13,7 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-public class NetworkScanner
+class NetworkScanner
 {
 
 
@@ -39,17 +39,21 @@ public class NetworkScanner
             e.printStackTrace();
         }
 
-        trial:
         try
         {
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), Integer.parseInt(CurrentServer.udpPort));
             datagramSocket.send(sendPacket);
             Log.i("TCPConnector" , ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
         }
-        catch(Exception e)
+        catch(IOException e)
         {
-
+            e.printStackTrace();
         }
+        catch(NullPointerException e)
+        {
+            e.printStackTrace();
+        }
+
 
         try
         {
@@ -70,8 +74,8 @@ public class NetworkScanner
                     {
                         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, 8888);
                         datagramSocket.send(sendPacket);
-                    } catch (Exception e) {
-
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
                     }
                     Log.i("TCPConnector" ,">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
                 }
@@ -102,7 +106,7 @@ public class NetworkScanner
         }
         catch (IOException e)
         {
-            //no hosts discovered
+            e.printStackTrace();
         }
         finally
         {

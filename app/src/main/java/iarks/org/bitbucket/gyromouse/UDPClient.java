@@ -26,6 +26,7 @@ class UDPClient implements Runnable
         }
         catch (Exception e)
         {
+            e.printStackTrace();
         }
         finally
         {
@@ -73,7 +74,7 @@ class UDPClient implements Runnable
                     }
                     catch (Exception e)
                     {
-
+                        e.printStackTrace();
                     }
                 }
                 else

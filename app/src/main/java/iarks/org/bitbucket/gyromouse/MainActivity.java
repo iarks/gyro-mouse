@@ -466,41 +466,44 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            if (result.equals("f")) {
-                lt.error();
-                Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
-            } else if (result.equals("dialog")) {
-                lt.success();
-                AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-                LayoutInflater inflater = getLayoutInflater();
-                View convertView = (View) inflater.inflate(R.layout.dialog_list, null);
-                alertDialog.setView(convertView);
-                alertDialog.setTitle("Serveral servers found over network");
-                ListView lv = (ListView) convertView.findViewById(R.id.lv);
+        protected void onPostExecute(String result)
+        {
+            switch (result)
+            {
+                case "f":
+                    lt.error();
+                    Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
+                    break;
+                case "dialog":
+                    lt.success();
+                    AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                    LayoutInflater inflater = getLayoutInflater();
+                    View convertView = inflater.inflate(R.layout.dialog_list, null);
+                    alertDialog.setView(convertView);
+                    alertDialog.setTitle("Serveral servers found over network");
+                    ListView lv = (ListView) convertView.findViewById(R.id.lv);
 
-                lv.setAdapter(adapter);
+                    lv.setAdapter(adapter);
 
-                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View v, int position, long id)
-                    {
-                        TextView ip = (TextView) v.findViewById(R.id.ip);
-                        TextView name = (TextView) v.findViewById(R.id.name);
-                        Server server = new Server("_" + name + "_" + ip, name.getText().toString(), ip.getText().toString());
-                        Conn conn = new Conn(server);
-                        conn.execute("");
-                    }
-                });
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View v, int position, long id)
+                        {
+                            TextView ip = (TextView) v.findViewById(R.id.ip);
+                            TextView name = (TextView) v.findViewById(R.id.name);
+                            Server server = new Server("_" + name + "_" + ip, name.getText().toString(), ip.getText().toString());
+                            TryConnection tryConnection = new TryConnection(server);
+                            tryConnection.execute("");
+                        }
+                    });
 
-                alertDialog.show();
-            } else {
-                lt.success();
-                Toasty.success(MainActivity.this, "connected to " + CurrentServer.serverName + " at " + CurrentServer.serverIP, Toast.LENGTH_SHORT, true).show();
+                    alertDialog.show();
+                    break;
+                default:
+                    lt.success();
+                    Toasty.success(MainActivity.this, "connected to " + CurrentServer.serverName + " at " + CurrentServer.serverIP, Toast.LENGTH_SHORT, true).show();
             }
-
-
         }
 
         @Override
@@ -515,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    class ScanNetwork extends AsyncTask<String, Void, String> {
+    private class ScanNetwork extends AsyncTask<String, Void, String> {
         LoadToast lt = new LoadToast(MainActivity.this);
 
         @Override
@@ -549,7 +552,7 @@ public class MainActivity extends AppCompatActivity {
                 AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
                 final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
                 LayoutInflater inflater = getLayoutInflater();
-                View convertView = (View) inflater.inflate(R.layout.dialog_list, null);
+                View convertView = inflater.inflate(R.layout.dialog_list, null);
                 alertDialog.setView(convertView);
                 alertDialog.setTitle("List");
                 ListView lv = (ListView) convertView.findViewById(R.id.lv);
@@ -563,8 +566,8 @@ public class MainActivity extends AppCompatActivity {
                         TextView ip = (TextView) v.findViewById(R.id.ip);
                         TextView name = (TextView) v.findViewById(R.id.name);
                         Server server = new Server("_" + name + "_" + ip, name.getText().toString(), ip.getText().toString());
-                        Conn conn = new Conn(server);
-                        conn.execute("");
+                        TryConnection tryConnection = new TryConnection(server);
+                        tryConnection.execute("");
                     }
                 });
                 alertDialog.show();
@@ -582,15 +585,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    class Conn extends AsyncTask<String, Void, String> {
-        boolean connected = false;
+    private class TryConnection extends AsyncTask<String, Void, String>
+    {
 
         LoadToast lt =new LoadToast(MainActivity.this);
 
         Server server;
         AlertDialog.Builder dialog;
 
-        Conn(Server serverp)
+        TryConnection(Server serverp)
         {
             server = serverp;
 

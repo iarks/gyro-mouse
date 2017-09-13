@@ -18,12 +18,14 @@ import android.widget.Toast;
 
 import net.steamcrafted.loadtoast.LoadToast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 import xdroid.toaster.Toaster;
 
-public class ServerListActivity extends AppCompatActivity {
+public class ServerListActivity extends AppCompatActivity
+{
 
     RecyclerView rv;
     List<Server> dbList;
@@ -34,6 +36,7 @@ public class ServerListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        dbList = new ArrayList<>();
         setContentView(R.layout.activity_server_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -95,7 +98,6 @@ public class ServerListActivity extends AppCompatActivity {
     class LoadDBServers extends AsyncTask<String, Void, String>
     {
         LoadToast lt = new LoadToast(ServerListActivity.this);
-
         @Override
         protected String doInBackground(String... params)
         {
