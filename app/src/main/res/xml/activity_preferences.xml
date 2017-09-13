@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Advanced Settings\nRestart app after making changes to these values for them to take effect"
+        android:key="pref_key_storage_settings">
+
     <EditTextPreference android:title="Server TCP Port"
         android:key="tcpPort"
         android:summary="Provide TCP port number of host"
@@ -17,22 +20,9 @@
         android:inputType="numberDecimal">
     </EditTextPreference>
 
-    <!--<com.yokkomi.commons.preference.seekbar.SeekBarPreference-->
-        <!--android:defaultValue="25"-->
-        <!--android:key="pointerSpeed"-->
-        <!--android:summary="Set pointer speed"-->
-        <!--android:title="Pointer Speed"-->
-        <!--app:explain="Set the rate of pointer movement"-->
-        <!--app:maxValue="100"-->
-        <!--app:padding="3"/>-->
+    </PreferenceCategory>
 
-    <!--<com.yokkomi.commons.preference.seekbar.SeekBarPreference-->
-        <!--android:defaultValue="0.2"-->
-        <!--android:key="pointerThreshold"-->
-        <!--android:summary="Set pointer responsiveness"-->
-        <!--android:title="Pointer Speed"-->
-        <!--app:explain="Set the sensitivity of pointer movement"-->
-        <!--app:maxValue="2"-->
-        <!--app:padding="3"/>-->
+
+
 
 </PreferenceScreen>

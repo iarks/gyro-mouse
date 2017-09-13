@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button buttonRight, buttonEscape, buttonLeft, buttonWindows;
     ImageButton buttonAR, buttonAL, buttonAU, buttonAD, buttonMouse, buttonScroll;
-    BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
+    final BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
     DatabaseHandler dbHandler;
     ArrayList<Server> discoveredServer = new ArrayList<>();
     List<Server> preServers = new ArrayList<>();
@@ -521,6 +521,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             lt.setText("Searching for servers");
+            lt.setTranslationY(150);
             lt.show();
         }
 
@@ -589,6 +590,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             lt.setText("Searching for servers");
+            lt.setTranslationY(150);
             lt.show();
         }
 

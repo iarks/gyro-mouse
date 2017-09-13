@@ -202,6 +202,7 @@ public class ServerListActivity extends AppCompatActivity
         protected void onPreExecute()
         {
             lt.setText("Looking into database");
+            lt.setTranslationY(150);
             lt.show();
         }
 
@@ -209,7 +210,7 @@ public class ServerListActivity extends AppCompatActivity
         protected void onProgressUpdate(Void... values){}
     }
 
-    class Conn extends AsyncTask<String, Void, String> {
+    private class Conn extends AsyncTask<String, Void, String> {
         boolean connected = false;
 
         LoadToast lt =new LoadToast(ServerListActivity.this);
