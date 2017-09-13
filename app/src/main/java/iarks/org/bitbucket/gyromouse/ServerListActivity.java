@@ -28,15 +28,15 @@ public class ServerListActivity extends AppCompatActivity
 {
 
     RecyclerView rv;
-    List<Server> dbList;
+    List<Server> dbList = new ArrayList<>();
     TextView currentServerName;
     TextView currentServerIP;
     final RecyclerViewServerAdapter ca = new RecyclerViewServerAdapter();
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        dbList = new ArrayList<>();
         setContentView(R.layout.activity_server_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -44,6 +44,8 @@ public class ServerListActivity extends AppCompatActivity
         rv = (RecyclerView) findViewById(R.id.recycler_view);
         currentServerName = (TextView)findViewById(R.id.serverName);
         currentServerIP= (TextView)findViewById(R.id.serverIP);
+
+        new LoadDBServers().execute("");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener()
@@ -66,14 +68,20 @@ public class ServerListActivity extends AppCompatActivity
                 // set dialog message
                 alertDialogBuilder
                         .setCancelable(false)
-                        .setPositiveButton("Add",
-                                new DialogInterface.OnClickListener() {
+                        .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog,int id) {
                                         Server server = new Server("_"+userInput_name.getText().toString()+"_"+userInput_ip.getText().toString(),userInput_name.getText().toString(),userInput_ip.getText().toString());
                                         Globals.databaseHandler.addServerToDB(server);
                                         //new LoadDBServers().execute("");
                                         dbList.add(server);
-                                        ca.notifyDataSetChanged();
+                                        if(dbList.size()==1)
+                                        {
+                                            new LoadDBServers().execute("");
+                                        }
+                                        else
+                                        {
+                                            ca.notifyDataSetChanged();
+                                        }
                                     }
                                 })
                         .setNegativeButton("Cancel",
@@ -92,18 +100,16 @@ public class ServerListActivity extends AppCompatActivity
             }
         });
 
-        new LoadDBServers().execute("");
+
     }
 
-    class LoadDBServers extends AsyncTask<String, Void, String>
+    private class LoadDBServers extends AsyncTask<String, Void, String>
     {
         LoadToast lt = new LoadToast(ServerListActivity.this);
         @Override
         protected String doInBackground(String... params)
         {
             int count = Globals.databaseHandler.getServerCount();
-
-            Toaster.toast("DATABASE COUNT "+count);
 
             // if server count is more than 0, then preexisting servers are present - try to connect to those
             if(count>0)
@@ -129,7 +135,6 @@ public class ServerListActivity extends AppCompatActivity
             else
             {
                 lt.success();
-//                final RecyclerViewServerAdapter ca = new RecyclerViewServerAdapter(dbList);
                 ca.setUpServerAdapter(dbList);
                 rv.setAdapter(ca);
 

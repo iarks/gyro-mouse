@@ -57,11 +57,6 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
 
-
-
-        latch = new CyclicBarrier(2);
-        Globals.cdLatch = latch;
-
         // inflate layout file
         setContentView(R.layout.activity_main);
 
@@ -69,24 +64,23 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // initialise variables
+        latch = new CyclicBarrier(2);
+        Globals.cdLatch = latch;
+
         //initiate database handler
         dbHandler = new DatabaseHandler(this);
         Globals.databaseHandler = dbHandler;
 
+        // initiate preference reader
         SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
-
-        // create the udp thread
+        // create objects of other classes
         final UDPClient udpClient = new UDPClient(sharedQueue);
         Globals.udpClient = udpClient;
-        final Thread udp_thread = new Thread(udpClient);
-        udp_thread.start();
-
-        // also start the tcp handler thread
         ServerHandler serverHandler = new ServerHandler();
-        Thread tcpClientThread = new Thread(serverHandler);
-        tcpClientThread.start();
-
+        final Trackpad trackpad = new Trackpad(sharedQueue, getApplicationContext());
+        final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue, getApplicationContext());
 
         // associate ui elements to variables/ objects
         buttonAD = (ImageButton) findViewById(R.id.buttonADown);
@@ -100,33 +94,47 @@ public class MainActivity extends AppCompatActivity {
         buttonWindows = (Button) findViewById(R.id.buttonWin);
         buttonLeft = (Button) findViewById(R.id.buttonLeft);
 
-        // create trackpad objects
-        final Trackpad trackpad = new Trackpad(sharedQueue, getApplicationContext());
+        // create the udp thread
+        final Thread udp_thread = new Thread(udpClient);
+        udp_thread.start();
 
-        // create scrollwheel objects
-        final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue, getApplicationContext());
-
+        // also start the tcp handler thread
+        Thread tcpClientThread = new Thread(serverHandler);
+        tcpClientThread.start();
 
         // add click listeners to buttons
-        buttonAD.setOnTouchListener(new View.OnTouchListener() {
+        buttonAD.setOnTouchListener(new View.OnTouchListener()
+        {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    try {
-                        synchronized (sharedQueue) {
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    try
+                    {
+                        synchronized (sharedQueue)
+                        {
                             sharedQueue.put("AD;1;" + CurrentServer.sessionKey);
                             sharedQueue.notifyAll();
                         }
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    try {
-                        synchronized (sharedQueue) {
+                }
+                else if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        synchronized (sharedQueue)
+                        {
                             sharedQueue.put("AD;0;" + CurrentServer.sessionKey);
                             sharedQueue.notifyAll();
                         }
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
                 }
@@ -349,13 +357,17 @@ public class MainActivity extends AppCompatActivity {
         // end of onCreate
 
         fabSpeedDial = (FabSpeedDial) findViewById(R.id.ff);
-        fabSpeedDial.setMenuListener(new SimpleMenuListenerAdapter() {
+
+        fabSpeedDial.setMenuListener(new SimpleMenuListenerAdapter()
+        {
             @Override
-            public boolean onMenuItemSelected(MenuItem menuItem) {
+            public boolean onMenuItemSelected(MenuItem menuItem)
+            {
                 int id = menuItem.getItemId();
 
                 //noinspection SimplifiableIfStatement
-                if (id == R.id.action_scanNetwork) {
+                if (id == R.id.action_scanNetwork)
+                {
                     new ScanNetwork().execute("");
                     return true;
                 } else if (id == R.id.action_dbServers) {

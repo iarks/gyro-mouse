@@ -13,8 +13,8 @@ public class RecyclerItemListener implements RecyclerView.OnItemTouchListener  {
 
     public interface RecyclerTouchListener
     {
-        public void onClickItem(View v, int position) ;
-        public void onLongClickItem(View v, int position);
+        void onClickItem(View v, int position) ;
+        void onLongClickItem(View v, int position);
     }
 
     public RecyclerItemListener(Context ctx, final RecyclerView rv, final RecyclerTouchListener listener)
