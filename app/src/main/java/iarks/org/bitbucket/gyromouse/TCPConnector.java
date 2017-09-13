@@ -40,7 +40,7 @@ class TCPConnector
                 clientSocket = new Socket();
 
                 //connect this socket to the servers - details are provided
-                clientSocket.connect(new InetSocketAddress(server.getServerIP(), 13000), 2000);
+                clientSocket.connect(new InetSocketAddress(server.getServerIP(), Integer.parseInt(CurrentServer.tcpPort)), 2000);
             }
             catch (Exception e)
             {

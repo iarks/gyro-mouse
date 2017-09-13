@@ -14,7 +14,9 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustNothing">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,11 +26,11 @@
         <activity
             android:name=".PreferencesActivity"
             android:label="@string/title_activity_preferences"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".ServerListActivity"
-            android:label="@string/title_activity_server_list"
-            android:theme="@style/AppTheme"></activity>
+            android:label="Hosts"
+            android:theme="@style/AppTheme"/>
     </application>
 
 </manifest>

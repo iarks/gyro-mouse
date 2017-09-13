@@ -6,13 +6,13 @@ import java.util.concurrent.BlockingQueue;
 
 import static android.R.attr.tag;
 
-class KeyboardEvents implements Runnable
+class KeyboardEventsHandler implements Runnable
 {
     private static final String TAG = MainActivity.class.getName();
 
     private KeyEvent event;
     private BlockingQueue<String> sharedQueue;
-    KeyboardEvents(KeyEvent event, BlockingQueue<String> sharedQueue)
+    KeyboardEventsHandler(KeyEvent event, BlockingQueue<String> sharedQueue)
     {
         this.event=event;
         this.sharedQueue=sharedQueue;

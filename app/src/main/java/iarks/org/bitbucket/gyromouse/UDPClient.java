@@ -23,10 +23,6 @@ class UDPClient implements Runnable
         try
         {
             clientSocket = new DatagramSocket();
-//          IPAddress = InetAddress.getByName(ip);
-//            port = portNumber;
-
-            Log.println(Log.INFO, "UDPClient", "HERE IN CONSTRUCTOR");
         }
         catch (Exception e)
         {
@@ -59,7 +55,6 @@ class UDPClient implements Runnable
     {
         while (true)
         {
-            //Log.e(TAG,"inWhile");
             synchronized (sharedQueue)
             {
                 if (!sharedQueue.isEmpty())

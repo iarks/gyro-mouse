@@ -13,7 +13,7 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-public class ScanNetwork
+public class NetworkScanner
 {
 
 

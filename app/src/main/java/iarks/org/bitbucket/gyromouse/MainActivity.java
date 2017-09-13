@@ -1,11 +1,8 @@
 package iarks.org.bitbucket.gyromouse;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -21,23 +18,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.johnpersano.supertoasts.library.Style;
-import com.github.johnpersano.supertoasts.library.SuperActivityToast;
-import com.github.johnpersano.supertoasts.library.utils.PaletteUtils;
-
 import net.steamcrafted.loadtoast.LoadToast;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -45,7 +36,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import es.dmoral.toasty.Toasty;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
-import xdroid.toaster.Toaster;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 
@@ -60,10 +50,14 @@ public class MainActivity extends AppCompatActivity {
     List<Server> preServers = new ArrayList<>();
     FabSpeedDial fabSpeedDial;
     CyclicBarrier latch;
+    static SharedPreferences SP;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
+
+
 
         latch = new CyclicBarrier(2);
         Globals.cdLatch = latch;
@@ -79,10 +73,8 @@ public class MainActivity extends AppCompatActivity {
         dbHandler = new DatabaseHandler(this);
         Globals.databaseHandler = dbHandler;
 
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        //CurrentServer.serverIP = SP.getString("ip", "192.168.1.40");
-        CurrentServer.tcpPort = SP.getString("tcpPort", "13000");
-        CurrentServer.udpPort = SP.getString("udpPort", "9050");
+        SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
 
         // create the udp thread
         final UDPClient udpClient = new UDPClient(sharedQueue);
@@ -411,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if ((event.getAction() == 1 || event.getAction() == 2) && event.getKeyCode() != KEYCODE_BACK) {
-            KeyboardEvents keyboardEvents = new KeyboardEvents(event, sharedQueue);
+            KeyboardEventsHandler keyboardEvents = new KeyboardEventsHandler(event, sharedQueue);
             Thread th = new Thread(keyboardEvents);
             th.start();
         }
@@ -441,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (!connected || count == 0) {
-                discoveredServer = iarks.org.bitbucket.gyromouse.ScanNetwork.searchServer();
+                discoveredServer = NetworkScanner.searchServer();
 
                 if (discoveredServer.size() == 1) {
                     //auto connect if only one server is available
@@ -465,7 +457,6 @@ public class MainActivity extends AppCompatActivity {
                             dbHandler.addServerToDB(servers);
                         }
                     }
-                    // TODO: 9/11/2017 show dialog
                     return "dialog";
                 } else {
                     return "f";
@@ -530,7 +521,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
 
-            discoveredServer = iarks.org.bitbucket.gyromouse.ScanNetwork.searchServer();
+            discoveredServer = NetworkScanner.searchServer();
 
             if (discoveredServer.size() > 0) {
                 for (Server servers : discoveredServer) {
@@ -637,6 +628,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(Void... values) {
         }
+    }
+
+    static String getTCPPort()
+    {
+        return SP.getString("tcpPort", "13000");
+    }
+
+    static String getUdpPort()
+    {
+        return SP.getString("udpPort", "9050");
     }
 
 }

@@ -1,6 +1,5 @@
 package iarks.org.bitbucket.gyromouse;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,7 +29,7 @@ public class ServerListActivity extends AppCompatActivity {
     List<Server> dbList;
     TextView currentServerName;
     TextView currentServerIP;
-    final ServerAdapter ca = new ServerAdapter();
+    final RecyclerViewServerAdapter ca = new RecyclerViewServerAdapter();
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -128,7 +127,7 @@ public class ServerListActivity extends AppCompatActivity {
             else
             {
                 lt.success();
-//                final ServerAdapter ca = new ServerAdapter(dbList);
+//                final RecyclerViewServerAdapter ca = new RecyclerViewServerAdapter(dbList);
                 ca.setUpServerAdapter(dbList);
                 rv.setAdapter(ca);
 

@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.MyViewHolder>
+public class RecyclerViewServerAdapter extends RecyclerView.Adapter<RecyclerViewServerAdapter.MyViewHolder>
 {
 
     private List<Server> serverList;
@@ -29,11 +29,11 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.MyViewHold
         }
     }
 
-    public ServerAdapter(List<Server> serverList)
+    public RecyclerViewServerAdapter(List<Server> serverList)
     {
         this.serverList = serverList;
     }
-    public ServerAdapter()
+    public RecyclerViewServerAdapter()
     {
 
     }
