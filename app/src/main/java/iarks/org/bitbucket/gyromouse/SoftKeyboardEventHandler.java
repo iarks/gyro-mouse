@@ -4,15 +4,13 @@ import android.util.Log;
 import android.view.KeyEvent;
 import java.util.concurrent.BlockingQueue;
 
-import static android.R.attr.tag;
-
-class KeyboardEventsHandler implements Runnable
+class SoftKeyboardEventHandler implements Runnable
 {
     private static final String TAG = MainActivity.class.getName();
 
     private KeyEvent event;
     private BlockingQueue<String> sharedQueue;
-    KeyboardEventsHandler(KeyEvent event, BlockingQueue<String> sharedQueue)
+    SoftKeyboardEventHandler(KeyEvent event, BlockingQueue<String> sharedQueue)
     {
         this.event=event;
         this.sharedQueue=sharedQueue;
@@ -31,7 +29,7 @@ class KeyboardEventsHandler implements Runnable
                 {
                     synchronized (sharedQueue)
                     {
-                        sharedQueue.put("BS;"+"xx;" + CurrentServer.sessionKey);
+                        sharedQueue.put("BS;"+"xx;" + ConnectedServer.sessionKey);
                         sharedQueue.notifyAll();
                     }
                 }
@@ -57,7 +55,7 @@ class KeyboardEventsHandler implements Runnable
                     {
 //                        Toast.makeText(context, "UNICODE CHARACTER NOT 0 : " + ch, Toast.LENGTH_SHORT).show();
                         synchronized (sharedQueue) {
-                            sharedQueue.put("U;" + charAt+ ";" + CurrentServer.sessionKey);
+                            sharedQueue.put("U;" + charAt+ ";" + ConnectedServer.sessionKey);
                             sharedQueue.notifyAll();
                         }
                         return;
@@ -74,7 +72,7 @@ class KeyboardEventsHandler implements Runnable
         try
         {
             synchronized (sharedQueue) {
-                sharedQueue.put("U;" + (char)i + ";" + CurrentServer.sessionKey);
+                sharedQueue.put("U;" + (char)i + ";" + ConnectedServer.sessionKey);
 //                Log.d(TAG,event.getCharacters().charAt(0)+"");
                 Log.d(TAG,(char)i+"");
 //                sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + event.getCharacters().charAt(0) + "\"}" + "\0");

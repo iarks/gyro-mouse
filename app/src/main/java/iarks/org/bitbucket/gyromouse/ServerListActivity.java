@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
-import xdroid.toaster.Toaster;
 
 public class ServerListActivity extends AppCompatActivity
 {
@@ -194,8 +193,8 @@ public class ServerListActivity extends AppCompatActivity
                         }));
             }
 
-            currentServerName.setText(CurrentServer.serverName);
-            currentServerIP.setText(CurrentServer.serverIP);
+            currentServerName.setText(ConnectedServer.serverName);
+            currentServerIP.setText(ConnectedServer.serverIP);
         }
 
         @Override
@@ -225,7 +224,7 @@ public class ServerListActivity extends AppCompatActivity
         @Override
         protected String doInBackground(String... params)
         {
-            if (TCPConnector.connectTCP(server))
+            if (NetworkUtil.connectTCP(server))
                 return "s";
             return "f";
         }
@@ -238,7 +237,7 @@ public class ServerListActivity extends AppCompatActivity
                 Toasty.error(ServerListActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
             } else {
                 lt.success();
-                Toasty.success(ServerListActivity.this, "connected to " + CurrentServer.serverName + " at " + CurrentServer.serverIP, Toast.LENGTH_SHORT, true).show();
+                Toasty.success(ServerListActivity.this, "connected to " + ConnectedServer.serverName + " at " + ConnectedServer.serverIP, Toast.LENGTH_SHORT, true).show();
             }
 
         }

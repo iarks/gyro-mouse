@@ -15,17 +15,14 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Arkadeep on 9/11/2017.
- */
 
-public class AdapterServers extends ArrayAdapter<Server>
+class AdapterServers extends ArrayAdapter<Server>
 {
-    Activity context;
+    private Activity context;
 
     ArrayList<Server> products;
 
-    public AdapterServers(Activity context, ArrayList<Server> objects)
+    AdapterServers(Activity context, ArrayList<Server> objects)
     {
         super(context, R.layout.list_view_layout, objects);
         this.context=context;

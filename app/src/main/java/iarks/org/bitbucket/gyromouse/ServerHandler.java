@@ -1,5 +1,4 @@
 package iarks.org.bitbucket.gyromouse;
-import android.provider.Settings;
 import android.util.Log;
 
 import java.io.DataInputStream;
@@ -11,8 +10,8 @@ import xdroid.toaster.Toaster;
 
 class ServerHandler implements Runnable
 {
-    int resetLatch=0;
-    int firstTime;
+    private int resetLatch=0;
+    private int firstTime;
 
 
 
@@ -42,8 +41,8 @@ class ServerHandler implements Runnable
             try
             {
                 firstTime=0;
-                DataOutputStream outToServer = new DataOutputStream(CurrentServer.tcpSocket.getOutputStream());
-                DataInputStream inFromServer = new DataInputStream(CurrentServer.tcpSocket.getInputStream());
+                DataOutputStream outToServer = new DataOutputStream(ConnectedServer.tcpSocket.getOutputStream());
+                DataInputStream inFromServer = new DataInputStream(ConnectedServer.tcpSocket.getInputStream());
 
                 String receivedString = null;
                 byte[] receivedBytes = new byte[256];
@@ -70,6 +69,7 @@ class ServerHandler implements Runnable
                     Log.i(getClass().getName(), "SERVER IS DEAD?");
                     Toaster.toast("SERVER IS PROBABLY DEAD");
                     resetLatch=1;
+                    ConnectedServer.reset();
                 }
             }
             catch (IOException e)

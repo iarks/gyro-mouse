@@ -1,32 +1,16 @@
 package iarks.org.bitbucket.gyromouse;
 
-import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
-
-import net.steamcrafted.loadtoast.LoadToast;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.concurrent.BrokenBarrierException;
 
-import es.dmoral.toasty.Toasty;
-import xdroid.toaster.Toaster;
-
-class TCPConnector
+class NetworkUtil
 {
 
     static boolean connectTCP(Server server)
@@ -40,7 +24,7 @@ class TCPConnector
                 clientSocket = new Socket();
 
                 //connect this socket to the servers - details are provided
-                clientSocket.connect(new InetSocketAddress(server.getServerIP(), Integer.parseInt(CurrentServer.tcpPort)), 2000);
+                clientSocket.connect(new InetSocketAddress(server.getServerIP(), Integer.parseInt(ConnectedServer.tcpPort)), 2000);
             }
             catch (Exception e)
             {
@@ -60,37 +44,37 @@ class TCPConnector
             int i;
 
             // read from server
-            Log.e("TCPConnector", "waiting here");
+            Log.e("NetworkUtil", "waiting here");
             while ((i = inFromServer.read(receivedBytes, 0, receivedBytes.length)) != 0)
             {
                 // Translate data bytes to a ASCII string.
                 receivedString = new String(receivedBytes);
                 receivedString = receivedString.trim();
-                Log.e("TCPConnector", "Received from server>> "+receivedString.trim());
+                Log.e("NetworkUtil", "Received from server>> "+receivedString.trim());
                 break;
             }
 
-            Log.e("TCPConnector", "here now");
+            Log.e("NetworkUtil", "here now");
 
             if (receivedString.equals("BUSY"))
             {
                 // if server returns busy it may be connected to another client
-                Log.e("TCPConnector", "Server busy at the moment cannot connect now");
+                Log.e("NetworkUtil", "Server busy at the moment cannot connect now");
                 return false;
             }
             else {
                 Log.e("inside else", "waiting here");
-                CurrentServer.serverIP = server.getServerIP();
+                ConnectedServer.serverIP = server.getServerIP();
 
-                CurrentServer.sessionKey = receivedString;
+                ConnectedServer.sessionKey = receivedString;
 
-                CurrentServer.tcpSocket = clientSocket;
+                ConnectedServer.tcpSocket = clientSocket;
 
-                CurrentServer.inetAddress = InetAddress.getByName(server.getServerIP());
+                ConnectedServer.inetAddress = InetAddress.getByName(server.getServerIP());
 
-                CurrentServer.serverName = server.getServerName();
+                ConnectedServer.serverName = server.getServerName();
 
-                Globals.udpClient.udpSetup();
+                Globals.udpClientUtil.udpSetup();
 
                 try {
                     Globals.cdLatch.await();
@@ -106,10 +90,10 @@ class TCPConnector
         catch (IOException e)
         {
 
-            Log.e("TCPConnector", "Whoops! It didn't work!\n");
+            Log.e("NetworkUtil", "Whoops! It didn't work!\n");
             e.printStackTrace();
-            Log.e("TCPConnector","CAUSE " +e.getCause().toString());
-            Log.e("TCPConnector","MESSAGE " +e.getMessage());
+            Log.e("NetworkUtil","CAUSE " +e.getCause().toString());
+            Log.e("NetworkUtil","MESSAGE " +e.getMessage());
             return false;
         }
 

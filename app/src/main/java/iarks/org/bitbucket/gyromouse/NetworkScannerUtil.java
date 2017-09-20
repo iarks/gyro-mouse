@@ -13,10 +13,8 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-class NetworkScanner
+class NetworkScannerUtil
 {
-
-
     static ArrayList<Server> searchServer()
     {
         ArrayList<Server> list = new ArrayList<>();
@@ -41,9 +39,9 @@ class NetworkScanner
 
         try
         {
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), Integer.parseInt(CurrentServer.udpPort));
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), Integer.parseInt(ConnectedServer.udpPort));
             datagramSocket.send(sendPacket);
-            Log.i("TCPConnector" , ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
+            Log.i("NetworkUtil" , ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
         }
         catch(IOException e)
         {
@@ -77,10 +75,10 @@ class NetworkScanner
                     } catch (NullPointerException e) {
                         e.printStackTrace();
                     }
-                    Log.i("TCPConnector" ,">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
+                    Log.i("NetworkUtil" ,">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
                 }
             }
-            Log.i("TCPConnector" , ">>> Done looping over all network interfaces. Now waiting for a reply!");
+            Log.i("NetworkUtil" , ">>> Done looping over all network interfaces. Now waiting for a reply!");
 
             while (true)
             {
@@ -90,7 +88,7 @@ class NetworkScanner
                 datagramSocket.receive(receivePacket);
 
                 // We have a response
-                Log.i("TCPConnector" , ">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
+                Log.i("NetworkUtil" , ">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
                 // check if message is correct - no need
 
                 String name = new String(receivePacket.getData()).trim();
@@ -102,7 +100,7 @@ class NetworkScanner
         }
         catch (SocketTimeoutException e)
         {
-            Log.i("TCPConnector" , ">>> SOCKET TIMED OUT");
+            Log.i("NetworkUtil" , ">>> SOCKET TIMED OUT");
         }
         catch (IOException e)
         {

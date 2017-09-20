@@ -54,7 +54,7 @@ class DatabaseHandler extends SQLiteOpenHelper
         onCreate(db);
     }
 
-    public void addServerToDB(Server server)
+    void addServerToDB(Server server)
     {
         Log.i(getClass().getName(),"database server add");
         try {
@@ -92,7 +92,7 @@ class DatabaseHandler extends SQLiteOpenHelper
         return server;
     }
 
-    public List<Server> getAllDBServers()
+    List<Server> getAllDBServers()
     {
         List<Server> serverList = new ArrayList<Server>();
 
@@ -123,7 +123,7 @@ class DatabaseHandler extends SQLiteOpenHelper
         return serverList;
     }
 
-    public int getServerCount()
+    int getServerCount()
     {
         String countQuery = "SELECT  * FROM " + TABLE_SERVERS;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -154,14 +154,14 @@ class DatabaseHandler extends SQLiteOpenHelper
         db.close();
     }
 
-    public void deleteServer(String id)
+    void deleteServer(String id)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_SERVERS, KEY_ID + " = ?", new String[] {id});
         db.close();
     }
 
-    public boolean checkAvailable(String key_id)
+    boolean checkAvailable(String key_id)
     {
         String selectQuery = "SELECT  * FROM " + TABLE_SERVERS;
 

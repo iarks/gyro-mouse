@@ -13,8 +13,6 @@ public class PreferencesActivity extends PreferenceActivity
     {
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
-
-
     }
 
 

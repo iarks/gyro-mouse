@@ -1,7 +1,5 @@
 package iarks.org.bitbucket.gyromouse;
 
-import android.util.Log;
-
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -9,7 +7,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.BlockingQueue;
 
-class UDPClient implements Runnable
+class UDPClientUtil implements Runnable
 {
     private static final String TAG = MainActivity.class.getName();
     private DatagramSocket clientSocket;
@@ -18,7 +16,7 @@ class UDPClient implements Runnable
     private byte[] data;
     private final BlockingQueue<String> sharedQueue;
 
-    UDPClient(BlockingQueue<String> bq)
+    UDPClientUtil(BlockingQueue<String> bq)
     {
         try
         {
@@ -38,8 +36,8 @@ class UDPClient implements Runnable
     {
         try
         {
-            IPAddress = InetAddress.getByName(CurrentServer.serverIP);
-            port = Integer.parseInt(CurrentServer.udpPort);
+            IPAddress = InetAddress.getByName(ConnectedServer.serverIP);
+            port = Integer.parseInt(ConnectedServer.udpPort);
         }catch (UnknownHostException e)
         {
             e.printStackTrace();
