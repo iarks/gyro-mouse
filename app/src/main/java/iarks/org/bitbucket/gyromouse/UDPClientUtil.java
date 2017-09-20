@@ -38,7 +38,8 @@ class UDPClientUtil implements Runnable
         {
             IPAddress = InetAddress.getByName(ConnectedServer.serverIP);
             port = Integer.parseInt(ConnectedServer.udpPort);
-        }catch (UnknownHostException e)
+        }
+        catch (UnknownHostException e)
         {
             e.printStackTrace();
         }
@@ -61,13 +62,15 @@ class UDPClientUtil implements Runnable
                     try
                     {
                         data = sharedQueue.remove().getBytes("UTF-8");
-                    } catch (UnsupportedEncodingException e) {
+                    }
+                    catch (UnsupportedEncodingException e)
+                    {
                         e.printStackTrace();
                     }
-                    DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, port);
                     try
                     {
-                        clientSocket.send(sendPacket);
+                        DatagramPacket clientRequestPacket = new DatagramPacket(data, data.length, IPAddress, port);
+                        clientSocket.send(clientRequestPacket);
                         data=null;
                     }
                     catch (Exception e)

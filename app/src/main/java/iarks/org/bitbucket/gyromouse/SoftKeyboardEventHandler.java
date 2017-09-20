@@ -12,74 +12,84 @@ class SoftKeyboardEventHandler implements Runnable
     private BlockingQueue<String> sharedQueue;
     SoftKeyboardEventHandler(KeyEvent event, BlockingQueue<String> sharedQueue)
     {
-        this.event=event;
-        this.sharedQueue=sharedQueue;
+        try
+        {
+            this.event=event;
+            this.sharedQueue=sharedQueue;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void run()
     {
-        int i;
-        int keyCode = event.getKeyCode();
-        int unicodeChar = event.getUnicodeChar();
-        switch (keyCode)
+        try
         {
-            case 67:
-                try
-                {
-                    synchronized (sharedQueue)
-                    {
-                        sharedQueue.put("BS;"+"xx;" + ConnectedServer.sessionKey);
-                        sharedQueue.notifyAll();
-                    }
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-                return;
-        }
-
-        if (unicodeChar == 0)
-        {
-            // keycode for unknown key events
-            if (keyCode == 0)
+            int i;
+            int keyCode = event.getKeyCode();
+            int unicodeChar = event.getUnicodeChar();
+            switch (keyCode)
             {
-//              Toast.makeText(context, "KEYCODE IS 0 - IT IS AN UNKNOWN KEY EVENT", Toast.LENGTH_SHORT).show();
-
-                char charAt = event.getCharacters().charAt(0);
-                if (charAt != '\u0000')
-                {
-                    String ch = event.getCharacters();
+                case 67:
                     try
                     {
-//                        Toast.makeText(context, "UNICODE CHARACTER NOT 0 : " + ch, Toast.LENGTH_SHORT).show();
-                        synchronized (sharedQueue) {
-                            sharedQueue.put("U;" + charAt+ ";" + ConnectedServer.sessionKey);
+                        synchronized (sharedQueue)
+                        {
+                            sharedQueue.put("BS;"+"xx;" + ConnectedServer.sessionKey);
                             sharedQueue.notifyAll();
                         }
-                        return;
                     }
                     catch (InterruptedException e)
                     {
                         e.printStackTrace();
                     }
+                    return;
+            }
+
+            if (unicodeChar == 0)
+            {
+                if (keyCode == 0)
+                {
+                    char charAt = event.getCharacters().charAt(0);
+                    if (charAt != '\u0000')
+                    {
+                        String ch = event.getCharacters();
+                        try
+                        {
+                            synchronized (sharedQueue)
+                            {
+                                sharedQueue.put("U;" + charAt+ ";" + ConnectedServer.sessionKey);
+                                sharedQueue.notifyAll();
+                            }
+                            return;
+                        }
+                        catch (InterruptedException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
-        }
 
-        i = unicodeChar;
-        try
-        {
-            synchronized (sharedQueue) {
-                sharedQueue.put("U;" + (char)i + ";" + ConnectedServer.sessionKey);
-//                Log.d(TAG,event.getCharacters().charAt(0)+"");
-                Log.d(TAG,(char)i+"");
-//                sharedQueue.put("{\"X\":" + "\"" + "U" + "\"," + "\"Y\":\"" + event.getCharacters().charAt(0) + "\"}" + "\0");
-                sharedQueue.notifyAll();
+            i = unicodeChar;
+            try
+            {
+                synchronized (sharedQueue)
+                {
+                    sharedQueue.put("U;" + (char)i + ";" + ConnectedServer.sessionKey);
+                    Log.d(TAG,(char)i+"");
+                    sharedQueue.notifyAll();
+                }
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
             }
         }
-        catch (InterruptedException e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }

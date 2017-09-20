@@ -13,14 +13,10 @@ import java.util.List;
 class DatabaseHandler extends SQLiteOpenHelper
 {
 
-    // All Static variables
-    // Database Version
     private static final int DATABASE_VERSION = 1;
 
-    // Database Name
     private static final String DATABASE_NAME = "ServerManager";
 
-    // Contacts table name
     private static final String TABLE_SERVERS = "Servers";
 
     // Contacts Table Columns names
@@ -77,24 +73,24 @@ class DatabaseHandler extends SQLiteOpenHelper
         Log.i(getClass().getName(),"That went well?");
     }
 
-    public Server getServerFromDB(int id)
-    {
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_SERVERS, new String[] { KEY_ID, KEY_NAME, KEY_IP }, KEY_ID + "=?", new String[] { String.valueOf(id) }, null, null, null, null);
-
-        if (cursor != null)
-            cursor.moveToFirst();
-
-       Server server = new Server(cursor.getString(0),  cursor.getString(1), cursor.getString(2));
-        // return contact
-        cursor.close();
-        return server;
-    }
+//    public Server getServerFromDB(int id)
+//    {
+//        SQLiteDatabase db = this.getReadableDatabase();
+//
+//        Cursor cursor = db.query(TABLE_SERVERS, new String[] { KEY_ID, KEY_NAME, KEY_IP }, KEY_ID + "=?", new String[] { String.valueOf(id) }, null, null, null, null);
+//
+//        if (cursor != null)
+//            cursor.moveToFirst();
+//
+//       Server server = new Server(cursor.getString(0),  cursor.getString(1), cursor.getString(2));
+//        // return contact
+//        cursor.close();
+//        return server;
+//    }
 
     List<Server> getAllDBServers()
     {
-        List<Server> serverList = new ArrayList<Server>();
+        List<Server> serverList = new ArrayList<>();
 
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_SERVERS;

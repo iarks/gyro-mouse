@@ -6,18 +6,18 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class RecyclerItemListener implements RecyclerView.OnItemTouchListener  {
+class RecyclerItemListener implements RecyclerView.OnItemTouchListener  {
 
     private RecyclerTouchListener listener;
     private GestureDetector gd;
 
-    public interface RecyclerTouchListener
+    interface RecyclerTouchListener
     {
         void onClickItem(View v, int position) ;
         void onLongClickItem(View v, int position);
     }
 
-    public RecyclerItemListener(Context ctx, final RecyclerView rv, final RecyclerTouchListener listener)
+    RecyclerItemListener(Context ctx, final RecyclerView rv, final RecyclerTouchListener listener)
     {
         this.listener = listener;
         gd = new GestureDetector(ctx, new GestureDetector.SimpleOnGestureListener()

@@ -14,8 +14,6 @@ import java.util.concurrent.BlockingQueue;
 
 class ScrollWheel implements Runnable
 {
-    private static final String TAG = MainActivity.class.getName();
-
     private final BlockingQueue<String> sharedQueue;
     private Context mContext;
     private SensorManager mSensorManager = null;
@@ -35,7 +33,6 @@ class ScrollWheel implements Runnable
     @Override
     public void run()
     {
-//        Log.e("Thread Name", Thread.currentThread().getName()+ "THIS THREAD RIGHT HERE!");
         Looper.prepare();
         mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
@@ -48,9 +45,7 @@ class ScrollWheel implements Runnable
             @Override
             public void onSensorChanged(SensorEvent event)
             {
-//                float axisX = event.values[0];
                 float axisY = event.values[1];
-//                float axisZ = event.values[2];
 
                 deltas = ("S;"+df.format(axisY)+";"+ ConnectedServer.sessionKey);
 
@@ -83,7 +78,6 @@ class ScrollWheel implements Runnable
 
     void stopThread()
     {
-        //Unregister the listener
         if (mSensorManager != null) {
             mSensorManager.unregisterListener(mListener);
         }

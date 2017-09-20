@@ -8,14 +8,9 @@ import static iarks.org.bitbucket.gyromouse.MainActivity.getUdpPort;
 
 class ConnectedServer
 {
-
     static String sessionKey, serverIP = "unavailable", serverName = "unavailable", tcpPort = getTCPPort(),udpPort = getUdpPort();
-    static Socket tcpSocket;
-
-
-
-
-    static InetAddress inetAddress;
+    static Socket clientTcpSocket;
+    static InetAddress serverInetAddress;
 
     private ConnectedServer(){}
 
@@ -24,8 +19,6 @@ class ConnectedServer
         serverName = "unavailable";
         serverIP = "unavailable";
         sessionKey="";
-        tcpSocket=null;
+        clientTcpSocket =null;
     }
-
-
 }

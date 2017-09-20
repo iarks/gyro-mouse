@@ -28,9 +28,15 @@ class ServerCommunicationUtil implements Runnable
                 }catch (InterruptedException e)
                 {
                     e.printStackTrace();
+                    Log.e(getClass().getName(),"Interrupted Exception");
+                    Log.e(getClass().getName(),e.getMessage());
+                    Log.e(getClass().getName(),e.getCause().toString());
                 }catch (BrokenBarrierException e)
                 {
                     e.printStackTrace();
+                    Log.e(getClass().getName(),"BrokenBarrier Exception");
+                    Log.e(getClass().getName(),e.getMessage());
+                    Log.e(getClass().getName(),e.getCause().toString());
                 }
             }
 
@@ -39,8 +45,8 @@ class ServerCommunicationUtil implements Runnable
             try
             {
                 firstTime=0;
-                DataOutputStream outToServer = new DataOutputStream(ConnectedServer.tcpSocket.getOutputStream());
-                DataInputStream inFromServer = new DataInputStream(ConnectedServer.tcpSocket.getInputStream());
+                DataOutputStream outToServer = new DataOutputStream(ConnectedServer.clientTcpSocket.getOutputStream());
+                DataInputStream inFromServer = new DataInputStream(ConnectedServer.clientTcpSocket.getInputStream());
 
                 String receivedString = null;
                 byte[] receivedBytes = new byte[256];
@@ -49,25 +55,28 @@ class ServerCommunicationUtil implements Runnable
 
                 while ((i = inFromServer.read(receivedBytes, 0, receivedBytes.length)) != 0)
                 {
-                    // Translate data bytes to a ASCII string.
                     receivedString = new String(receivedBytes);
                     receivedString = receivedString.trim();
                     Log.i(getClass().getName(),"Received from server>> "+ receivedString.trim());
                     break;
                 }
-
-                if (receivedString.equals("UDERE?"))
+                try
                 {
-                    Log.i(getClass().getName(), "SERVER IS PINGING");
-                    outToServer.write("YES".getBytes(), 0, "YES".getBytes().length);
-                    outToServer.flush();
-                }
-                else if (receivedString.equals(""))
+                    if (receivedString.equals("UDERE?"))
+                    {
+                        Log.i(getClass().getName(), "SERVER IS PINGING");
+                        outToServer.write("YES".getBytes(), 0, "YES".getBytes().length);
+                        outToServer.flush();
+                    } else if (receivedString.equals(""))
+                    {
+                        Log.i(getClass().getName(), "SERVER IS DEAD?");
+                        Toaster.toast("SERVER IS PROBABLY DEAD");
+                        resetLatch = 1;
+                        ConnectedServer.reset();
+                    }
+                }catch (NullPointerException e)
                 {
-                    Log.i(getClass().getName(), "SERVER IS DEAD?");
-                    Toaster.toast("SERVER IS PROBABLY DEAD");
-                    resetLatch=1;
-                    ConnectedServer.reset();
+                    e.printStackTrace();
                 }
             }
             catch (IOException e)

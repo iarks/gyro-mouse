@@ -45,8 +45,11 @@ public class MainActivity extends AppCompatActivity
 
     Button buttonRight, buttonEscape, buttonLeft, buttonWindows;
     ImageButton buttonAR, buttonAL, buttonAU, buttonAD, buttonMouse, buttonScroll;
+
     final BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
+
     DatabaseHandler dbHandler;
+
     ArrayList<Server> discoveredServer = new ArrayList<>();
     List<Server> preServers = new ArrayList<>();
     FabSpeedDial fabSpeedDial;
@@ -185,7 +188,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case "dialog":
                     lt.success();
-                    AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
+                    ListViewServerAdapter adapter = new ListViewServerAdapter(MainActivity.this, discoveredServer);
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
                     LayoutInflater inflater = getLayoutInflater();
                     View convertView = inflater.inflate(R.layout.dialog_list, null);
@@ -259,7 +262,7 @@ public class MainActivity extends AppCompatActivity
             } else {
                 lt.success();
 
-                AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
+                ListViewServerAdapter adapter = new ListViewServerAdapter(MainActivity.this, discoveredServer);
                 final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
                 LayoutInflater inflater = getLayoutInflater();
                 View convertView = inflater.inflate(R.layout.dialog_list, null);
