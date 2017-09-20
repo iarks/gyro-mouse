@@ -8,12 +8,10 @@ import java.util.concurrent.BrokenBarrierException;
 
 import xdroid.toaster.Toaster;
 
-class ServerHandler implements Runnable
+class ServerCommunicationUtil implements Runnable
 {
     private int resetLatch=0;
     private int firstTime;
-
-
 
     @Override
     public void run()

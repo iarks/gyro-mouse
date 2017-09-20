@@ -39,7 +39,8 @@ import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
     private static final String TAG = MainActivity.class.getName();
 
     Button buttonRight, buttonEscape, buttonLeft, buttonWindows;
@@ -64,6 +65,297 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // initialise variables, threads, objects, buttonClickListeners, etc.
+        init();
+
+        //try to connect to servers
+        new ConnectToServers().execute("");
+        // end of onCreate
+    }
+
+    // create overflow menu to toolbar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.overflow_menu, menu);
+        return true;
+    }
+
+    // add click listeners to toolbar elements
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_wifi) {
+            startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
+            return true;
+        } else if (id == R.id.action_keyboard) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+            return true;
+        } else if (id == R.id.action_settings) {
+            Intent i = new Intent(this, PreferencesActivity.class);
+            startActivity(i);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    // click listener for keyboard events
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if ((event.getAction() == 1 || event.getAction() == 2) && event.getKeyCode() != KEYCODE_BACK) {
+            SoftKeyboardEventHandler keyboardEvents = new SoftKeyboardEventHandler(event, sharedQueue);
+            Thread th = new Thread(keyboardEvents);
+            th.start();
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    //try retrieving, scanning, connecting
+    private class ConnectToServers extends AsyncTask<String, Void, String> {
+        boolean connected = false;
+        LoadToast lt = new LoadToast(MainActivity.this);
+
+        @Override
+        protected String doInBackground(String... params)
+        {
+
+            int count = dbHandler.getServerCount();
+
+            if (count > 0)
+            {
+                preServers = dbHandler.getAllDBServers();
+
+                for (Server server : preServers) {
+
+                    if (NetworkUtil.connectTCP(server)) {
+                        connected = true;
+                        return "s";
+                    }
+                }
+            }
+
+            if (!connected || count == 0)
+            {
+                discoveredServer = NetworkScannerUtil.searchServer();
+
+                if (discoveredServer.size() == 1)
+                {
+                    //auto connect if only one server is available
+                    for (Server servers : discoveredServer) {
+                        boolean check = dbHandler.checkAvailable(servers.getServerID());
+                        if (!check) {
+                            // add them to database
+                            dbHandler.addServerToDB(servers);
+                        }
+                    }
+                    if (NetworkUtil.connectTCP(discoveredServer.remove(0))) {
+                        connected = true;
+                        return "s";
+                    } else
+                        return "f";
+                } else if (discoveredServer.size() > 1) {
+                    // show if more than 1 servers are available
+                    for (Server servers : discoveredServer) {
+                        boolean check = dbHandler.checkAvailable(servers.getServerID());
+                        if (!check) {
+                            dbHandler.addServerToDB(servers);
+                        }
+                    }
+                    return "dialog";
+                } else {
+                    return "f";
+                }
+            }
+            return "f";
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            switch (result)
+            {
+                case "f":
+                    lt.error();
+                    Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
+                    break;
+                case "dialog":
+                    lt.success();
+                    AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                    LayoutInflater inflater = getLayoutInflater();
+                    View convertView = inflater.inflate(R.layout.dialog_list, null);
+                    alertDialog.setView(convertView);
+                    alertDialog.setTitle("Serveral servers found over network");
+                    ListView lv = (ListView) convertView.findViewById(R.id.lv);
+
+                    lv.setAdapter(adapter);
+
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View v, int position, long id)
+                        {
+                            TextView ip = (TextView) v.findViewById(R.id.ip);
+                            TextView name = (TextView) v.findViewById(R.id.name);
+                            Server server = new Server("_" + name + "_" + ip, name.getText().toString(), ip.getText().toString());
+                            TryConnection tryConnection = new TryConnection(server);
+                            tryConnection.execute("");
+                        }
+                    });
+
+                    alertDialog.show();
+                    break;
+                default:
+                    lt.success();
+                    Toasty.success(MainActivity.this, "connected to " + ConnectedServer.serverName + " at " + ConnectedServer.serverIP, Toast.LENGTH_SHORT, true).show();
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            lt.setText("Searching for servers");
+            lt.setTranslationY(150);
+            lt.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+        }
+    }
+
+    //scan for servers
+    private class ScanNetwork extends AsyncTask<String, Void, String> {
+        LoadToast lt = new LoadToast(MainActivity.this);
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            discoveredServer = NetworkScannerUtil.searchServer();
+
+            if (discoveredServer.size() > 0) {
+                for (Server servers : discoveredServer) {
+                    boolean check = dbHandler.checkAvailable(servers.getServerID());
+                    if (!check) {
+                        // add newly found servers to database
+                        dbHandler.addServerToDB(servers);
+                    }
+                }
+                return "1";
+            } else {
+                return "0";
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result.equals("0")) {
+                lt.error();
+                Toasty.error(MainActivity.this, "Could Not find any servers on local network", Toast.LENGTH_SHORT, true).show();
+            } else {
+                lt.success();
+
+                AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
+                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                LayoutInflater inflater = getLayoutInflater();
+                View convertView = inflater.inflate(R.layout.dialog_list, null);
+                alertDialog.setView(convertView);
+                alertDialog.setTitle("List");
+                ListView lv = (ListView) convertView.findViewById(R.id.lv);
+
+                lv.setAdapter(adapter);
+
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View v, int position, long id)
+                    {
+                        TextView ip = (TextView) v.findViewById(R.id.ip);
+                        TextView name = (TextView) v.findViewById(R.id.name);
+                        Server server = new Server("_" + name + "_" + ip, name.getText().toString(), ip.getText().toString());
+                        TryConnection tryConnection = new TryConnection(server);
+                        tryConnection.execute("");
+                    }
+                });
+                alertDialog.show();
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            lt.setText("Searching for servers");
+            lt.setTranslationY(150);
+            lt.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+        }
+    }
+
+    //try connecting to a given server
+    private class TryConnection extends AsyncTask<String, Void, String> {
+
+        LoadToast lt =new LoadToast(MainActivity.this);
+
+        Server server;
+        AlertDialog.Builder dialog;
+
+        TryConnection(Server serverp)
+        {
+            server = serverp;
+
+        }
+
+
+        @Override
+        protected String doInBackground(String... params)
+        {
+            if (NetworkUtil.connectTCP(server))
+                return "s";
+            return "f";
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            if (result.equals("f")) {
+                lt.error();
+                Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
+            } else {
+                lt.success();
+                Toasty.success(MainActivity.this, "connected to " + ConnectedServer.serverName + " at " + ConnectedServer.serverIP, Toast.LENGTH_SHORT, true).show();
+            }
+
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            lt.setText("Searching for servers");
+            lt.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+        }
+    }
+
+    static String getTCPPort()
+    {
+        return SP.getString("tcpPort", "13000");
+    }
+
+    static String getUdpPort()
+    {
+        return SP.getString("udpPort", "9050");
+    }
+
+    void init()
+    {
         // initialise variables
         latch = new CyclicBarrier(2);
         Globals.cdLatch = latch;
@@ -74,13 +366,6 @@ public class MainActivity extends AppCompatActivity {
 
         // initiate preference reader
         SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-
-        // create objects of other classes
-        final UDPClientUtil udpClientUtil = new UDPClientUtil(sharedQueue);
-        Globals.udpClientUtil = udpClientUtil;
-        ServerHandler serverHandler = new ServerHandler();
-        final Trackpad trackpad = new Trackpad(sharedQueue, getApplicationContext());
-        final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue, getApplicationContext());
 
         // associate ui elements to variables/ objects
         buttonAD = (ImageButton) findViewById(R.id.buttonADown);
@@ -94,13 +379,21 @@ public class MainActivity extends AppCompatActivity {
         buttonWindows = (Button) findViewById(R.id.buttonWin);
         buttonLeft = (Button) findViewById(R.id.buttonLeft);
 
-        // create the udp thread
-        final Thread udp_thread = new Thread(udpClientUtil);
-        udp_thread.start();
+        // create objects of other classes
+        final UDPClientUtil udpClientUtil = new UDPClientUtil(sharedQueue);
+        Globals.udpClientUtil = udpClientUtil;
 
-        // also start the tcp handler thread
-        Thread tcpClientThread = new Thread(serverHandler);
-        tcpClientThread.start();
+        final Trackpad trackpad = new Trackpad(sharedQueue, getApplicationContext());
+        final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue, getApplicationContext());
+
+        // create the udp client thread
+        final Thread udpClientUtilThread = new Thread(udpClientUtil);
+        udpClientUtilThread.start();
+
+        // also start the server communication thread
+        ServerCommunicationUtil serverCommunicationUtil = new ServerCommunicationUtil();
+        Thread serverCommunicationUtilThread = new Thread(serverCommunicationUtil);
+        serverCommunicationUtilThread.start();
 
         // add click listeners to buttons
         buttonAD.setOnTouchListener(new View.OnTouchListener()
@@ -142,7 +435,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        buttonAR.setOnTouchListener(new View.OnTouchListener() {
+        buttonAR.setOnTouchListener(new View.OnTouchListener()
+        {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -168,7 +462,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        buttonAL.setOnTouchListener(new View.OnTouchListener() {
+        buttonAL.setOnTouchListener(new View.OnTouchListener()
+        {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -195,7 +490,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        buttonAU.setOnTouchListener(new View.OnTouchListener() {
+        buttonAU.setOnTouchListener(new View.OnTouchListener()
+        {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -221,7 +517,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        buttonMouse.setOnTouchListener(new View.OnTouchListener() {
+        buttonMouse.setOnTouchListener(new View.OnTouchListener()
+        {
             long timeDown, timeUp;
 
             @Override
@@ -251,13 +548,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        buttonScroll.setOnTouchListener(new View.OnTouchListener() {
+        buttonScroll.setOnTouchListener(new View.OnTouchListener()
+        {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                {
                     Thread scrollWheel_thread = new Thread(scrollWheel);
                     scrollWheel_thread.start();
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                }
+                else if (event.getAction() == MotionEvent.ACTION_UP)
+                {
                     udpClientUtil.clearThread();
                     scrollWheel.stopThread();
                 }
@@ -352,10 +654,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ConnectToServers ss = new ConnectToServers();
-        ss.execute("");
-        // end of onCreate
-
         fabSpeedDial = (FabSpeedDial) findViewById(R.id.ff);
 
         fabSpeedDial.setMenuListener(new SimpleMenuListenerAdapter()
@@ -365,12 +663,13 @@ public class MainActivity extends AppCompatActivity {
             {
                 int id = menuItem.getItemId();
 
-                //noinspection SimplifiableIfStatement
                 if (id == R.id.action_scanNetwork)
                 {
                     new ScanNetwork().execute("");
                     return true;
-                } else if (id == R.id.action_dbServers) {
+                }
+                else if (id == R.id.action_dbServers)
+                {
                     Intent myIntent = new Intent(MainActivity.this, ServerListActivity.class);
                     MainActivity.this.startActivity(myIntent);
                     return true;
@@ -379,282 +678,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    // create overflow menu to toolbar
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.overflow_menu, menu);
-        return true;
-    }
-
-    // add click listenrs to toolbar elements
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_wifi) {
-            startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
-            return true;
-        } else if (id == R.id.action_keyboard) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
-            return true;
-        } else if (id == R.id.action_settings) {
-            Intent i = new Intent(this, PreferencesActivity.class);
-            startActivity(i);
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    // click listener for keyboard events
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if ((event.getAction() == 1 || event.getAction() == 2) && event.getKeyCode() != KEYCODE_BACK) {
-            SoftKeyboardEventHandler keyboardEvents = new SoftKeyboardEventHandler(event, sharedQueue);
-            Thread th = new Thread(keyboardEvents);
-            th.start();
-        }
-        return super.dispatchKeyEvent(event);
-    }
-
-
-    private class ConnectToServers extends AsyncTask<String, Void, String> {
-        boolean connected = false;
-        LoadToast lt = new LoadToast(MainActivity.this);
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            int count = dbHandler.getServerCount();
-
-            if (count > 0) {
-                preServers = dbHandler.getAllDBServers();
-
-                for (Server server : preServers) {
-
-                    if (NetworkUtil.connectTCP(server)) {
-                        connected = true;
-                        return "s";
-                    }
-                }
-            }
-
-            if (!connected || count == 0) {
-                discoveredServer = NetworkScannerUtil.searchServer();
-
-                if (discoveredServer.size() == 1) {
-                    //auto connect if only one server is available
-                    for (Server servers : discoveredServer) {
-                        boolean check = dbHandler.checkAvailable(servers.getServerID());
-                        if (!check) {
-                            // add them to database
-                            dbHandler.addServerToDB(servers);
-                        }
-                    }
-                    if (NetworkUtil.connectTCP(discoveredServer.remove(0))) {
-                        connected = true;
-                        return "s";
-                    } else
-                        return "f";
-                } else if (discoveredServer.size() > 1) {
-                    // show if more than 1 servers are available
-                    for (Server servers : discoveredServer) {
-                        boolean check = dbHandler.checkAvailable(servers.getServerID());
-                        if (!check) {
-                            dbHandler.addServerToDB(servers);
-                        }
-                    }
-                    return "dialog";
-                } else {
-                    return "f";
-                }
-            }
-            return "f";
-        }
-
-        @Override
-        protected void onPostExecute(String result)
-        {
-            switch (result)
-            {
-                case "f":
-                    lt.error();
-                    Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
-                    break;
-                case "dialog":
-                    lt.success();
-                    AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
-                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-                    LayoutInflater inflater = getLayoutInflater();
-                    View convertView = inflater.inflate(R.layout.dialog_list, null);
-                    alertDialog.setView(convertView);
-                    alertDialog.setTitle("Serveral servers found over network");
-                    ListView lv = (ListView) convertView.findViewById(R.id.lv);
-
-                    lv.setAdapter(adapter);
-
-                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View v, int position, long id)
-                        {
-                            TextView ip = (TextView) v.findViewById(R.id.ip);
-                            TextView name = (TextView) v.findViewById(R.id.name);
-                            Server server = new Server("_" + name + "_" + ip, name.getText().toString(), ip.getText().toString());
-                            TryConnection tryConnection = new TryConnection(server);
-                            tryConnection.execute("");
-                        }
-                    });
-
-                    alertDialog.show();
-                    break;
-                default:
-                    lt.success();
-                    Toasty.success(MainActivity.this, "connected to " + ConnectedServer.serverName + " at " + ConnectedServer.serverIP, Toast.LENGTH_SHORT, true).show();
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-            lt.setText("Searching for servers");
-            lt.setTranslationY(150);
-            lt.show();
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-        }
-    }
-
-
-    private class ScanNetwork extends AsyncTask<String, Void, String> {
-        LoadToast lt = new LoadToast(MainActivity.this);
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            discoveredServer = NetworkScannerUtil.searchServer();
-
-            if (discoveredServer.size() > 0) {
-                for (Server servers : discoveredServer) {
-                    boolean check = dbHandler.checkAvailable(servers.getServerID());
-                    if (!check) {
-                        // add newly found servers to database
-                        dbHandler.addServerToDB(servers);
-                    }
-                }
-                return "1";
-            } else {
-                return "0";
-            }
-        }
-
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (result.equals("0")) {
-                lt.error();
-                Toasty.error(MainActivity.this, "Could Not find any servers on local network", Toast.LENGTH_SHORT, true).show();
-            } else {
-                lt.success();
-
-                AdapterServers adapter = new AdapterServers(MainActivity.this, discoveredServer);
-                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-                LayoutInflater inflater = getLayoutInflater();
-                View convertView = inflater.inflate(R.layout.dialog_list, null);
-                alertDialog.setView(convertView);
-                alertDialog.setTitle("List");
-                ListView lv = (ListView) convertView.findViewById(R.id.lv);
-
-                lv.setAdapter(adapter);
-
-                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View v, int position, long id)
-                    {
-                        TextView ip = (TextView) v.findViewById(R.id.ip);
-                        TextView name = (TextView) v.findViewById(R.id.name);
-                        Server server = new Server("_" + name + "_" + ip, name.getText().toString(), ip.getText().toString());
-                        TryConnection tryConnection = new TryConnection(server);
-                        tryConnection.execute("");
-                    }
-                });
-                alertDialog.show();
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-            lt.setText("Searching for servers");
-            lt.setTranslationY(150);
-            lt.show();
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-        }
-    }
-
-    private class TryConnection extends AsyncTask<String, Void, String>
-    {
-
-        LoadToast lt =new LoadToast(MainActivity.this);
-
-        Server server;
-        AlertDialog.Builder dialog;
-
-        TryConnection(Server serverp)
-        {
-            server = serverp;
-
-        }
-
-
-        @Override
-        protected String doInBackground(String... params)
-        {
-            if (NetworkUtil.connectTCP(server))
-                return "s";
-            return "f";
-        }
-
-        @Override
-        protected void onPostExecute(String result)
-        {
-            if (result.equals("f")) {
-                lt.error();
-                Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
-            } else {
-                lt.success();
-                Toasty.success(MainActivity.this, "connected to " + ConnectedServer.serverName + " at " + ConnectedServer.serverIP, Toast.LENGTH_SHORT, true).show();
-            }
-
-        }
-
-        @Override
-        protected void onPreExecute()
-        {
-            lt.setText("Searching for servers");
-            lt.show();
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-        }
-    }
-
-    static String getTCPPort()
-    {
-        return SP.getString("tcpPort", "13000");
-    }
-
-    static String getUdpPort()
-    {
-        return SP.getString("udpPort", "9050");
-    }
-
 }
