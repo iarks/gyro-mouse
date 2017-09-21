@@ -1,6 +1,7 @@
 package iarks.org.bitbucket.gyromouse;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -31,6 +32,8 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 
 
 import es.dmoral.toasty.Toasty;
@@ -55,11 +58,14 @@ public class MainActivity extends AppCompatActivity
     FabSpeedDial fabSpeedDial;
     CyclicBarrier latch;
     static SharedPreferences SP;
+    //PreferenceChanged pcl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        Log.e(getClass().getName(),"onCreate");
 
         // inflate layout file
         setContentView(R.layout.activity_main);
@@ -78,7 +84,9 @@ public class MainActivity extends AppCompatActivity
 
     // create overflow menu to toolbar
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        Log.e(getClass().getName(),"onCreateOptionsMenu");
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.overflow_menu, menu);
         return true;
@@ -369,6 +377,8 @@ public class MainActivity extends AppCompatActivity
 
         // initiate preference reader
         SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        //pcl = new PreferenceChanged();
+        //SP.registerOnSharedPreferenceChangeListener(pcl);
 
         // associate ui elements to variables/ objects
         buttonAD = (ImageButton) findViewById(R.id.buttonADown);
@@ -680,5 +690,34 @@ public class MainActivity extends AppCompatActivity
                 return false;
             }
         });
+    }
+
+   @Override
+    protected void onResume()
+    {
+        super.onResume();
+        if(Globals.advanceChanged==1)
+        {
+            Globals.advanceChanged=0;
+            AlertDialog.Builder builder;
+            builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("Restart App")
+                    .setMessage("Restart app for changes to take effect")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            Intent i = getBaseContext().getPackageManager()
+                                    .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            finish();
+                            startActivity(i);
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+
+        }
+        Log.e(getClass().getName(),"onResume");
     }
 }

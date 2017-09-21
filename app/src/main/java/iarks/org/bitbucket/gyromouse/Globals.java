@@ -7,4 +7,5 @@ class Globals
     static DatabaseHandler databaseHandler;
     static UDPClientUtil udpClientUtil;
     static CyclicBarrier cdLatch;
+    static int advanceChanged=0;
 }
