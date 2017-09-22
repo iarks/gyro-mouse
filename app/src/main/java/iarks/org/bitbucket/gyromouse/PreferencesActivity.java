@@ -7,23 +7,28 @@ import android.preference.PreferenceFragment;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.Preference;
 import android.util.Log;
-import android.widget.TextView;
+import android.widget.Toast;
+
+import es.dmoral.toasty.Toasty;
+import xdroid.toaster.Toaster;
 
 public class PreferencesActivity extends PreferenceActivity
 {
-    SharedPreferences  SP;
-
+    static SharedPreferences SP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SP.registerOnSharedPreferenceChangeListener(new PreferenceChanged());
 
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
+
     }
 
 
@@ -34,8 +39,37 @@ public class PreferencesActivity extends PreferenceActivity
         {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.activity_preferences);
+            android.preference.Preference pref = findPreference("reset");
+            pref.setOnPreferenceClickListener(new android.preference.Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(android.preference.Preference preference)
+                {
+                    Log.e(getClass().getName(),"Reset Preferences");
+                    SharedPreferences.Editor editor = SP.edit();
+                    editor.clear();
+                    editor.apply();
+                    resetPrefViews();
+                    Globals.advanceChanged=1;
+                    Toaster.toast("All values reset");
+                    Toaster.toast("App may need to restart");
+
+                    return true;
+                }
+            });
+        }
+
+        void resetPrefViews()
+        {
+            android.preference.EditTextPreference tcpPref = (android.preference.EditTextPreference)findPreference("tcpPort");
+            tcpPref.setText("13000");
+
+            android.preference.EditTextPreference udpPref = (android.preference.EditTextPreference)findPreference("udpPort");
+            udpPref.setText("49443");
         }
     }
+
+
 
     private class PreferenceChanged implements SharedPreferences.OnSharedPreferenceChangeListener
     {
@@ -53,22 +87,4 @@ public class PreferencesActivity extends PreferenceActivity
             }
         }
     }
-
-
-
-
-//    @Override
-//    public boolean onPreferenceClick(Preference preference)
-//    {
-//        if(preference.getKey().equals("reset"))
-//        {
-//            Log.e(getClass().getName(),"Reset Preferences");
-//            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(PreferencesActivity.this);
-//            SharedPreferences.Editor editor = preferences.edit();
-//            editor.clear();
-//            editor.apply();
-//            return true;
-//        }
-//        return false;
-//    }
 }

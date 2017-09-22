@@ -20,17 +20,14 @@
         <!--app:msbp_maxValue="1000"-->
         <!--app:msbp_interval="1"/>-->
 
-    <PreferenceScreen
-        android:title="Reset Preferences"
-        android:key="rest"/>
-
     <PreferenceCategory
         android:title="Advanced Settings"
         android:key="pref_key_storage_settings">
 
     <PreferenceScreen
         app:key="advancedSettings"
-        android:title="Socket Settings">
+        android:title="Socket Settings"
+        android:summary="Change server socket addresses.">
 
     <PreferenceCategory
         android:title="Restart app after making changes to these values for them to take effect"
@@ -40,7 +37,7 @@
         android:key="tcpPort"
         android:summary="Provide TCP port number of host"
         android:hint="xxx.xxx.xxx.xxx"
-        android:inputType="numberDecimal"
+        android:inputType="number"
         android:defaultValue="13000">
     </EditTextPreference>
 
@@ -48,13 +45,19 @@
         android:key="udpPort"
         android:defaultValue="49443"
         android:summary="Provide UDP port number of host"
-        android:hint="9050"
+        android:hint="49443"
         android:inputType="numberDecimal">
     </EditTextPreference>
 
     </PreferenceCategory>
 
+
     </PreferenceScreen>
+
+        <PreferenceScreen
+            android:title="Reset Defaults"
+            android:summary="Reverts changes to default values."
+            android:key="reset"/>
 
     </PreferenceCategory>
 
