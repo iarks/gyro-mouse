@@ -36,16 +36,16 @@
     <EditTextPreference android:title="Server TCP Port"
         android:key="tcpPort"
         android:summary="Provide TCP port number of host"
-        android:hint="xxx.xxx.xxx.xxx"
+        android:hint="13000"
         android:inputType="number"
         android:defaultValue="13000">
     </EditTextPreference>
 
     <EditTextPreference android:title="Server UDP Port"
         android:key="udpPort"
-        android:defaultValue="49443"
+        android:defaultValue="9050"
         android:summary="Provide UDP port number of host"
-        android:hint="49443"
+        android:hint="9050"
         android:inputType="numberDecimal">
     </EditTextPreference>
 

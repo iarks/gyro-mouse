@@ -200,6 +200,9 @@ public class ServerListActivity extends AppCompatActivity
         @Override
         protected void onPreExecute()
         {
+            currentServerName.setText(ConnectedServer.serverName);
+            currentServerIP.setText(ConnectedServer.serverIP);
+
             lt.setText("Looking into database");
             lt.setTranslationY(150);
             lt.show();
@@ -209,7 +212,8 @@ public class ServerListActivity extends AppCompatActivity
         protected void onProgressUpdate(Void... values){}
     }
 
-    private class Conn extends AsyncTask<String, Void, String> {
+    private class Conn extends AsyncTask<String, Void, String>
+    {
         boolean connected = false;
 
         LoadToast lt =new LoadToast(ServerListActivity.this);
@@ -239,7 +243,8 @@ public class ServerListActivity extends AppCompatActivity
                 lt.success();
                 Toasty.success(ServerListActivity.this, "connected to " + ConnectedServer.serverName + " at " + ConnectedServer.serverIP, Toast.LENGTH_SHORT, true).show();
             }
-
+            currentServerName.setText(ConnectedServer.serverName);
+            currentServerIP.setText(ConnectedServer.serverIP);
         }
 
         @Override
@@ -247,11 +252,18 @@ public class ServerListActivity extends AppCompatActivity
         {
             lt.setText("Searching for servers");
             lt.show();
+
         }
 
         @Override
         protected void onProgressUpdate(Void... values) {
         }
+    }
+
+    void updateCurrentServerView()
+    {
+        currentServerName.setText(ConnectedServer.serverName);
+        currentServerIP.setText(ConnectedServer.serverIP);
     }
 
 }

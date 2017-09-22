@@ -39,7 +39,7 @@ class NetworkScannerUtil
         {
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), Integer.parseInt(ConnectedServer.udpPort));
             datagramSocket.send(sendPacket);
-            Log.i("NetworkScannerUtil" , "Request packet sent to: 255.255.255.255 (DEFAULT)");
+            Log.e("NetworkScannerUtil" , "Request packet sent to: 255.255.255.255 (DEFAULT)");
         }
         catch(IOException e)
         {
@@ -82,10 +82,10 @@ class NetworkScannerUtil
                     {
                         e.printStackTrace();
                     }
-                    Log.i("NetworkScannerUtil" ,"Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
+                    Log.e("NetworkScannerUtil" ,"Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
                 }
             }
-            Log.i("NetworkScannerUtil" , "Done looping over all network interfaces. Now waiting for a reply");
+            Log.e("NetworkScannerUtil" , "Done looping over all network interfaces. Now waiting for a reply");
 
             while (true)
             {
@@ -100,7 +100,7 @@ class NetworkScannerUtil
                 {
                     e.printStackTrace();
                 }
-                Log.i("NetworkScannerUtil" , "Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
+                Log.e("NetworkScannerUtil" , "Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
 
                 String name = new String(receivePacket.getData()).trim();
                 String id = "_"+name+"_"+receivePacket.getAddress().getHostAddress();

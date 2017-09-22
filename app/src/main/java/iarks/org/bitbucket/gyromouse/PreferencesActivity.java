@@ -65,7 +65,7 @@ public class PreferencesActivity extends PreferenceActivity
             tcpPref.setText("13000");
 
             android.preference.EditTextPreference udpPref = (android.preference.EditTextPreference)findPreference("udpPort");
-            udpPref.setText("49443");
+            udpPref.setText("9050");
         }
     }
 
