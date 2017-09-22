@@ -21,6 +21,7 @@ class UDPClientUtil implements Runnable
         try
         {
             clientSocket = new DatagramSocket();
+            CurrentConnection.datagramSocket=clientSocket;
         }
         catch (Exception e)
         {
@@ -36,8 +37,8 @@ class UDPClientUtil implements Runnable
     {
         try
         {
-            IPAddress = InetAddress.getByName(ConnectedServer.serverIP);
-            port = Integer.parseInt(ConnectedServer.udpPort);
+            IPAddress = InetAddress.getByName(CurrentConnection.serverIP);
+            port = Integer.parseInt(CurrentConnection.udpPort);
         }
         catch (UnknownHostException e)
         {

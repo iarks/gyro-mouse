@@ -45,8 +45,8 @@ class ServerCommunicationUtil implements Runnable
             try
             {
                 firstTime=0;
-                DataOutputStream outToServer = new DataOutputStream(ConnectedServer.clientTcpSocket.getOutputStream());
-                DataInputStream inFromServer = new DataInputStream(ConnectedServer.clientTcpSocket.getInputStream());
+                DataOutputStream outToServer = new DataOutputStream(CurrentConnection.clientTcpSocket.getOutputStream());
+                DataInputStream inFromServer = new DataInputStream(CurrentConnection.clientTcpSocket.getInputStream());
 
                 String receivedString = null;
                 byte[] receivedBytes = new byte[256];
@@ -72,7 +72,7 @@ class ServerCommunicationUtil implements Runnable
                         Log.i(getClass().getName(), "SERVER IS DEAD?");
                         Toaster.toast("SERVER IS PROBABLY DEAD");
                         resetLatch = 1;
-                        ConnectedServer.reset();
+                        CurrentConnection.reset();
                     }
                 }catch (NullPointerException e)
                 {
@@ -84,6 +84,11 @@ class ServerCommunicationUtil implements Runnable
                 e.printStackTrace();
             }
         }
+
+    }
+
+    static void closePortAndExit()
+    {
 
     }
 

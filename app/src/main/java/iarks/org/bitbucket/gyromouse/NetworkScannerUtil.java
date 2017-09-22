@@ -37,7 +37,7 @@ class NetworkScannerUtil
 
         try
         {
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), Integer.parseInt(ConnectedServer.udpPort));
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), Integer.parseInt(CurrentConnection.udpPort));
             datagramSocket.send(sendPacket);
             Log.e("NetworkScannerUtil" , "Request packet sent to: 255.255.255.255 (DEFAULT)");
         }

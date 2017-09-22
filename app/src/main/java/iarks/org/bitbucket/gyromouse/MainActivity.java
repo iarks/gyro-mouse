@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 
 
 import es.dmoral.toasty.Toasty;
@@ -78,8 +76,45 @@ public class MainActivity extends AppCompatActivity
         init();
 
         //try to connect to servers
-        new ConnectToServers().execute("");
+        new SearchAndConnectUtil().execute("");
         // end of onCreate
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        if(Globals.advanceChanged==1)
+        {
+            Globals.advanceChanged=0;
+            AlertDialog.Builder builder;
+            builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("Restart App")
+                    .setMessage("Restart app for changes to take effect")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            Intent i = getBaseContext().getPackageManager()
+                                    .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            finish();
+                            startActivity(i);
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+
+        }
+        Log.e(getClass().getName(),"onResume");
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        Log.e(getClass().getName(),"OnDestroy");
+        CurrentConnection.closeSockets();
     }
 
     // create overflow menu to toolbar
@@ -127,7 +162,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     //try retrieving, scanning, connecting
-    private class ConnectToServers extends AsyncTask<String, Void, String> {
+    private class SearchAndConnectUtil extends AsyncTask<String, Void, String>
+    {
         boolean connected = false;
         LoadToast lt = new LoadToast(MainActivity.this);
 
@@ -222,7 +258,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 default:
                     lt.success();
-                    Toasty.success(MainActivity.this, "connected to " + ConnectedServer.serverName + " at " + ConnectedServer.serverIP, Toast.LENGTH_SHORT, true).show();
+                    Toasty.success(MainActivity.this, "connected to " + CurrentConnection.serverName + " at " + CurrentConnection.serverIP, Toast.LENGTH_SHORT, true).show();
             }
         }
 
@@ -338,7 +374,7 @@ public class MainActivity extends AppCompatActivity
                 Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
             } else {
                 lt.success();
-                Toasty.success(MainActivity.this, "connected to " + ConnectedServer.serverName + " at " + ConnectedServer.serverIP, Toast.LENGTH_SHORT, true).show();
+                Toasty.success(MainActivity.this, "connected to " + CurrentConnection.serverName + " at " + CurrentConnection.serverIP, Toast.LENGTH_SHORT, true).show();
             }
 
         }
@@ -355,16 +391,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static String getTCPPort()
-    {
-        return SP.getString("tcpPort", "13000");
-    }
-
-    static String getUdpPort()
-    {
-        return SP.getString("udpPort", "9050");
-    }
-
     void init()
     {
         // initialise variables
@@ -377,8 +403,7 @@ public class MainActivity extends AppCompatActivity
 
         // initiate preference reader
         SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        //pcl = new PreferenceChanged();
-        //SP.registerOnSharedPreferenceChangeListener(pcl);
+        Globals.sharedPreferences = SP;
 
         // associate ui elements to variables/ objects
         buttonAD = (ImageButton) findViewById(R.id.buttonADown);
@@ -420,7 +445,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         synchronized (sharedQueue)
                         {
-                            sharedQueue.put("AD;1;" + ConnectedServer.sessionKey);
+                            sharedQueue.put("AD;1;" + CurrentConnection.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     }
@@ -435,7 +460,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         synchronized (sharedQueue)
                         {
-                            sharedQueue.put("AD;0;" + ConnectedServer.sessionKey);
+                            sharedQueue.put("AD;0;" + CurrentConnection.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     }
@@ -455,7 +480,7 @@ public class MainActivity extends AppCompatActivity
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AR;1;" + ConnectedServer.sessionKey);
+                            sharedQueue.put("AR;1;" + CurrentConnection.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -464,7 +489,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AR;0;" + ConnectedServer.sessionKey);
+                            sharedQueue.put("AR;0;" + CurrentConnection.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -482,7 +507,7 @@ public class MainActivity extends AppCompatActivity
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AL;1;" + ConnectedServer.sessionKey);
+                            sharedQueue.put("AL;1;" + CurrentConnection.sessionKey);
                             sharedQueue.notifyAll();
                         }
 
@@ -492,7 +517,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AL;0;" + ConnectedServer.sessionKey);
+                            sharedQueue.put("AL;0;" + CurrentConnection.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -510,7 +535,7 @@ public class MainActivity extends AppCompatActivity
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AU;1;" + ConnectedServer.sessionKey);
+                            sharedQueue.put("AU;1;" + CurrentConnection.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -519,7 +544,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AU;0;" + ConnectedServer.sessionKey);
+                            sharedQueue.put("AU;0;" + CurrentConnection.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -548,8 +573,8 @@ public class MainActivity extends AppCompatActivity
                     if (timeUp - timeDown < 500) {
                         try {
                             synchronized (sharedQueue) {
-                                sharedQueue.put("LD;x;" + ConnectedServer.sessionKey);
-                                sharedQueue.put("LU;x;" + ConnectedServer.sessionKey);
+                                sharedQueue.put("LD;x;" + CurrentConnection.sessionKey);
+                                sharedQueue.put("LU;x;" + CurrentConnection.sessionKey);
                                 sharedQueue.notifyAll();
                             }
                         } catch (InterruptedException e) {
@@ -586,7 +611,7 @@ public class MainActivity extends AppCompatActivity
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("RD;x;" + ConnectedServer.sessionKey);
+                            sharedQueue.put("RD;x;" + CurrentConnection.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -595,7 +620,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("RU;x;" + ConnectedServer.sessionKey);
+                            sharedQueue.put("RU;x;" + CurrentConnection.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -615,7 +640,7 @@ public class MainActivity extends AppCompatActivity
                     downTime = event.getDownTime();
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("LD;x;" + ConnectedServer.sessionKey);
+                            sharedQueue.put("LD;x;" + CurrentConnection.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -625,7 +650,7 @@ public class MainActivity extends AppCompatActivity
                     if (event.getEventTime() - downTime < 1000) {
                         try {
                             synchronized (sharedQueue) {
-                                sharedQueue.put("LU;x;" + ConnectedServer.sessionKey);
+                                sharedQueue.put("LU;x;" + CurrentConnection.sessionKey);
                                 sharedQueue.notifyAll();
                             }
                         } catch (InterruptedException e) {
@@ -644,7 +669,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 try {
                     synchronized (sharedQueue) {
-                        sharedQueue.put("ESC;x;" + ConnectedServer.sessionKey);
+                        sharedQueue.put("ESC;x;" + CurrentConnection.sessionKey);
                         sharedQueue.notifyAll();
                     }
                 } catch (InterruptedException e) {
@@ -658,7 +683,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 try {
                     synchronized (sharedQueue) {
-                        sharedQueue.put("WIN;x;" + ConnectedServer.sessionKey);
+                        sharedQueue.put("WIN;x;" + CurrentConnection.sessionKey);
                         sharedQueue.notifyAll();
                     }
                 } catch (InterruptedException e) {
@@ -690,34 +715,5 @@ public class MainActivity extends AppCompatActivity
                 return false;
             }
         });
-    }
-
-   @Override
-    protected void onResume()
-    {
-        super.onResume();
-        if(Globals.advanceChanged==1)
-        {
-            Globals.advanceChanged=0;
-            AlertDialog.Builder builder;
-            builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("Restart App")
-                    .setMessage("Restart app for changes to take effect")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int which)
-                        {
-                            Intent i = getBaseContext().getPackageManager()
-                                    .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            finish();
-                            startActivity(i);
-                        }
-                    })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-
-        }
-        Log.e(getClass().getName(),"onResume");
     }
 }

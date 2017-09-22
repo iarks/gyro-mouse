@@ -21,7 +21,7 @@ class NetworkUtil
             try
             {
                 clientSocket = new Socket();
-                clientSocket.connect(new InetSocketAddress(server.getServerIP(), Integer.parseInt(ConnectedServer.tcpPort)), 2000);
+                clientSocket.connect(new InetSocketAddress(server.getServerIP(), Integer.parseInt(CurrentConnection.tcpPort)), 2000);
             }
             catch (Exception e)
             {
@@ -60,15 +60,15 @@ class NetworkUtil
                 }
                 else
                 {
-                    ConnectedServer.serverIP = server.getServerIP();
+                    CurrentConnection.serverIP = server.getServerIP();
 
-                    ConnectedServer.sessionKey = receivedString;
+                    CurrentConnection.sessionKey = receivedString;
 
-                    ConnectedServer.clientTcpSocket = clientSocket;
+                    CurrentConnection.clientTcpSocket = clientSocket;
 
-                    ConnectedServer.serverInetAddress = InetAddress.getByName(server.getServerIP());
+                    //CurrentConnection.serverInetAddress = InetAddress.getByName(server.getServerIP());
 
-                    ConnectedServer.serverName = server.getServerName();
+                    CurrentConnection.serverName = server.getServerName();
 
                     Globals.udpClientUtil.udpSetup();
 

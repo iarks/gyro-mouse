@@ -38,7 +38,7 @@ class SoftKeyboardEventHandler implements Runnable
                     {
                         synchronized (sharedQueue)
                         {
-                            sharedQueue.put("BS;"+"xx;" + ConnectedServer.sessionKey);
+                            sharedQueue.put("BS;"+"xx;" + CurrentConnection.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     }
@@ -61,7 +61,7 @@ class SoftKeyboardEventHandler implements Runnable
                         {
                             synchronized (sharedQueue)
                             {
-                                sharedQueue.put("U;" + charAt+ ";" + ConnectedServer.sessionKey);
+                                sharedQueue.put("U;" + charAt+ ";" + CurrentConnection.sessionKey);
                                 sharedQueue.notifyAll();
                             }
                             return;
@@ -79,7 +79,7 @@ class SoftKeyboardEventHandler implements Runnable
             {
                 synchronized (sharedQueue)
                 {
-                    sharedQueue.put("U;" + (char)i + ";" + ConnectedServer.sessionKey);
+                    sharedQueue.put("U;" + (char)i + ";" + CurrentConnection.sessionKey);
                     Log.d(TAG,(char)i+"");
                     sharedQueue.notifyAll();
                 }

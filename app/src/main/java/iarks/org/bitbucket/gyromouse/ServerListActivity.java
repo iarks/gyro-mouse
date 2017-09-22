@@ -193,15 +193,15 @@ public class ServerListActivity extends AppCompatActivity
                         }));
             }
 
-            currentServerName.setText(ConnectedServer.serverName);
-            currentServerIP.setText(ConnectedServer.serverIP);
+            currentServerName.setText(CurrentConnection.serverName);
+            currentServerIP.setText(CurrentConnection.serverIP);
         }
 
         @Override
         protected void onPreExecute()
         {
-            currentServerName.setText(ConnectedServer.serverName);
-            currentServerIP.setText(ConnectedServer.serverIP);
+            currentServerName.setText(CurrentConnection.serverName);
+            currentServerIP.setText(CurrentConnection.serverIP);
 
             lt.setText("Looking into database");
             lt.setTranslationY(150);
@@ -241,10 +241,10 @@ public class ServerListActivity extends AppCompatActivity
                 Toasty.error(ServerListActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
             } else {
                 lt.success();
-                Toasty.success(ServerListActivity.this, "connected to " + ConnectedServer.serverName + " at " + ConnectedServer.serverIP, Toast.LENGTH_SHORT, true).show();
+                Toasty.success(ServerListActivity.this, "connected to " + CurrentConnection.serverName + " at " + CurrentConnection.serverIP, Toast.LENGTH_SHORT, true).show();
             }
-            currentServerName.setText(ConnectedServer.serverName);
-            currentServerIP.setText(ConnectedServer.serverIP);
+            currentServerName.setText(CurrentConnection.serverName);
+            currentServerIP.setText(CurrentConnection.serverIP);
         }
 
         @Override
@@ -262,8 +262,8 @@ public class ServerListActivity extends AppCompatActivity
 
     void updateCurrentServerView()
     {
-        currentServerName.setText(ConnectedServer.serverName);
-        currentServerIP.setText(ConnectedServer.serverIP);
+        currentServerName.setText(CurrentConnection.serverName);
+        currentServerIP.setText(CurrentConnection.serverIP);
     }
 
 }
