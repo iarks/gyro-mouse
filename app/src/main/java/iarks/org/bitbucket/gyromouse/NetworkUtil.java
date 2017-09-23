@@ -1,5 +1,9 @@
 package iarks.org.bitbucket.gyromouse;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.support.v7.preference.Preference;
 import android.util.Log;
 
 import java.io.DataInputStream;
@@ -13,15 +17,16 @@ import java.util.concurrent.BrokenBarrierException;
 class NetworkUtil
 {
 
-    static boolean connectTCP(Server server)
+    static boolean connectTCP(Server server,Context context)
     {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         try
         {
             Socket clientSocket;
             try
             {
                 clientSocket = new Socket();
-                clientSocket.connect(new InetSocketAddress(server.getServerIP(), Integer.parseInt(CurrentConnection.tcpPort)), 2000);
+                clientSocket.connect(new InetSocketAddress(server.getServerIP(), Integer.parseInt(prefs.getString("tcpPort","13000"))), 2000);
             }
             catch (Exception e)
             {
@@ -31,7 +36,11 @@ class NetworkUtil
 
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
             Log.i("NetworkUtil", "Asking server for connection request");
-            outToServer.write("CANCONNECT?".getBytes(), 0, "CANCONNECT?".getBytes().length);
+
+            String temp = prefs.getString("udpPort","9050");
+            Log.e(context.getClass().getName(),temp);
+            outToServer.write(("CANCONNECT?"+temp).getBytes(), 0, ("CANCONNECT?"+temp).getBytes().length);
+
 
             DataInputStream inFromServer = new DataInputStream(clientSocket.getInputStream());
 

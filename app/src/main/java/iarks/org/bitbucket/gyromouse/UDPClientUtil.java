@@ -1,5 +1,9 @@
 package iarks.org.bitbucket.gyromouse;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -15,13 +19,15 @@ class UDPClientUtil implements Runnable
     private int port;
     private byte[] data;
     private final BlockingQueue<String> sharedQueue;
+    private Context contextt;
 
-    UDPClientUtil(BlockingQueue<String> bq)
+    UDPClientUtil(BlockingQueue<String> bq, Context context)
     {
         try
         {
             clientSocket = new DatagramSocket();
-            CurrentConnection.datagramSocket=clientSocket;
+//            CurrentConnection.datagramSocket=clientSocket;
+            contextt=context;
         }
         catch (Exception e)
         {
@@ -37,8 +43,9 @@ class UDPClientUtil implements Runnable
     {
         try
         {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(contextt);
             IPAddress = InetAddress.getByName(CurrentConnection.serverIP);
-            port = Integer.parseInt(CurrentConnection.udpPort);
+            port = Integer.parseInt(prefs.getString("udpPort","9050"));
         }
         catch (UnknownHostException e)
         {

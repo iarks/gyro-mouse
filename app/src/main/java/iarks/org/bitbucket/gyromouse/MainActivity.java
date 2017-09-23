@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.IntentCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -47,6 +48,9 @@ public class MainActivity extends AppCompatActivity
     Button buttonRight, buttonEscape, buttonLeft, buttonWindows;
     ImageButton buttonAR, buttonAL, buttonAU, buttonAD, buttonMouse, buttonScroll;
 
+    Thread udpClientUtilThread=null;
+    Thread serverCommunicationUtilThread=null;
+
     final BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
 
     DatabaseHandler dbHandler;
@@ -55,7 +59,7 @@ public class MainActivity extends AppCompatActivity
     List<Server> preServers = new ArrayList<>();
     FabSpeedDial fabSpeedDial;
     CyclicBarrier latch;
-    static SharedPreferences SP;
+    SharedPreferences SP;
     //PreferenceChanged pcl;
 
     @Override
@@ -95,9 +99,17 @@ public class MainActivity extends AppCompatActivity
                     {
                         public void onClick(DialogInterface dialog, int which)
                         {
+                            if(udpClientUtilThread.isAlive())
+                                udpClientUtilThread.interrupt();
+                            if(serverCommunicationUtilThread.isAlive())
+                                serverCommunicationUtilThread.interrupt();
+
+                            Log.e(getClass().getName(),"Threads Killed");
+
                             Intent i = getBaseContext().getPackageManager()
                                     .getLaunchIntentForPackage( getBaseContext().getPackageName() );
                             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
                             finish();
                             startActivity(i);
                         }
@@ -179,7 +191,7 @@ public class MainActivity extends AppCompatActivity
 
                 for (Server server : preServers) {
 
-                    if (NetworkUtil.connectTCP(server)) {
+                    if (NetworkUtil.connectTCP(server,MainActivity.this)) {
                         connected = true;
                         return "s";
                     }
@@ -188,7 +200,7 @@ public class MainActivity extends AppCompatActivity
 
             if (!connected || count == 0)
             {
-                discoveredServer = NetworkScannerUtil.searchServer();
+                discoveredServer = NetworkScannerUtil.searchServer(MainActivity.this);
 
                 if (discoveredServer.size() == 1)
                 {
@@ -200,7 +212,7 @@ public class MainActivity extends AppCompatActivity
                             dbHandler.addServerToDB(servers);
                         }
                     }
-                    if (NetworkUtil.connectTCP(discoveredServer.remove(0))) {
+                    if (NetworkUtil.connectTCP(discoveredServer.remove(0),MainActivity.this)) {
                         connected = true;
                         return "s";
                     } else
@@ -281,7 +293,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected String doInBackground(String... params) {
 
-            discoveredServer = NetworkScannerUtil.searchServer();
+            discoveredServer = NetworkScannerUtil.searchServer(MainActivity.this);
 
             if (discoveredServer.size() > 0) {
                 for (Server servers : discoveredServer) {
@@ -361,7 +373,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected String doInBackground(String... params)
         {
-            if (NetworkUtil.connectTCP(server))
+            if (NetworkUtil.connectTCP(server,MainActivity.this))
                 return "s";
             return "f";
         }
@@ -393,6 +405,7 @@ public class MainActivity extends AppCompatActivity
 
     void init()
     {
+        Log.e(getClass().getName(),"INIT CALLED");
         // initialise variables
         latch = new CyclicBarrier(2);
         Globals.cdLatch = latch;
@@ -401,9 +414,7 @@ public class MainActivity extends AppCompatActivity
         dbHandler = new DatabaseHandler(this);
         Globals.databaseHandler = dbHandler;
 
-        // initiate preference reader
-        SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        Globals.sharedPreferences = SP;
+
 
         // associate ui elements to variables/ objects
         buttonAD = (ImageButton) findViewById(R.id.buttonADown);
@@ -418,20 +429,22 @@ public class MainActivity extends AppCompatActivity
         buttonLeft = (Button) findViewById(R.id.buttonLeft);
 
         // create objects of other classes
-        final UDPClientUtil udpClientUtil = new UDPClientUtil(sharedQueue);
+        final UDPClientUtil udpClientUtil = new UDPClientUtil(sharedQueue,this);
         Globals.udpClientUtil = udpClientUtil;
 
         final Trackpad trackpad = new Trackpad(sharedQueue, getApplicationContext());
         final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue, getApplicationContext());
 
         // create the udp client thread
-        final Thread udpClientUtilThread = new Thread(udpClientUtil);
+        udpClientUtilThread = new Thread(udpClientUtil);
         udpClientUtilThread.start();
+        Log.e(getClass().getName(),"IDPCLientUTIL thread started");
 
         // also start the server communication thread
         ServerCommunicationUtil serverCommunicationUtil = new ServerCommunicationUtil();
-        Thread serverCommunicationUtilThread = new Thread(serverCommunicationUtil);
+        serverCommunicationUtilThread = new Thread(serverCommunicationUtil);
         serverCommunicationUtilThread.start();
+        Log.e(getClass().getName(),"Server Communication util thread started");
 
         // add click listeners to buttons
         buttonAD.setOnTouchListener(new View.OnTouchListener()

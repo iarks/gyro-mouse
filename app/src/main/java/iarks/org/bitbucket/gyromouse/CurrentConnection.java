@@ -13,8 +13,7 @@ class CurrentConnection
     static String sessionKey;
 
     // params describing current server
-    static String serverIP = "unavailable", serverName = "unavailable", tcpPort = getTCPPort(),udpPort = getUdpPort();
-    //static InetAddress serverInetAddress;
+    static String serverIP = "unavailable", serverName = "unavailable";
 
     // params describing current client
     static Socket clientTcpSocket;
@@ -30,16 +29,6 @@ class CurrentConnection
         serverIP = "unavailable";
         sessionKey="";
         clientTcpSocket =null;
-    }
-
-    private static String getTCPPort()
-    {
-        return Globals.sharedPreferences.getString("tcpPort", "13000");
-    }
-
-    private static String getUdpPort()
-    {
-        return Globals.sharedPreferences.getString("udpPort", "9050");
     }
 
     static void closeSockets()

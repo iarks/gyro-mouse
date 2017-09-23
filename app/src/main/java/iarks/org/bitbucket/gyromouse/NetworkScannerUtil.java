@@ -1,5 +1,8 @@
 package iarks.org.bitbucket.gyromouse;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.IOException;
@@ -15,10 +18,12 @@ import java.util.Enumeration;
 
 class NetworkScannerUtil
 {
-    static ArrayList<Server> searchServer()
+    static ArrayList<Server> searchServer(Context context)
     {
         ArrayList<Server> list = new ArrayList<>();
         list.clear();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         byte[] sendData = "CANHAVEIP?;x;GMO".getBytes();
         DatagramSocket datagramSocket = null;
@@ -37,7 +42,7 @@ class NetworkScannerUtil
 
         try
         {
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), Integer.parseInt(CurrentConnection.udpPort));
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), Integer.parseInt(prefs.getString("udpPort","9080")));
             datagramSocket.send(sendPacket);
             Log.e("NetworkScannerUtil" , "Request packet sent to: 255.255.255.255 (DEFAULT)");
         }
@@ -75,6 +80,7 @@ class NetworkScannerUtil
                     // Send the broadcast package!
                     try
                     {
+//                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, Integer.parseInt(prefs.getString("udpPort","9080")));
                         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, 8888);
                         datagramSocket.send(sendPacket);
                     }

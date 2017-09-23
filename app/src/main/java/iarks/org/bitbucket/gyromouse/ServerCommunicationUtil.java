@@ -10,41 +10,41 @@ import xdroid.toaster.Toaster;
 
 class ServerCommunicationUtil implements Runnable
 {
-    private int resetLatch=0;
+    private int resetLatch = 0;
     private int firstTime;
 
     @Override
     public void run()
     {
-        firstTime=1;
+        firstTime = 1;
         while (true)
         {
-            if(resetLatch == 1 || firstTime==1)
+            if (resetLatch == 1 || firstTime == 1)
             {
                 try
                 {
-                    resetLatch=0;
+                    resetLatch = 0;
                     Globals.cdLatch.await();
-                }catch (InterruptedException e)
+                }
+                catch (InterruptedException e)
                 {
+                    Log.e(getClass().getName(), "Interrupted Exception");
                     e.printStackTrace();
-                    Log.e(getClass().getName(),"Interrupted Exception");
-                    Log.e(getClass().getName(),e.getMessage());
-                    Log.e(getClass().getName(),e.getCause().toString());
-                }catch (BrokenBarrierException e)
+                    return;
+
+                }
+                catch (BrokenBarrierException e)
                 {
+                    Log.e(getClass().getName(), "BrokenBarrier Exception");
                     e.printStackTrace();
-                    Log.e(getClass().getName(),"BrokenBarrier Exception");
-                    Log.e(getClass().getName(),e.getMessage());
-                    Log.e(getClass().getName(),e.getCause().toString());
+                    return;
                 }
             }
 
 
-
             try
             {
-                firstTime=0;
+                firstTime = 0;
                 DataOutputStream outToServer = new DataOutputStream(CurrentConnection.clientTcpSocket.getOutputStream());
                 DataInputStream inFromServer = new DataInputStream(CurrentConnection.clientTcpSocket.getInputStream());
 
@@ -57,7 +57,7 @@ class ServerCommunicationUtil implements Runnable
                 {
                     receivedString = new String(receivedBytes);
                     receivedString = receivedString.trim();
-                    Log.i(getClass().getName(),"Received from server>> "+ receivedString.trim());
+                    Log.i(getClass().getName(), "Received from server>> " + receivedString.trim());
                     break;
                 }
                 try
@@ -74,7 +74,8 @@ class ServerCommunicationUtil implements Runnable
                         resetLatch = 1;
                         CurrentConnection.reset();
                     }
-                }catch (NullPointerException e)
+                }
+                catch (NullPointerException e)
                 {
                     e.printStackTrace();
                 }
@@ -86,6 +87,8 @@ class ServerCommunicationUtil implements Runnable
         }
 
     }
+
+
 
     static void closePortAndExit()
     {

@@ -228,7 +228,7 @@ public class ServerListActivity extends AppCompatActivity
         @Override
         protected String doInBackground(String... params)
         {
-            if (NetworkUtil.connectTCP(server))
+            if (NetworkUtil.connectTCP(server,ServerListActivity.this))
                 return "s";
             return "f";
         }
