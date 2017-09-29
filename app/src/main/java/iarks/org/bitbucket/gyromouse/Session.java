@@ -1,14 +1,22 @@
 package iarks.org.bitbucket.gyromouse;
 
+import android.os.AsyncTask;
+import android.util.Log;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.Socket;
 
-class Session
+class Session implements Runnable
 {
     private static Session sessionInstance = null;
 
     // params shared between server and client
     private String sessionKey;
+
+    private String message;
+
 
     // params describing current server
     private String serverIP = "unavailable", serverName = "unavailable";
@@ -18,14 +26,14 @@ class Session
     private DatagramSocket datagramSocket;
 
 
-    public static Session getNewSessionInstance()
+    static Session getNewSessionInstance()
     {
         sessionInstance = null;
         sessionInstance = new Session();
         return sessionInstance;
     }
 
-    public static Session getSessionInstance()
+    static Session getSessionInstance()
     {
         if (sessionInstance == null)
             sessionInstance = new Session();
@@ -42,7 +50,7 @@ class Session
         datagramSocket=null;
     }
 
-    public void initialise(String sessionKey, String serverIP, String serverName, Socket clientTcpSocket)
+    void initialise(String sessionKey, String serverIP, String serverName, Socket clientTcpSocket)
     {
         this.sessionKey = sessionKey;
         this.clientTcpSocket = clientTcpSocket;
@@ -50,29 +58,34 @@ class Session
         this.serverName = serverName;
     }
 
-    public String getSessionKey()
+    String getSessionKey()
     {
         return sessionKey;
     }
 
-    public String getServerIP()
+    String getServerIP()
     {
         return serverIP;
     }
 
-    public String getServerName()
+    String getServerName()
     {
         return serverName;
     }
 
-    public Socket getClientTcpSocket()
+    Socket getClientTcpSocket()
     {
-        return clientTcpSocket;
+        return this.clientTcpSocket;
     }
 
     public DatagramSocket getDatagramSocket()
     {
         return datagramSocket;
+    }
+
+    private String getMessage()
+    {
+        return this.message;
     }
 
     // reset server details
@@ -81,27 +94,33 @@ class Session
         sessionInstance=null;
     }
 
-    static void closeSockets()
+    void sendDataToServer(String message)
     {
-//        try
-//        {
-//            if (this.clientTcpSocket != null)
-//                clientTcpSocket.close();
-//        }
-//        catch (IOException e)
-//        {
-//            e.printStackTrace();
-//            Log.e("Session","ClientSocketClosed");
-//        }
-//
-//        try
-//        {
-//           if(datagramSocket!=null)
-//               datagramSocket.close();
-//        }catch (Exception e)
-//        {
-//            e.printStackTrace();
-//            Log.e("Session","UDPSocketClosed");
-//        }
+        Log.i(getClass().getName(),"sending data asynchronously");
+        Thread sendOut = new Thread(this);
+        this.message = message;
+        sendOut.start();
+        Log.i(getClass().getName(),"sending data asynchronously done");
+    }
+
+
+
+    // this sends out data to the server asynchronously
+    @Override
+    public void run()
+    {
+        message = getMessage();
+        DataOutputStream outToServer;
+        try
+        {
+            outToServer = new DataOutputStream(getClientTcpSocket().getOutputStream());
+            outToServer.write(message.getBytes(), 0, message.getBytes().length);
+            outToServer.flush();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 }
+

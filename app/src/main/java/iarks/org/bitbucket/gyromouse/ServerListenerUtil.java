@@ -8,10 +8,14 @@ import java.util.concurrent.BrokenBarrierException;
 
 import xdroid.toaster.Toaster;
 
-class ServerCommunicationUtil implements Runnable
+class ServerListenerUtil implements Runnable
 {
     private int resetLatch = 0;
     private int firstTime;
+
+    private final String AM_ALIVE_RESPONSE_STRING = "YES";
+    private final String SERVER_DEAD_STRING = "";
+    private final String SERVER_ASKING_RESPONSE = "UDERE?";
 
     @Override
     public void run()
@@ -45,7 +49,6 @@ class ServerCommunicationUtil implements Runnable
             try
             {
                 firstTime = 0;
-                DataOutputStream outToServer = new DataOutputStream(Session.getSessionInstance().getClientTcpSocket().getOutputStream());
                 DataInputStream inFromServer = new DataInputStream(Session.getSessionInstance().getClientTcpSocket().getInputStream());
 
                 String receivedString = null;
@@ -57,20 +60,21 @@ class ServerCommunicationUtil implements Runnable
                 {
                     receivedString = new String(receivedBytes);
                     receivedString = receivedString.trim();
-                    Log.i(getClass().getName(), "Received from server>> " + receivedString.trim());
+                    Log.i(getClass().getName(), "Received from server: " + receivedString.trim());
                     break;
                 }
                 try
                 {
-                    if (receivedString.equals("UDERE?"))
+                    if (receivedString.equals(SERVER_ASKING_RESPONSE))
                     {
                         Log.i(getClass().getName(), "SERVER IS PINGING");
-                        outToServer.write("YES".getBytes(), 0, "YES".getBytes().length);
-                        outToServer.flush();
-                    } else if (receivedString.equals(""))
+                        Log.i(getClass().getName(), "send data back to server saying we are alive");
+                        Session.getSessionInstance().sendDataToServer(AM_ALIVE_RESPONSE_STRING);
+                    }
+                    else if (receivedString.equals(SERVER_DEAD_STRING))
                     {
                         Log.i(getClass().getName(), "SERVER IS DEAD?");
-                        Toaster.toast("SERVER IS PROBABLY DEAD");
+                        Toaster.toast("Server has disconnected");
                         resetLatch = 1;
                         Session.reset();
                     }
@@ -87,13 +91,5 @@ class ServerCommunicationUtil implements Runnable
         }
 
     }
-
-
-
-    static void closePortAndExit()
-    {
-
-    }
-
 }
 

@@ -3,7 +3,6 @@ package iarks.org.bitbucket.gyromouse;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.IntentCompat;
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity
     ImageButton buttonAR, buttonAL, buttonAU, buttonAD, buttonMouse, buttonScroll;
 
     Thread udpClientUtilThread = null;
-    Thread serverCommunicationUtilThread = null;
+    Thread serverListenerUtilThread = null;
 
     final BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
 
@@ -95,8 +94,8 @@ public class MainActivity extends AppCompatActivity
                         {
                             if (udpClientUtilThread.isAlive())
                                 udpClientUtilThread.interrupt();
-                            if (serverCommunicationUtilThread.isAlive())
-                                serverCommunicationUtilThread.interrupt();
+                            if (serverListenerUtilThread.isAlive())
+                                serverListenerUtilThread.interrupt();
 
                             Log.e(getClass().getName(), "Threads Killed");
 
@@ -464,9 +463,9 @@ public class MainActivity extends AppCompatActivity
 
         // also start the server communication thread
         Log.e(getClass().getName(), "Server Communication util thread starting");
-        ServerCommunicationUtil serverCommunicationUtil = new ServerCommunicationUtil();
-        serverCommunicationUtilThread = new Thread(serverCommunicationUtil);
-        serverCommunicationUtilThread.start();
+        ServerListenerUtil serverListenerUtil = new ServerListenerUtil();
+        serverListenerUtilThread = new Thread(serverListenerUtil);
+        serverListenerUtilThread.start();
         Log.e(getClass().getName(), "Server Communication util thread started");
 
         // add click listeners to buttons
