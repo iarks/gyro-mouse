@@ -124,28 +124,27 @@ class ClientConnection
         }
         else
         {
-            Client.serverIP = server.getServerIP();
-            Client.sessionKey = receivedString;
-            Client.clientTcpSocket = clientSocket;
-            //Client.serverInetAddress = InetAddress.getByName(server.getServerIP());
-            Client.serverName = server.getServerName();
+            Log.e(context.getClass().getName(), "client successfully connected to server. Setting up session status");
+            Session currentSession = Session.getNewSessionInstance();
+            currentSession.initialise(receivedString,server.getServerIP(),server.getServerName(),clientSocket);
+            Log.e(context.getClass().getName(), "setting up session status complete");
             Globals.udpClientUtil.udpSetup();
             try
             {
+                Log.e(context.getClass().getName(), "setting up cyclic barrier and waiting");
                 Globals.cdLatch.await();
+                Log.e(context.getClass().getName(), "cyclic barrier setup complete");
             }
             catch (InterruptedException e)
             {
+                Log.e(context.getClass().getName(), "cyclic barrier interrupted");
                 e.printStackTrace();
-                Log.e("ClientConnection", "CAUSE " + e.getCause().toString());
-                Log.e("ClientConnection", "MESSAGE " + e.getMessage());
                 return false;
             }
             catch (BrokenBarrierException e)
             {
+                Log.e(context.getClass().getName(), "cyclic barrier broken");
                 e.printStackTrace();
-                Log.e("ClientConnection", "CAUSE " + e.getCause().toString());
-                Log.e("ClientConnection", "MESSAGE " + e.getMessage());
                 return false;
             }
         }

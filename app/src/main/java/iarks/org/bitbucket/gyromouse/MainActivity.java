@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onDestroy();
         Log.e(getClass().getName(),"OnDestroy");
-        Client.closeSockets();
+        Session.closeSockets();
     }
 
     // create overflow menu to toolbar
@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 default:
                     lt.success();
-                    Toasty.success(MainActivity.this, "connected to " + Client.serverName + " at " + Client.serverIP, Toast.LENGTH_SHORT, true).show();
+                    Toasty.success(MainActivity.this, "connected to " + Session.getSessionInstance().getServerName() + " at " + Session.getSessionInstance().getServerIP(), Toast.LENGTH_SHORT, true).show();
             }
         }
 
@@ -385,7 +385,7 @@ public class MainActivity extends AppCompatActivity
                 Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
             } else {
                 lt.success();
-                Toasty.success(MainActivity.this, "connected to " + Client.serverName + " at " + Client.serverIP, Toast.LENGTH_SHORT, true).show();
+                Toasty.success(MainActivity.this, "connected to " + Session.getSessionInstance().getServerName() + " at " + Session.getSessionInstance().getServerIP(), Toast.LENGTH_SHORT, true).show();
             }
 
         }
@@ -457,7 +457,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         synchronized (sharedQueue)
                         {
-                            sharedQueue.put("AD;1;" + Client.sessionKey);
+                            sharedQueue.put("AD;1;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
                     }
@@ -472,7 +472,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         synchronized (sharedQueue)
                         {
-                            sharedQueue.put("AD;0;" + Client.sessionKey);
+                            sharedQueue.put("AD;0;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
                     }
@@ -492,7 +492,7 @@ public class MainActivity extends AppCompatActivity
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AR;1;" + Client.sessionKey);
+                            sharedQueue.put("AR;1;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -501,7 +501,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AR;0;" + Client.sessionKey);
+                            sharedQueue.put("AR;0;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -519,7 +519,7 @@ public class MainActivity extends AppCompatActivity
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AL;1;" + Client.sessionKey);
+                            sharedQueue.put("AL;1;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
 
@@ -529,7 +529,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AL;0;" + Client.sessionKey);
+                            sharedQueue.put("AL;0;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -547,7 +547,7 @@ public class MainActivity extends AppCompatActivity
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AU;1;" + Client.sessionKey);
+                            sharedQueue.put("AU;1;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -556,7 +556,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AU;0;" + Client.sessionKey);
+                            sharedQueue.put("AU;0;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -585,8 +585,8 @@ public class MainActivity extends AppCompatActivity
                     if (timeUp - timeDown < 500) {
                         try {
                             synchronized (sharedQueue) {
-                                sharedQueue.put("LD;x;" + Client.sessionKey);
-                                sharedQueue.put("LU;x;" + Client.sessionKey);
+                                sharedQueue.put("LD;x;" + Session.getSessionInstance().getSessionKey());
+                                sharedQueue.put("LU;x;" + Session.getSessionInstance().getSessionKey());
                                 sharedQueue.notifyAll();
                             }
                         } catch (InterruptedException e) {
@@ -623,7 +623,7 @@ public class MainActivity extends AppCompatActivity
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("RD;x;" + Client.sessionKey);
+                            sharedQueue.put("RD;x;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -632,7 +632,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("RU;x;" + Client.sessionKey);
+                            sharedQueue.put("RU;x;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -652,7 +652,7 @@ public class MainActivity extends AppCompatActivity
                     downTime = event.getDownTime();
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("LD;x;" + Client.sessionKey);
+                            sharedQueue.put("LD;x;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -662,7 +662,7 @@ public class MainActivity extends AppCompatActivity
                     if (event.getEventTime() - downTime < 1000) {
                         try {
                             synchronized (sharedQueue) {
-                                sharedQueue.put("LU;x;" + Client.sessionKey);
+                                sharedQueue.put("LU;x;" + Session.getSessionInstance().getSessionKey());
                                 sharedQueue.notifyAll();
                             }
                         } catch (InterruptedException e) {
@@ -681,7 +681,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 try {
                     synchronized (sharedQueue) {
-                        sharedQueue.put("ESC;x;" + Client.sessionKey);
+                        sharedQueue.put("ESC;x;" + Session.getSessionInstance().getSessionKey());
                         sharedQueue.notifyAll();
                     }
                 } catch (InterruptedException e) {
@@ -695,7 +695,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 try {
                     synchronized (sharedQueue) {
-                        sharedQueue.put("WIN;x;" + Client.sessionKey);
+                        sharedQueue.put("WIN;x;" + Session.getSessionInstance().getSessionKey());
                         sharedQueue.notifyAll();
                     }
                 } catch (InterruptedException e) {

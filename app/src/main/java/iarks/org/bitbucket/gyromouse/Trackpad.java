@@ -55,7 +55,7 @@ class Trackpad implements Runnable
         {
             try
             {
-                sharedQueue.put("EOT;x;"+ Client.sessionKey);
+                sharedQueue.put("EOT;x;"+ Session.getSessionInstance().getSessionKey());
                 deltas=null;
             }
             catch (InterruptedException e)
@@ -130,7 +130,7 @@ class Trackpad implements Runnable
                 x = (Math.toDegrees(x));
 //                y = (Math.toDegrees(y));
 
-                deltas = df.format(z) + ";" + df.format(x) + ";" + Client.sessionKey;
+                deltas = df.format(z) + ";" + df.format(x) + ";" + Session.getSessionInstance().getSessionKey();
 
                 synchronized (sharedQueue)
                 {

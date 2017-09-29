@@ -193,15 +193,15 @@ public class ServerListActivity extends AppCompatActivity
                         }));
             }
 
-            currentServerName.setText(Client.serverName);
-            currentServerIP.setText(Client.serverIP);
+            currentServerName.setText(Session.getSessionInstance().getServerName());
+            currentServerIP.setText(Session.getSessionInstance().getServerIP());
         }
 
         @Override
         protected void onPreExecute()
         {
-            currentServerName.setText(Client.serverName);
-            currentServerIP.setText(Client.serverIP);
+            currentServerName.setText(Session.getSessionInstance().getServerName());
+            currentServerIP.setText(Session.getSessionInstance().getServerIP());
 
             lt.setText("Looking into database");
             lt.setTranslationY(150);
@@ -241,10 +241,10 @@ public class ServerListActivity extends AppCompatActivity
                 Toasty.error(ServerListActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
             } else {
                 lt.success();
-                Toasty.success(ServerListActivity.this, "connected to " + Client.serverName + " at " + Client.serverIP, Toast.LENGTH_SHORT, true).show();
+                Toasty.success(ServerListActivity.this, "connected to " + Session.getSessionInstance().getServerName() + " at " + Session.getSessionInstance().getServerIP(), Toast.LENGTH_SHORT, true).show();
             }
-            currentServerName.setText(Client.serverName);
-            currentServerIP.setText(Client.serverIP);
+            currentServerName.setText(Session.getSessionInstance().getServerName());
+            currentServerIP.setText(Session.getSessionInstance().getServerIP());
         }
 
         @Override
@@ -262,8 +262,8 @@ public class ServerListActivity extends AppCompatActivity
 
     void updateCurrentServerView()
     {
-        currentServerName.setText(Client.serverName);
-        currentServerIP.setText(Client.serverIP);
+        currentServerName.setText(Session.getSessionInstance().getServerName());
+        currentServerIP.setText(Session.getSessionInstance().getServerIP());
     }
 
 }
