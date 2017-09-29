@@ -47,8 +47,8 @@ public class MainActivity extends AppCompatActivity
     Button buttonRight, buttonEscape, buttonLeft, buttonWindows;
     ImageButton buttonAR, buttonAL, buttonAU, buttonAD, buttonMouse, buttonScroll;
 
-    Thread udpClientUtilThread=null;
-    Thread serverCommunicationUtilThread=null;
+    Thread udpClientUtilThread = null;
+    Thread serverCommunicationUtilThread = null;
 
     final BlockingQueue<String> sharedQueue = new LinkedBlockingDeque<>(5);
 
@@ -58,38 +58,33 @@ public class MainActivity extends AppCompatActivity
     List<Server> preServers = new ArrayList<>();
     FabSpeedDial fabSpeedDial;
     CyclicBarrier latch;
-    SharedPreferences SP;
-    //PreferenceChanged pcl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        Log.e(getClass().getName(),"onCreate");
+        Log.e(TAG, "onCreate");
 
-        // inflate layout file
         setContentView(R.layout.activity_main);
 
-        // add toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // initialise variables, threads, objects, buttonClickListeners, etc.
         init();
 
-        //try to connect to servers
         new SearchAndConnectUtil().execute("");
-        // end of onCreate
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-        if(Globals.advanceChanged==1)
+        Log.e(TAG, "onResume");
+
+        if (Globals.advanceChanged == 1)
         {
-            Globals.advanceChanged=0;
+            Globals.advanceChanged = 0;
             AlertDialog.Builder builder;
             builder = new AlertDialog.Builder(MainActivity.this);
             builder.setTitle("Restart App")
@@ -98,15 +93,15 @@ public class MainActivity extends AppCompatActivity
                     {
                         public void onClick(DialogInterface dialog, int which)
                         {
-                            if(udpClientUtilThread.isAlive())
+                            if (udpClientUtilThread.isAlive())
                                 udpClientUtilThread.interrupt();
-                            if(serverCommunicationUtilThread.isAlive())
+                            if (serverCommunicationUtilThread.isAlive())
                                 serverCommunicationUtilThread.interrupt();
 
-                            Log.e(getClass().getName(),"Threads Killed");
+                            Log.e(getClass().getName(), "Threads Killed");
 
                             Intent i = getBaseContext().getPackageManager()
-                                    .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                                    .getLaunchIntentForPackage(getBaseContext().getPackageName());
                             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
                             finish();
@@ -117,22 +112,14 @@ public class MainActivity extends AppCompatActivity
                     .show();
 
         }
-        Log.e(getClass().getName(),"onResume");
+        Log.e(getClass().getName(), "onResume");
     }
 
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-        Log.e(getClass().getName(),"OnDestroy");
-        Session.closeSockets();
-    }
-
-    // create overflow menu to toolbar
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        Log.e(getClass().getName(),"onCreateOptionsMenu");
+        Log.e(getClass().getName(), "onCreateOptionsMenu");
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.overflow_menu, menu);
         return true;
@@ -140,21 +127,25 @@ public class MainActivity extends AppCompatActivity
 
     // add click listeners to toolbar elements
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_wifi) {
+        if (id == R.id.action_wifi)
+        {
             startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
             return true;
-        } else if (id == R.id.action_keyboard) {
+        } else if (id == R.id.action_keyboard)
+        {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
             return true;
-        } else if (id == R.id.action_settings) {
+        } else if (id == R.id.action_settings)
+        {
             Intent i = new Intent(this, PreferencesActivity.class);
             startActivity(i);
         }
@@ -163,8 +154,10 @@ public class MainActivity extends AppCompatActivity
 
     // click listener for keyboard events
     @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if ((event.getAction() == 1 || event.getAction() == 2) && event.getKeyCode() != KEYCODE_BACK) {
+    public boolean dispatchKeyEvent(KeyEvent event)
+    {
+        if ((event.getAction() == 1 || event.getAction() == 2) && event.getKeyCode() != KEYCODE_BACK)
+        {
             SoftKeyboardEventHandler keyboardEvents = new SoftKeyboardEventHandler(event, sharedQueue);
             Thread th = new Thread(keyboardEvents);
             th.start();
@@ -188,9 +181,11 @@ public class MainActivity extends AppCompatActivity
             {
                 preServers = dbHandler.getAllDBServers();
 
-                for (Server server : preServers) {
+                for (Server server : preServers)
+                {
 
-                    if (ClientConnection.connectClient(server,MainActivity.this)) {
+                    if (ClientConnection.connectClient(server, MainActivity.this))
+                    {
                         connected = true;
                         return "s";
                     }
@@ -204,28 +199,35 @@ public class MainActivity extends AppCompatActivity
                 if (discoveredServer.size() == 1)
                 {
                     //auto connect if only one server is available
-                    for (Server servers : discoveredServer) {
+                    for (Server servers : discoveredServer)
+                    {
                         boolean check = dbHandler.checkAvailable(servers.getServerID());
-                        if (!check) {
+                        if (!check)
+                        {
                             // add them to database
                             dbHandler.addServerToDB(servers);
                         }
                     }
-                    if (ClientConnection.connectClient(discoveredServer.remove(0),MainActivity.this)) {
+                    if (ClientConnection.connectClient(discoveredServer.remove(0), MainActivity.this))
+                    {
                         connected = true;
                         return "s";
                     } else
                         return "f";
-                } else if (discoveredServer.size() > 1) {
+                } else if (discoveredServer.size() > 1)
+                {
                     // show if more than 1 servers are available
-                    for (Server servers : discoveredServer) {
+                    for (Server servers : discoveredServer)
+                    {
                         boolean check = dbHandler.checkAvailable(servers.getServerID());
-                        if (!check) {
+                        if (!check)
+                        {
                             dbHandler.addServerToDB(servers);
                         }
                     }
                     return "dialog";
-                } else {
+                } else
+                {
                     return "f";
                 }
             }
@@ -253,7 +255,8 @@ public class MainActivity extends AppCompatActivity
 
                     lv.setAdapter(adapter);
 
-                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                    {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View v, int position, long id)
                         {
@@ -274,47 +277,58 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onPreExecute() {
+        protected void onPreExecute()
+        {
             lt.setText("Searching for servers");
             lt.setTranslationY(150);
             lt.show();
         }
 
         @Override
-        protected void onProgressUpdate(Void... values) {
+        protected void onProgressUpdate(Void... values)
+        {
+            // not used
         }
     }
 
     //scan for servers
-    private class ScanNetwork extends AsyncTask<String, Void, String> {
+    private class ScanNetwork extends AsyncTask<String, Void, String>
+    {
         LoadToast lt = new LoadToast(MainActivity.this);
 
         @Override
-        protected String doInBackground(String... params) {
+        protected String doInBackground(String... params)
+        {
 
             discoveredServer = NetworkScannerUtil.searchServer(MainActivity.this);
 
-            if (discoveredServer.size() > 0) {
-                for (Server servers : discoveredServer) {
+            if (discoveredServer.size() > 0)
+            {
+                for (Server servers : discoveredServer)
+                {
                     boolean check = dbHandler.checkAvailable(servers.getServerID());
-                    if (!check) {
+                    if (!check)
+                    {
                         // add newly found servers to database
                         dbHandler.addServerToDB(servers);
                     }
                 }
                 return "1";
-            } else {
+            } else
+            {
                 return "0";
             }
         }
 
-
         @Override
-        protected void onPostExecute(String result) {
-            if (result.equals("0")) {
+        protected void onPostExecute(String result)
+        {
+            if (result.equals("0"))
+            {
                 lt.error();
                 Toasty.error(MainActivity.this, "Could Not find any servers on local network", Toast.LENGTH_SHORT, true).show();
-            } else {
+            } else
+            {
                 lt.success();
 
                 ListViewServerAdapter adapter = new ListViewServerAdapter(MainActivity.this, discoveredServer);
@@ -327,37 +341,43 @@ public class MainActivity extends AppCompatActivity
 
                 lv.setAdapter(adapter);
 
-                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View v, int position, long id)
-                    {
-                        TextView ip = (TextView) v.findViewById(R.id.ip);
-                        TextView name = (TextView) v.findViewById(R.id.name);
-                        Server server = new Server("_" + name + "_" + ip, name.getText().toString(), ip.getText().toString());
-                        TryConnection tryConnection = new TryConnection(server);
-                        tryConnection.execute("");
-                    }
-                });
+                lv.setOnItemClickListener(
+                        new AdapterView.OnItemClickListener()
+                        {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View v, int position, long id)
+                            {
+                                TextView ip = (TextView) v.findViewById(R.id.ip);
+                                TextView name = (TextView) v.findViewById(R.id.name);
+                                Server server = new Server("_" + name + "_" + ip, name.getText().toString(), ip.getText().toString());
+                                TryConnection tryConnection = new TryConnection(server);
+                                tryConnection.execute("");
+                            }
+                        });
                 alertDialog.show();
             }
         }
 
         @Override
-        protected void onPreExecute() {
+        protected void onPreExecute()
+        {
             lt.setText("Searching for servers");
             lt.setTranslationY(150);
             lt.show();
         }
 
         @Override
-        protected void onProgressUpdate(Void... values) {
+        protected void onProgressUpdate(Void... values)
+        {
+            // not used
         }
     }
 
     //try connecting to a given server
-    private class TryConnection extends AsyncTask<String, Void, String> {
+    private class TryConnection extends AsyncTask<String, Void, String>
+    {
 
-        LoadToast lt =new LoadToast(MainActivity.this);
+        LoadToast lt = new LoadToast(MainActivity.this);
 
         Server server;
         AlertDialog.Builder dialog;
@@ -372,7 +392,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected String doInBackground(String... params)
         {
-            if (ClientConnection.connectClient(server,MainActivity.this))
+            if (ClientConnection.connectClient(server, MainActivity.this))
                 return "s";
             return "f";
         }
@@ -380,10 +400,12 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(String result)
         {
-            if (result.equals("f")) {
+            if (result.equals("f"))
+            {
                 lt.error();
                 Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
-            } else {
+            } else
+            {
                 lt.success();
                 Toasty.success(MainActivity.this, "connected to " + Session.getSessionInstance().getServerName() + " at " + Session.getSessionInstance().getServerIP(), Toast.LENGTH_SHORT, true).show();
             }
@@ -398,13 +420,14 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onProgressUpdate(Void... values) {
+        protected void onProgressUpdate(Void... values)
+        {
         }
     }
 
     void init()
     {
-        Log.e(getClass().getName(),"INIT CALLED");
+        Log.e(getClass().getName(), "init");
         // initialise variables
         latch = new CyclicBarrier(2);
         Globals.cdLatch = latch;
@@ -412,7 +435,6 @@ public class MainActivity extends AppCompatActivity
         //initiate database handler
         dbHandler = new DatabaseHandler(this);
         Globals.databaseHandler = dbHandler;
-
 
 
         // associate ui elements to variables/ objects
@@ -428,22 +450,24 @@ public class MainActivity extends AppCompatActivity
         buttonLeft = (Button) findViewById(R.id.buttonLeft);
 
         // create objects of other classes
-        final UDPClientUtil udpClientUtil = new UDPClientUtil(sharedQueue,this);
+        final UDPClientUtil udpClientUtil = new UDPClientUtil(sharedQueue, this);
         Globals.udpClientUtil = udpClientUtil;
 
         final Trackpad trackpad = new Trackpad(sharedQueue, getApplicationContext());
         final ScrollWheel scrollWheel = new ScrollWheel(sharedQueue, getApplicationContext());
 
         // create the udp client thread
+        Log.e(TAG, "udpclientutil thread starting");
         udpClientUtilThread = new Thread(udpClientUtil);
         udpClientUtilThread.start();
-        Log.e(getClass().getName(),"IDPCLientUTIL thread started");
+        Log.e(TAG, "udpclientutil thread started");
 
         // also start the server communication thread
+        Log.e(getClass().getName(), "Server Communication util thread starting");
         ServerCommunicationUtil serverCommunicationUtil = new ServerCommunicationUtil();
         serverCommunicationUtilThread = new Thread(serverCommunicationUtil);
         serverCommunicationUtilThread.start();
-        Log.e(getClass().getName(),"Server Communication util thread started");
+        Log.e(getClass().getName(), "Server Communication util thread started");
 
         // add click listeners to buttons
         buttonAD.setOnTouchListener(new View.OnTouchListener()
@@ -465,8 +489,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         e.printStackTrace();
                     }
-                }
-                else if (event.getAction() == MotionEvent.ACTION_UP)
+                } else if (event.getAction() == MotionEvent.ACTION_UP)
                 {
                     try
                     {
@@ -488,23 +511,34 @@ public class MainActivity extends AppCompatActivity
         buttonAR.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    try {
-                        synchronized (sharedQueue) {
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    try
+                    {
+                        synchronized (sharedQueue)
+                        {
                             sharedQueue.put("AR;1;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    try {
-                        synchronized (sharedQueue) {
+                } else if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        synchronized (sharedQueue)
+                        {
                             sharedQueue.put("AR;0;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
                 }
@@ -515,24 +549,35 @@ public class MainActivity extends AppCompatActivity
         buttonAL.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    try {
-                        synchronized (sharedQueue) {
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    try
+                    {
+                        synchronized (sharedQueue)
+                        {
                             sharedQueue.put("AL;1;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
 
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    try {
-                        synchronized (sharedQueue) {
+                } else if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        synchronized (sharedQueue)
+                        {
                             sharedQueue.put("AL;0;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
                 }
@@ -543,23 +588,34 @@ public class MainActivity extends AppCompatActivity
         buttonAU.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    try {
-                        synchronized (sharedQueue) {
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    try
+                    {
+                        synchronized (sharedQueue)
+                        {
                             sharedQueue.put("AU;1;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    try {
-                        synchronized (sharedQueue) {
+                } else if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        synchronized (sharedQueue)
+                        {
                             sharedQueue.put("AU;0;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
                 }
@@ -569,27 +625,37 @@ public class MainActivity extends AppCompatActivity
 
         buttonMouse.setOnTouchListener(new View.OnTouchListener()
         {
-            long timeDown, timeUp;
-
+            long timeDown=0, timeUp=0;
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    Log.i(TAG,"action down");
                     timeDown = event.getDownTime();
                     Thread trackpad_thread = new Thread(trackpad);
                     trackpad_thread.start();
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                }
+                else if(event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    Log.i(TAG,"action up");
                     timeUp = event.getEventTime();
                     udpClientUtil.clearThread();
                     trackpad.stopThread();
                     Log.i(getClass().getName(), "cleared");
-                    if (timeUp - timeDown < 500) {
-                        try {
-                            synchronized (sharedQueue) {
+                    if (timeUp - timeDown < 500)
+                    {
+                        try
+                        {
+                            synchronized (sharedQueue)
+                            {
                                 sharedQueue.put("LD;x;" + Session.getSessionInstance().getSessionKey());
                                 sharedQueue.put("LU;x;" + Session.getSessionInstance().getSessionKey());
                                 sharedQueue.notifyAll();
                             }
-                        } catch (InterruptedException e) {
+                        }
+                        catch (InterruptedException e)
+                        {
                             e.printStackTrace();
                         }
                     }
@@ -607,8 +673,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     Thread scrollWheel_thread = new Thread(scrollWheel);
                     scrollWheel_thread.start();
-                }
-                else if (event.getAction() == MotionEvent.ACTION_UP)
+                } else if (event.getAction() == MotionEvent.ACTION_UP)
                 {
                     udpClientUtil.clearThread();
                     scrollWheel.stopThread();
@@ -617,25 +682,37 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        buttonRight.setOnTouchListener(new View.OnTouchListener() {
+        buttonRight.setOnTouchListener(new View.OnTouchListener()
+        {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    try {
-                        synchronized (sharedQueue) {
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    try
+                    {
+                        synchronized (sharedQueue)
+                        {
                             sharedQueue.put("RD;x;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    try {
-                        synchronized (sharedQueue) {
+                } else if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        synchronized (sharedQueue)
+                        {
                             sharedQueue.put("RU;x;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
                 }
@@ -643,32 +720,46 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        buttonLeft.setOnTouchListener(new View.OnTouchListener() {
+        buttonLeft.setOnTouchListener(new View.OnTouchListener()
+        {
             long downTime = 0;
 
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                {
                     downTime = event.getDownTime();
-                    try {
-                        synchronized (sharedQueue) {
+                    try
+                    {
+                        synchronized (sharedQueue)
+                        {
                             sharedQueue.put("LD;x;" + Session.getSessionInstance().getSessionKey());
                             sharedQueue.notifyAll();
                         }
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (event.getEventTime() - downTime < 1000) {
-                        try {
-                            synchronized (sharedQueue) {
+                } else if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    if (event.getEventTime() - downTime < 1000)
+                    {
+                        try
+                        {
+                            synchronized (sharedQueue)
+                            {
                                 sharedQueue.put("LU;x;" + Session.getSessionInstance().getSessionKey());
                                 sharedQueue.notifyAll();
                             }
-                        } catch (InterruptedException e) {
+                        }
+                        catch (InterruptedException e)
+                        {
                             e.printStackTrace();
                         }
-                    } else {
+                    } else
+                    {
                         Toast.makeText(MainActivity.this, "Left Mouse Button Pressed", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -676,29 +767,41 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        buttonEscape.setOnClickListener(new View.OnClickListener() {
+        buttonEscape.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                try {
-                    synchronized (sharedQueue) {
+            public void onClick(View v)
+            {
+                try
+                {
+                    synchronized (sharedQueue)
+                    {
                         sharedQueue.put("ESC;x;" + Session.getSessionInstance().getSessionKey());
                         sharedQueue.notifyAll();
                     }
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e)
+                {
                     e.printStackTrace();
                 }
             }
         });
 
-        buttonWindows.setOnClickListener(new View.OnClickListener() {
+        buttonWindows.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                try {
-                    synchronized (sharedQueue) {
+            public void onClick(View v)
+            {
+                try
+                {
+                    synchronized (sharedQueue)
+                    {
                         sharedQueue.put("WIN;x;" + Session.getSessionInstance().getSessionKey());
                         sharedQueue.notifyAll();
                     }
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e)
+                {
                     e.printStackTrace();
                 }
             }
@@ -717,8 +820,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     new ScanNetwork().execute("");
                     return true;
-                }
-                else if (id == R.id.action_dbServers)
+                } else if (id == R.id.action_dbServers)
                 {
                     Intent myIntent = new Intent(MainActivity.this, ServerListActivity.class);
                     MainActivity.this.startActivity(myIntent);
