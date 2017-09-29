@@ -15,53 +15,69 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 class NetworkScannerUtil
 {
+    private final static String IP_REQUEST_STRING = "CANHAVEIP?;x;GMO";
+
+    // this function scans the network for available servers and returns a list of all identified servers
     static ArrayList<Server> searchServer(Context context)
     {
-        ArrayList<Server> list = new ArrayList<>();
+
+        HashMap<String,Server> list = new HashMap<>();
         list.clear();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        byte[] sendData = "CANHAVEIP?;x;GMO".getBytes();
+        byte[] sendData = IP_REQUEST_STRING.getBytes();
         DatagramSocket datagramSocket = null;
+
         try
         {
+            Log.i(context.getClass().getName(),"initialising random port on client");
             datagramSocket = new DatagramSocket();
             datagramSocket.setSoTimeout(3000);
             datagramSocket.setBroadcast(true);
+            Log.i(context.getClass().getName(),"initialising random port on client complete");
         }
         catch (SocketException e)
         {
+            Log.e(context.getClass().getName(),"unable to initialise any port");
             e.printStackTrace();
-            Log.e("ClientConnection","CAUSE " +e.getCause().toString());
-            Log.e("ClientConnection","MESSAGE " +e.getMessage());
+            Log.e(context.getClass().getName() , "closing socket if opened");
+            if (datagramSocket != null)
+                datagramSocket.close();
+            return new ArrayList<>(list.values());
         }
+
 
         try
         {
+            Log.e(context.getClass().getName() , "sending request packet to: 255.255.255.255 (DEFAULT)");
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), Integer.parseInt(prefs.getString("udpPort","9080")));
             datagramSocket.send(sendPacket);
-            Log.e("NetworkScannerUtil" , "Request packet sent to: 255.255.255.255 (DEFAULT)");
+            Log.e(context.getClass().getName() , "sending request packet to: 255.255.255.255 (DEFAULT) complete");
         }
+
         catch(IOException e)
         {
+            Log.e(context.getClass().getName() , "unable to send broadcast packet - IOException");
             e.printStackTrace();
-            Log.e("NetworkScannerUtil","CAUSE " +e.getCause().toString());
-            Log.e("NetworkScannerUtil","MESSAGE " +e.getMessage());
         }
         catch(NullPointerException e)
         {
+            Log.e(context.getClass().getName() , "unable to send broadcast packet - NullPointerException");
             e.printStackTrace();
-            Log.e("NetworkScannerUtil","CAUSE " +e.getCause().toString());
-            Log.e("NetworkScannerUtil","MESSAGE " +e.getMessage());
         }
-
 
         try
         {
+            Log.e(context.getClass().getName() , "broadcasting over all network interfaces individually");
+
             Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements())
             {
@@ -80,22 +96,23 @@ class NetworkScannerUtil
                     // Send the broadcast package!
                     try
                     {
-//                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, Integer.parseInt(prefs.getString("udpPort","9080")));
-                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, 8888);
+                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, Integer.parseInt(prefs.getString("udpPort","9080")));
                         datagramSocket.send(sendPacket);
                     }
                     catch (NullPointerException e)
                     {
+                        Log.e(context.getClass().getName(),"null pointer exception");
                         e.printStackTrace();
                     }
-                    Log.e("NetworkScannerUtil" ,"Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
+                    Log.e(context.getClass().getName() ,"Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
                 }
             }
-            Log.e("NetworkScannerUtil" , "Done looping over all network interfaces. Now waiting for a reply");
+            Log.e(context.getClass().getName() , "broadcasting over all network interfaces individually complete");
 
             while (true)
             {
                 // Wait for a response
+                Log.e(context.getClass().getName() , "waiting for reply");
                 byte[] recvBuf = new byte[15000];
                 DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
                 try
@@ -104,29 +121,35 @@ class NetworkScannerUtil
                 }
                 catch (NullPointerException e)
                 {
+                    Log.e(context.getClass().getName(), "error receiving response");
                     e.printStackTrace();
                 }
-                Log.e("NetworkScannerUtil" , "Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
+                Log.e(context.getClass().getName() , "response from server: " + receivePacket.getAddress().getHostAddress());
 
                 String name = new String(receivePacket.getData()).trim();
                 String id = "_"+name+"_"+receivePacket.getAddress().getHostAddress();
-                list.add(new Server(id, name, receivePacket.getAddress().getHostAddress()));
+                list.put(id, new Server(id, name, receivePacket.getAddress().getHostAddress()));
             }
         }
         catch (SocketTimeoutException e)
         {
-            Log.e("NetworkScannerUtil" , "socket timed out");
+            Log.e(context.getClass().getName() , "socket timed out");
             e.printStackTrace();
+
+            return new ArrayList<>(list.values());
         }
         catch (IOException e)
         {
+            Log.e(context.getClass().getName() , "IOExcetion occurred");
             e.printStackTrace();
+
+            return new ArrayList<>(list.values());
         }
         finally
         {
+            Log.e(context.getClass().getName() , "closing socket");
             if (datagramSocket != null)
                 datagramSocket.close();
-            return list;
         }
     }
 }
