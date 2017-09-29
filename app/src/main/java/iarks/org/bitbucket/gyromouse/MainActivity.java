@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.content.IntentCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -126,7 +125,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onDestroy();
         Log.e(getClass().getName(),"OnDestroy");
-        CurrentConnection.closeSockets();
+        Client.closeSockets();
     }
 
     // create overflow menu to toolbar
@@ -191,7 +190,7 @@ public class MainActivity extends AppCompatActivity
 
                 for (Server server : preServers) {
 
-                    if (NetworkUtil.connectTCP(server,MainActivity.this)) {
+                    if (ClientConnection.connectClient(server,MainActivity.this)) {
                         connected = true;
                         return "s";
                     }
@@ -212,7 +211,7 @@ public class MainActivity extends AppCompatActivity
                             dbHandler.addServerToDB(servers);
                         }
                     }
-                    if (NetworkUtil.connectTCP(discoveredServer.remove(0),MainActivity.this)) {
+                    if (ClientConnection.connectClient(discoveredServer.remove(0),MainActivity.this)) {
                         connected = true;
                         return "s";
                     } else
@@ -270,7 +269,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 default:
                     lt.success();
-                    Toasty.success(MainActivity.this, "connected to " + CurrentConnection.serverName + " at " + CurrentConnection.serverIP, Toast.LENGTH_SHORT, true).show();
+                    Toasty.success(MainActivity.this, "connected to " + Client.serverName + " at " + Client.serverIP, Toast.LENGTH_SHORT, true).show();
             }
         }
 
@@ -373,7 +372,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected String doInBackground(String... params)
         {
-            if (NetworkUtil.connectTCP(server,MainActivity.this))
+            if (ClientConnection.connectClient(server,MainActivity.this))
                 return "s";
             return "f";
         }
@@ -386,7 +385,7 @@ public class MainActivity extends AppCompatActivity
                 Toasty.error(MainActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
             } else {
                 lt.success();
-                Toasty.success(MainActivity.this, "connected to " + CurrentConnection.serverName + " at " + CurrentConnection.serverIP, Toast.LENGTH_SHORT, true).show();
+                Toasty.success(MainActivity.this, "connected to " + Client.serverName + " at " + Client.serverIP, Toast.LENGTH_SHORT, true).show();
             }
 
         }
@@ -458,7 +457,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         synchronized (sharedQueue)
                         {
-                            sharedQueue.put("AD;1;" + CurrentConnection.sessionKey);
+                            sharedQueue.put("AD;1;" + Client.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     }
@@ -473,7 +472,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         synchronized (sharedQueue)
                         {
-                            sharedQueue.put("AD;0;" + CurrentConnection.sessionKey);
+                            sharedQueue.put("AD;0;" + Client.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     }
@@ -493,7 +492,7 @@ public class MainActivity extends AppCompatActivity
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AR;1;" + CurrentConnection.sessionKey);
+                            sharedQueue.put("AR;1;" + Client.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -502,7 +501,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AR;0;" + CurrentConnection.sessionKey);
+                            sharedQueue.put("AR;0;" + Client.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -520,7 +519,7 @@ public class MainActivity extends AppCompatActivity
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AL;1;" + CurrentConnection.sessionKey);
+                            sharedQueue.put("AL;1;" + Client.sessionKey);
                             sharedQueue.notifyAll();
                         }
 
@@ -530,7 +529,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AL;0;" + CurrentConnection.sessionKey);
+                            sharedQueue.put("AL;0;" + Client.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -548,7 +547,7 @@ public class MainActivity extends AppCompatActivity
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AU;1;" + CurrentConnection.sessionKey);
+                            sharedQueue.put("AU;1;" + Client.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -557,7 +556,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("AU;0;" + CurrentConnection.sessionKey);
+                            sharedQueue.put("AU;0;" + Client.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -586,8 +585,8 @@ public class MainActivity extends AppCompatActivity
                     if (timeUp - timeDown < 500) {
                         try {
                             synchronized (sharedQueue) {
-                                sharedQueue.put("LD;x;" + CurrentConnection.sessionKey);
-                                sharedQueue.put("LU;x;" + CurrentConnection.sessionKey);
+                                sharedQueue.put("LD;x;" + Client.sessionKey);
+                                sharedQueue.put("LU;x;" + Client.sessionKey);
                                 sharedQueue.notifyAll();
                             }
                         } catch (InterruptedException e) {
@@ -624,7 +623,7 @@ public class MainActivity extends AppCompatActivity
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("RD;x;" + CurrentConnection.sessionKey);
+                            sharedQueue.put("RD;x;" + Client.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -633,7 +632,7 @@ public class MainActivity extends AppCompatActivity
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("RU;x;" + CurrentConnection.sessionKey);
+                            sharedQueue.put("RU;x;" + Client.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -653,7 +652,7 @@ public class MainActivity extends AppCompatActivity
                     downTime = event.getDownTime();
                     try {
                         synchronized (sharedQueue) {
-                            sharedQueue.put("LD;x;" + CurrentConnection.sessionKey);
+                            sharedQueue.put("LD;x;" + Client.sessionKey);
                             sharedQueue.notifyAll();
                         }
                     } catch (InterruptedException e) {
@@ -663,7 +662,7 @@ public class MainActivity extends AppCompatActivity
                     if (event.getEventTime() - downTime < 1000) {
                         try {
                             synchronized (sharedQueue) {
-                                sharedQueue.put("LU;x;" + CurrentConnection.sessionKey);
+                                sharedQueue.put("LU;x;" + Client.sessionKey);
                                 sharedQueue.notifyAll();
                             }
                         } catch (InterruptedException e) {
@@ -682,7 +681,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 try {
                     synchronized (sharedQueue) {
-                        sharedQueue.put("ESC;x;" + CurrentConnection.sessionKey);
+                        sharedQueue.put("ESC;x;" + Client.sessionKey);
                         sharedQueue.notifyAll();
                     }
                 } catch (InterruptedException e) {
@@ -696,7 +695,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 try {
                     synchronized (sharedQueue) {
-                        sharedQueue.put("WIN;x;" + CurrentConnection.sessionKey);
+                        sharedQueue.put("WIN;x;" + Client.sessionKey);
                         sharedQueue.notifyAll();
                     }
                 } catch (InterruptedException e) {

@@ -26,7 +26,7 @@ class UDPClientUtil implements Runnable
         try
         {
             clientSocket = new DatagramSocket();
-//            CurrentConnection.datagramSocket=clientSocket;
+//            Client.datagramSocket=clientSocket;
             contextt=context;
         }
         catch (Exception e)
@@ -44,7 +44,7 @@ class UDPClientUtil implements Runnable
         try
         {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(contextt);
-            IPAddress = InetAddress.getByName(CurrentConnection.serverIP);
+            IPAddress = InetAddress.getByName(Client.serverIP);
             port = Integer.parseInt(prefs.getString("udpPort","9050"));
         }
         catch (UnknownHostException e)

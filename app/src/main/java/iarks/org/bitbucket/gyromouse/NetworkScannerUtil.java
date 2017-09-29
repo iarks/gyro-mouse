@@ -36,8 +36,8 @@ class NetworkScannerUtil
         catch (SocketException e)
         {
             e.printStackTrace();
-            Log.e("NetworkUtil","CAUSE " +e.getCause().toString());
-            Log.e("NetworkUtil","MESSAGE " +e.getMessage());
+            Log.e("ClientConnection","CAUSE " +e.getCause().toString());
+            Log.e("ClientConnection","MESSAGE " +e.getMessage());
         }
 
         try

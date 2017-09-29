@@ -193,15 +193,15 @@ public class ServerListActivity extends AppCompatActivity
                         }));
             }
 
-            currentServerName.setText(CurrentConnection.serverName);
-            currentServerIP.setText(CurrentConnection.serverIP);
+            currentServerName.setText(Client.serverName);
+            currentServerIP.setText(Client.serverIP);
         }
 
         @Override
         protected void onPreExecute()
         {
-            currentServerName.setText(CurrentConnection.serverName);
-            currentServerIP.setText(CurrentConnection.serverIP);
+            currentServerName.setText(Client.serverName);
+            currentServerIP.setText(Client.serverIP);
 
             lt.setText("Looking into database");
             lt.setTranslationY(150);
@@ -228,7 +228,7 @@ public class ServerListActivity extends AppCompatActivity
         @Override
         protected String doInBackground(String... params)
         {
-            if (NetworkUtil.connectTCP(server,ServerListActivity.this))
+            if (ClientConnection.connectClient(server,ServerListActivity.this))
                 return "s";
             return "f";
         }
@@ -241,10 +241,10 @@ public class ServerListActivity extends AppCompatActivity
                 Toasty.error(ServerListActivity.this, "Could Not Connect to any server", Toast.LENGTH_SHORT, true).show();
             } else {
                 lt.success();
-                Toasty.success(ServerListActivity.this, "connected to " + CurrentConnection.serverName + " at " + CurrentConnection.serverIP, Toast.LENGTH_SHORT, true).show();
+                Toasty.success(ServerListActivity.this, "connected to " + Client.serverName + " at " + Client.serverIP, Toast.LENGTH_SHORT, true).show();
             }
-            currentServerName.setText(CurrentConnection.serverName);
-            currentServerIP.setText(CurrentConnection.serverIP);
+            currentServerName.setText(Client.serverName);
+            currentServerIP.setText(Client.serverIP);
         }
 
         @Override
@@ -262,8 +262,8 @@ public class ServerListActivity extends AppCompatActivity
 
     void updateCurrentServerView()
     {
-        currentServerName.setText(CurrentConnection.serverName);
-        currentServerIP.setText(CurrentConnection.serverIP);
+        currentServerName.setText(Client.serverName);
+        currentServerIP.setText(Client.serverIP);
     }
 
 }

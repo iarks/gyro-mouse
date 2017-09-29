@@ -7,7 +7,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 
-class CurrentConnection
+class Client
 {
     // params shared between server and client
     static String sessionKey;
@@ -20,7 +20,7 @@ class CurrentConnection
     static DatagramSocket datagramSocket;
 
 
-    private CurrentConnection(){}
+    private Client(){}
 
     // reset server details
     static void reset()
@@ -41,7 +41,7 @@ class CurrentConnection
         catch (IOException e)
         {
             e.printStackTrace();
-            Log.e("CurrentConnection","ClientSocketClosed");
+            Log.e("Client","ClientSocketClosed");
         }
 
         try
@@ -51,7 +51,7 @@ class CurrentConnection
         }catch (Exception e)
         {
             e.printStackTrace();
-            Log.e("CurrentConnection","UDPSocketClosed");
+            Log.e("Client","UDPSocketClosed");
         }
     }
 }
