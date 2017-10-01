@@ -14,7 +14,7 @@ class ServerListenerUtil implements Runnable
     private int firstTime;
 
     private final String AM_ALIVE_RESPONSE_STRING = "YES";
-    private final String SERVER_DEAD_STRING = "";
+    private final String SERVER_DEAD_STRING = "SHUTTINGDOWN";
     private final String SERVER_ASKING_RESPONSE = "UDERE?";
 
     @Override
@@ -73,7 +73,7 @@ class ServerListenerUtil implements Runnable
                     }
                     else if (receivedString.equals(SERVER_DEAD_STRING))
                     {
-                        Log.i(getClass().getName(), "SERVER IS DEAD?");
+                        Log.i(getClass().getName(), "server disconnected");
                         Toaster.toast("Server has disconnected");
                         resetLatch = 1;
                         Session.reset();

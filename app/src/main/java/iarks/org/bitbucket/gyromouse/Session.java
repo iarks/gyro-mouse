@@ -91,6 +91,14 @@ class Session implements Runnable
     // reset server details
     static void reset()
     {
+        try
+        {
+            sessionInstance.getClientTcpSocket().close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
         sessionInstance=null;
     }
 
